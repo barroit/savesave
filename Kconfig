@@ -1,0 +1,118 @@
+# SPDX-License-Identifier: GPL-3.0
+mainmenu "SaveSave $(SSVERSION) Configuration"
+
+menu "Features"
+
+config USE_UNICODE
+	bool "Use unicode"
+	default y
+
+endmenu # "Features"
+
+menu "Compiling"
+
+choice
+	prompt "Compiler"
+	default CXX_IS_GCC
+
+config CXX_IS_GCC
+	bool "MinGW g++"
+	select LINKER_LINK_WMAIN if USE_UNICODE
+	select CROSS_COMPILING
+
+config CXX_IS_CLANG
+	bool "LLVM clang++"
+
+endchoice
+
+menu "Compiler flags"
+
+choice
+	prompt "Debug level"
+	default CXX_DEBUG_0
+
+config CXX_DEBUG_0
+	bool "0 - produces no debug information at all"
+
+config CXX_DEBUG_1
+	bool "1 - produces minimal information"
+
+config CXX_DEBUG_2
+	bool "2 - produces more information"
+
+config CXX_DEBUG_3
+	bool "3 - includes as much information as possible"
+
+endchoice
+
+choice
+	prompt "Optimizations"
+	default CXX_OPTIMIZE_2
+
+config CXX_OPTIMIZE_0
+	bool "0 - reduce compilation time"
+
+config CXX_OPTIMIZE_1
+	bool "1 - optimize a little"
+
+config CXX_OPTIMIZE_2
+	bool "2 - optimize even more"
+
+config CXX_OPTIMIZE_3
+	bool "3 - optimize yet more"
+
+config CXX_OPTIMIZE_S
+	bool "s - optimize for size"
+
+config CXX_OPTIMIZE_FAST
+	bool "fast - optimize to oblivion"
+	help
+	  Disregard strict standards compliance. Use as many optimizations as
+	  possible.
+
+config CXX_OPTIMIZE_G
+	bool "g - optimize debugging experience"
+
+config CXX_OPTIMIZE_Z
+	bool "z - optimize aggressively for size rather than speed"
+
+endchoice
+
+config CXX_WARNING_ALL
+	bool "use -Wall"
+	default y
+
+endmenu # "Compiler flags"
+
+config CXX_COMPILER_NAME
+	string
+	default "x86_64-w64-mingw32-g++" if CXX_IS_GCC
+	default "clang++"
+
+choice
+	prompt "CXX version"
+	default CXX_VERSION_17
+
+config CXX_VERSION_20
+	bool "20"
+
+config CXX_VERSION_17
+	bool "17"
+
+config CXX_VERSION_14
+	bool "14"
+
+config CXX_VERSION_11
+	bool "11"
+
+endchoice
+
+config LINKER_LINK_WMAIN
+	bool "Link unicode main"
+	depends on CXX_IS_GCC && USE_UNICODE
+
+config CROSS_COMPILING
+	bool "Cross compiling"
+	depends on CXX_IS_GCC
+
+endmenu # "Compiling"
