@@ -52,18 +52,18 @@ endif()
 
 project(svsave VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
 
+include_directories(include/)
+
 if (BUILD STREQUAL linux)
-  file(GLOB platspec_src LIST_DIRECTORIES false src/uni/*.c)
-  set(mainfile src/savesave.c)
+  file(GLOB platspec_src LIST_DIRECTORIES false uni/*.c)
+  set(mainfile entry/savesave.c)
 else()
-  file(GLOB platspec_src LIST_DIRECTORIES false src/win/*.cpp)
-  set(mainfile src/savesave.cpp)
+  file(GLOB platspec_src LIST_DIRECTORIES false win/*.cpp)
+  set(mainfile entry/savesave.cpp)
 endif()
 add_library(platspec OBJECT ${platspec_src})
-target_include_directories(platspec PRIVATE src/)
 
-file(GLOB platfree_src LIST_DIRECTORIES false src/*.c)
-list(FILTER platfree_src EXCLUDE REGEX .*savesave.c$)
+file(GLOB platfree_src LIST_DIRECTORIES false platfree/*.c)
 add_library(platfree OBJECT ${platfree_src})
 
 add_executable(savesave ${mainfile})
