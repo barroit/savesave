@@ -1,18 +1,24 @@
 # SPDX-License-Identifier: GPL-3.0
+MAKEFLAGS += -rR
+MAKEFLAGS += --no-print-directory
+
 abs_root := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 abs_build := $(abs_root)/build
 
-ROOT := $(abs_root)
-BUILD := $(abs_build)
 DOTCONFIG :=  $(abs_root)/.config
+HOST := linux
+ARCH := $(shell uname -m)
 
-export ROOT BUILD DOTCONFIG
+export DOTCONFIG HOST ARCH
 
-all_targets := all menuconfig clean distclean
+all_targets := cmake_config cmake_build menuconfig clean distclean
 
 .PHONY: $(all_targets)
 
-all:
+cmake_build: cmake_config
+	@cmake --build $(abs_build)
+
+cmake_config:
 	@cmake $(abs_root) -B $(abs_build)
 
 menuconfig:
