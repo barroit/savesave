@@ -2,14 +2,19 @@
 MAKEFLAGS += -rR
 MAKEFLAGS += --no-print-directory
 
-abs_root := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+abs_root  := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 abs_build := $(abs_root)/build
+abs_gen   := $(abs_root)/include/generated
 
-DOTCONFIG :=  $(abs_root)/.config
+export ROOT := $(abs_root)
+
+DOTCONFIG := $(abs_root)/.config
+AUTOCONF  := $(abs_gen)/autoconf.h
+export DOTCONFIG AUTOCONF
+
 HOST := linux
 ARCH := $(shell uname -m)
-
-export DOTCONFIG HOST ARCH
+export HOST ARCH
 
 all_targets := cmake_config cmake_build menuconfig clean distclean
 
@@ -18,8 +23,12 @@ all_targets := cmake_config cmake_build menuconfig clean distclean
 cmake_build: cmake_config
 	@cmake --build $(abs_build)
 
-cmake_config:
+cmake_config: cmake_prepare
 	@cmake $(abs_root) -B $(abs_build)
+
+cmake_prepare:
+	@mkdir -p $(abs_gen)
+	@genconfig --header-path $(AUTOCONF)
 
 menuconfig:
 	@MENUCONFIG_STYLE=aquatic menuconfig
@@ -28,4 +37,5 @@ clean:
 	@make -C $(abs_build) clean
 
 distclean:
+	@rm $(AUTOCONF)
 	@rm -r $(abs_build)/*

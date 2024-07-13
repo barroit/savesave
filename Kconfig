@@ -49,6 +49,7 @@ config COMPILER_PREFIX
 	depends on CROSS_COMPILING
 	default "x86_64-w64-mingw32-" if $(ARCH) = "x86_64"
 	default "aarch64-w64-mingw32-" if $(ARCH) = "aarch64"
+	default "arch-xxx-xxx-"
 
 endmenu # "Compiler"
 

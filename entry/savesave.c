@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-int main(int argv, const char *argv[])
+int main(int argc, const char *argv[])
 {
 	return 0;
 }

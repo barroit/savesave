@@ -6,7 +6,7 @@ set(PATCH_VERSION  1)
 set(TWEAK_VERSION  0)
 set(SAVESAVE_VERSION ${MAJOR_VERSION}.${PATCH_VERSION}.${TWEAK_VERSION})
 
-include(scripts/kconfig.cmake)
+include($ENV{ROOT}/scripts/kconfig.cmake)
 
 if (CONFIG_CROSS_COMPILING OR NOT $ENV{HOST} STREQUAL linux)
 set(BUILD windows)
@@ -31,18 +31,21 @@ endif()
 
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_EXTENSIONS true)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS true)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (CONFIG_COMPILER_WARNING_ALL)
-list(APPEND CMAKE_C_FLAGS -Wall)
-list(APPEND CMAKE_CXX_FLAGS -Wall)
+add_compile_options(-Wall)
 endif()
 
 if (CONFIG_COMPILER_WARNING_EXTRA)
-list(APPEND CMAKE_C_FLAGS -Wextra)
-list(APPEND CMAKE_CXX_FLAGS -Wextra)
+add_compile_options(-Wextra)
 endif()
+
+add_compile_options(-include $ENV{AUTOCONF})
 
 list(APPEND languages C)
 
@@ -50,33 +53,41 @@ if (BUILD STREQUAL windows)
 list(APPEND languages CXX)
 endif()
 
-project(svsave VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
+project(savesave VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
 
-include_directories(include/)
+include_directories($ENV{ROOT}/include/)
 
 if (BUILD STREQUAL linux)
   file(GLOB platspec_src LIST_DIRECTORIES false uni/*.c)
-  set(mainfile entry/savesave.c)
+  set(mainfile $ENV{ROOT}/entry/savesave.c)
 else()
   file(GLOB platspec_src LIST_DIRECTORIES false win/*.cpp)
-  set(mainfile entry/savesave.cpp)
+  set(mainfile $ENV{ROOT}/entry/savesave.cpp)
 endif()
 add_library(platspec OBJECT ${platspec_src})
 
 file(GLOB platfree_src LIST_DIRECTORIES false platfree/*.c)
 add_library(platfree OBJECT ${platfree_src})
 
-add_executable(savesave ${mainfile})
+if (BUILD STREQUAL linux)
+  add_executable(savesave ${mainfile})
+else()
+  add_executable(savesave WIN32 ${mainfile})
+endif()
 target_link_libraries(savesave platfree platspec)
 
 if (CONFIG_LINKER_LINK_WMAIN)
 target_link_options(savesave PRIVATE -municode)
 endif()
 
+add_compile_definitions(_POSIX_C_SOURCE=200809L)
+
 if (CONFIG_USE_UNICODE)
 add_compile_definitions(UNICODE)
 endif()
 
 if (BUILD STREQUAL windows)
-add_compile_definitions(NTDDI_VERSION=NTDDI_WIN10)
+add_compile_definitions(NTDDI_WIN10
+			WINVER=_WIN32_WINNT_WIN10
+			_WIN32_WINNT=_WIN32_WINNT_WIN10)
 endif()

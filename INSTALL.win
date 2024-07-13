@@ -1,0 +1,29 @@
+
+		SaveSave installation
+
+Before install SaveSave, the following requirements need to be met
+
+	Kconfiglib (install via pip, tested with version 14.1)
+
+	CMake => 3.21
+
+	Clang && Clang++ (tested with version 18.1)
+
+	Ninja build (tested with version 1.12)
+
+	Windows 11 SDK
+
+	MSVC (tested with version v143)
+
+Normally you can just do ‘winbuild.ps1’, and that will build the program under
+build/ directory. If you want to do a config, you can do
+
+	> menuconfig
+	# and run winbuild.ps1 again to build the program
+
+If you're willing to clean up build configs (and you better do this to avoid
+any inconsistency after running make menuconfig), you just delete the build
+directories
+
+	> rm build
+	> rm include/generated

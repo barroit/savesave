@@ -1,0 +1,22 @@
+
+		SaveSave installation
+
+Before install SaveSave, the following requirements need to be met
+
+	kconfiglib (install via pip, tested with version 14.1)
+
+	cmake => 3.21
+
+Normally you can just do ‘make’, and that will build the program under build/
+directory. If you want to do a config, you can do
+
+	$ make menuconfig
+
+If you're willing to clean up build configs (and you better do this to avoid
+any inconsistency after running make menuconfig), you can run
+
+	$ make clean
+
+Alternatively you can clean all build-related files by running
+
+	$ make distclean

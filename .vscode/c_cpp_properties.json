@@ -1,0 +1,21 @@
+{
+	"configurations": [
+		{
+			"name": "gcc",
+			"defines": [
+				"_POSIX_C_SOURCE=200809L"
+			]
+		},
+		{
+			"name": "mingw64",
+			"defines": [
+				"_POSIX_C_SOURCE=200809L",
+				"NTDDI_WIN10",
+				"WINVER=_WIN32_WINNT_WIN10",
+				"_WIN32_WINNT=_WIN32_WINNT_WIN10",
+				"UNICODE"
+			]
+		}
+	],
+	"version": 4
+}
