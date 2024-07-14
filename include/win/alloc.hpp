@@ -7,4 +7,10 @@
 
 #pragma once
 
-int parse_cmdline(const char *cmdline);
+#include <stddef.h>
+
+template <typename T>
+T* xnew();
+
+template <typename T>
+T* xnew(size_t n);

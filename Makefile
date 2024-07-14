@@ -21,7 +21,7 @@ all_targets := cmake_config cmake_build menuconfig clean distclean
 .PHONY: $(all_targets)
 
 cmake_build: cmake_config
-	@cmake --build $(abs_build)
+	@cmake --build $(abs_build) --parallel
 
 cmake_config: cmake_prepare
 	@cmake $(abs_root) -B $(abs_build)

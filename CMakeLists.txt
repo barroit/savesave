@@ -82,19 +82,14 @@ else()
 endif()
 target_link_libraries(savesave platfree platspec)
 
-if (CONFIG_LINKER_LINK_WMAIN)
-target_link_options(savesave PRIVATE -municode)
+if (BUILD STREQUAL windows)
+target_link_libraries(savesave ws2_32)
 endif()
 
 add_compile_definitions(_POSIX_C_SOURCE=200809L)
 
-if (CONFIG_USE_UNICODE)
-add_compile_definitions(UNICODE)
-endif()
-
 if (BUILD STREQUAL windows)
 add_compile_definitions(NTDDI_WIN10
-			WIN32_NATIVE
 			WINVER=_WIN32_WINNT_WIN10
 			_WIN32_WINNT=_WIN32_WINNT_WIN10)
 endif()

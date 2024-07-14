@@ -54,7 +54,7 @@
 #endif
 
 /* Specification.  */
-#include "poll.h"
+#include "compat/poll.h"
 
 #ifdef HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>

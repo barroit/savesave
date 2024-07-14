@@ -5,8 +5,12 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef USAGE_H
-#define USAGE_H
+#ifndef TERMSG_H
+#define TERMSG_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "compiler.h"
 #include <errno.h>
@@ -28,5 +32,9 @@ extern char *strerror(int);
 
 #define bug(...) bug_routine(__FILE__, __LINE__, __VA_ARGS__)
 
-#endif /* USAGE_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* TERMSG_H */
 

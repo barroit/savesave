@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-#include "usage.h"
+#include "termsg.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
