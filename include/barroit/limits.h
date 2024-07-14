@@ -8,7 +8,12 @@
 #ifndef BR_LIMIT_H
 #define BR_LIMIT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <limits.h>
+#include "compat.h"
 
 /*
  * Most functions use SSIZE_MAX as the portable maximum number of bytes they
@@ -26,6 +31,10 @@
 # define MAX_ALLOC_SIZE SIZE_MAX
 #else
 # define MAX_ALLOC_SIZE MAX_ALLOC_SIZE_DEFAULT
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* BR_LIMIT_H */

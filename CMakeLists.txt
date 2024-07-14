@@ -61,7 +61,7 @@ endif()
 
 project(savesave VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
 
-include_directories($ENV{ROOT}/include/)
+include_directories($ENV{ROOT}/include)
 
 if (BUILD STREQUAL linux)
   file(GLOB platspec_src LIST_DIRECTORIES false uni/*.c)

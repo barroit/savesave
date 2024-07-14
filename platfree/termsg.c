@@ -12,6 +12,10 @@
 #include "barroit/io.h"
 #include <stdlib.h>
 
+#if (defined __clang__ && defined _WIN32)
+# define fileno _fileno
+#endif
+
 #define UPDATE_BUF(buf, n, len)		\
 	do {				\
 		size_t __len = len;	\

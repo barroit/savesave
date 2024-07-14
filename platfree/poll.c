@@ -24,7 +24,7 @@
 # pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
 # include <malloc.h>
 #endif
 
@@ -54,7 +54,7 @@
 #endif
 
 /* Specification.  */
-#include "compat/poll.h"
+#include "poll.h"
 
 #ifdef HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>

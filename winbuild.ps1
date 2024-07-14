@@ -20,4 +20,4 @@ mkdir -Force $abs_gen > $null
 genconfig --header-path $env:AUTOCONF --config-out .config
 
 cmake -G Ninja $abs_root -B $abs_build
-cmake --build $abs_build
+cmake --build $abs_build --parallel
