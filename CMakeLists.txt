@@ -45,6 +45,12 @@ if (CONFIG_COMPILER_WARNING_EXTRA)
 add_compile_options(-Wextra)
 endif()
 
+set_choiced_value(CONFIG_COMPILER_DEBUG)
+add_compile_options(-g${CONFIG_COMPILER_DEBUG})
+
+set_choiced_value(CONFIG_COMPILER_OPTIMIZE)
+add_compile_options(-O${CONFIG_COMPILER_OPTIMIZE})
+
 add_compile_options(-include $ENV{AUTOCONF})
 
 list(APPEND languages C)
@@ -88,6 +94,7 @@ endif()
 
 if (BUILD STREQUAL windows)
 add_compile_definitions(NTDDI_WIN10
+			WIN32_NATIVE
 			WINVER=_WIN32_WINNT_WIN10
 			_WIN32_WINNT=_WIN32_WINNT_WIN10)
 endif()

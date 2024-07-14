@@ -6,8 +6,18 @@
  */
 
 #include "windows.h"
+#include "win/cmdline.hpp"
 
-int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int)
+#ifdef UNICODE
+#define REALMAIN wWinMain
+#else
+#define REALMAIN WinMain
+#endif
+
+int WINAPI REALMAIN(HINSTANCE app, HINSTANCE, TCHAR *cmdline, int)
 {
+	if (*cmdline != 0)
+		return parse_cmdline();
+
 	return 0;
 }

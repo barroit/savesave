@@ -4,7 +4,12 @@
 			"name": "gcc",
 			"defines": [
 				"_POSIX_C_SOURCE=200809L"
-			]
+			],
+			"intelliSenseMode": "linux-gcc-x64",
+			"includePath": [
+				"${workspaceFolder}/include"
+			],
+			"compilerPath": "${env:HOME}/.local/bin/gcc"
 		},
 		{
 			"name": "mingw64",
@@ -14,7 +19,12 @@
 				"WINVER=_WIN32_WINNT_WIN10",
 				"_WIN32_WINNT=_WIN32_WINNT_WIN10",
 				"UNICODE"
-			]
+			],
+			"intelliSenseMode": "windows-gcc-x64",
+			"includePath": [
+				"${workspaceFolder}/include"
+			],
+			"compilerPath": "/usr/bin/x86_64-w64-mingw32-gcc"
 		}
 	],
 	"version": 4
