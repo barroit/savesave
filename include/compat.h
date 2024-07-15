@@ -3,6 +3,8 @@
  * Copyright 2024 Jiamu Sun
  *
  * Contact: barroit@linux.com
+ * 
+ * This file shall only be include by build system
  */
 
 #ifndef COMPAT_H

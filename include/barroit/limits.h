@@ -13,7 +13,6 @@ extern "C" {
 #endif
 
 #include <limits.h>
-#include "compat.h"
 
 /*
  * Most functions use SSIZE_MAX as the portable maximum number of bytes they

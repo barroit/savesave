@@ -1,0 +1,26 @@
+// SPDX-License-Identifier: GPL-3.0
+#ifndef APPHELP_H
+#define APPHELP_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define HELP_MESSAGE_WINDOWS						\
+	"Usage: savesave.exe [--version] [--help]\n"			\
+	"\n"								\
+	"    --version      print program version\n"			\
+	"    --help         get help message\n"				\
+	"\n"								\
+	"Usually, you can just double click the executable, and this\n"	\
+	"will start the application and automatically back up your \n"	\
+	"saves at regular intervals"
+
+#define HELP_MESSAGE_LINUX						\
+	"\n"
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* APPHELP_H */

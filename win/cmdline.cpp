@@ -6,13 +6,13 @@
  */
 
 #include "windows.h"
-#include "win/cmdline.hpp"
-#include "shellapi.h"
 #include <iomanip>
 #include <sstream>
 #include <string.h>
 #include "win/alloc.hpp"
 #include "alloc.h"
+#include "generated/appname.h"
+#include "list.h"
 
 struct arg_array {
 	char **buf;
@@ -20,37 +20,34 @@ struct arg_array {
 	size_t cap;
 };
 
-static int cmdline2argv(const char *cmdline, char ***argv, int *argc)
+int cmdline2argv(const char *cmdline, char ***argv)
 {
-	std::istringstream stream{ cmdline };
+	std::string line = std::string(APPNAME) + " " + std::string(cmdline);
+	std::istringstream stream(std::move(line));
 	std::string arg;
 
-	char *buf;
-	size_t nr;
-	struct arg_array arr = { 0 };
-
+	struct arg_array args = { 0 };
 	while (stream >> std::quoted(arg)) {
-		nr = arg.size() + 1;
-		buf = xnew<char>(nr);
+		size_t nr = arg.size() + 1;
+		char *buf = xnew<char>(nr);
 		memcpy(buf, arg.c_str(), nr);
 
-		CAP_GROW(&arr.buf, arr.nr + 1, &arr.cap);
+		CAP_GROW(&args.buf, args.nr + 1, &args.cap);
+		args.buf[args.nr++] = buf;
 	}
-	return 0;
+
+	CAP_GROW(&args.buf, args.nr + 1, &args.cap);
+	args.buf[args.nr] = NULL;
+
+	*argv = args.buf;
+	return args.nr;
 }
 
-int parse_cmdline(const char *cmdline)
+void rmargv(int argc, char **argv)
 {
-	char **argv;
-	int argc, err;
+	int i;
+	for_each_idx(i, argc)
+		delete[] argv[i];
 
-	err = cmdline2argv(cmdline, &argv, &argc);
-	if (err) {
-		goto err_get_argv;
-	}
-
-	return 0;
-
-err_get_argv:
-	return 1;
+	free(argv);
 }

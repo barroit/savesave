@@ -5,21 +5,22 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef BR_IO_H
-#define BR_IO_H
+#ifndef RUNOPT_H
+#define RUNOPT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stddef.h>
+enum optid {
+	OPT_VERSION = 'v',
+	OPT_HELP    = 'h',
+};
 
-ssize_t robread(int fd, void *buf, size_t n);
-
-ssize_t robwrite(int fd, const void *buf, size_t n);
+int parse_option(int argc, char *const *argv);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BR_IO_H */
+#endif /* RUNOPT_H */

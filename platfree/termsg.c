@@ -116,3 +116,8 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 
 	exit(128);
 }
+
+const char *getstrerror(void)
+{
+	return strerror(errno);
+}

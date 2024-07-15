@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: GPL-3.0
+#ifndef APPVERSION_H
+#define APPVERSION_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define MAJOR_VERSION "@MAJOR_VERSION@"
+#define PATCH_VERSION "@PATCH_VERSION@"
+#define TWEAK_VERSION "@TWEAK_VERSION@"
+
+#define SAVESAVE_VERSION "@SAVESAVE_VERSION@"
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* APPVERSION_H */

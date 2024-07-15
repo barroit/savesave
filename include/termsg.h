@@ -22,17 +22,13 @@ NORETURN die_routine(const char *extr, const char *fmt, ...) __format(2, 3);
 NORETURN bug_routine(const char *file,
 		     int line, const char *fmt, ...) __format(3, 4);
 
-#if (defined __clang__ && defined _WIN32)
-_ACRTIMP char* __cdecl strerror(int);
-#else
-extern char *strerror(int);
-#endif
+const char *getstrerror(void);
 
 #define error(...)       error_routine(0, __VA_ARGS__)
-#define error_errno(...) error_routine(strerror(errno), __VA_ARGS__)
+#define error_errno(...) error_routine(getstrerror(), __VA_ARGS__)
 
 #define die(...)       die_routine(0, __VA_ARGS__)
-#define die_errno(...) die_routine(strerror(errno), __VA_ARGS__)
+#define die_errno(...) die_routine(getstrerror(), __VA_ARGS__)
 
 #define bug(...) bug_routine(__FILE__, __LINE__, __VA_ARGS__)
 

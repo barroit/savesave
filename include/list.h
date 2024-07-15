@@ -5,21 +5,17 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef BR_IO_H
-#define BR_IO_H
+#ifndef LIST_H
+#define LIST_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stddef.h>
-
-ssize_t robread(int fd, void *buf, size_t n);
-
-ssize_t robwrite(int fd, const void *buf, size_t n);
+#define for_each_idx(i, n) for (i = 0; i < n; i++)
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BR_IO_H */
+#endif /* LIST_H */
