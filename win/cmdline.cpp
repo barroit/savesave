@@ -14,7 +14,7 @@
 #include "generated/appname.h"
 #include "list.h"
 
-struct arg_array {
+struct argarr {
 	char **buf;
 	size_t nr;
 	size_t cap;
@@ -26,17 +26,17 @@ int cmdline2argv(const char *cmdline, char ***argv)
 	std::istringstream stream(std::move(line));
 	std::string arg;
 
-	struct arg_array args = { 0 };
+	struct argarr args = { 0 };
 	while (stream >> std::quoted(arg)) {
 		size_t nr = arg.size() + 1;
 		char *buf = xnew<char>(nr);
 		memcpy(buf, arg.c_str(), nr);
 
-		CAP_GROW(&args.buf, args.nr + 1, &args.cap);
+		cap_grow((void **)&args.buf, args.nr + 1, &args.cap);
 		args.buf[args.nr++] = buf;
 	}
 
-	CAP_GROW(&args.buf, args.nr + 1, &args.cap);
+	cap_grow((void **)&args.buf, args.nr + 1, &args.cap);
 	args.buf[args.nr] = NULL;
 
 	*argv = args.buf;

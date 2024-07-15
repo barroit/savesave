@@ -6,7 +6,7 @@
  */
 
 #include "runopt.h"
-#include "getopt.h"
+#include "compat/getopt.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "generated/version.h"

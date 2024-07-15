@@ -23,8 +23,6 @@ void *xrealloc(void *p, size_t n);
 
 void cap_grow(void **buf, size_t req, size_t *cap);
 
-#define CAP_GROW(buf, req, cap) cap_grow((void **)(buf), req, cap)
-
 #ifdef __cplusplus
 }
 #endif

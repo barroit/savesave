@@ -14,11 +14,9 @@ static void handle_command_line(const char *cmdline)
 {
 	setup_console();
 
-	int argc, res;
 	char **argv;
-
-	argc = cmdline2argv(cmdline, &argv);
-	res = parse_option(argc, argv);
+	int argc = cmdline2argv(cmdline, &argv);
+	int res = parse_option(argc, argv);
 
 	if (res == OPT_HELP || res == OPT_VERSION) {
 		putchar('\n');

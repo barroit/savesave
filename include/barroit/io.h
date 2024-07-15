@@ -12,7 +12,11 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
+#ifdef _WIN32
+# include <io.h>
+#else
+# include <unistd.h>
+#endif
 
 ssize_t robread(int fd, void *buf, size_t n);
 

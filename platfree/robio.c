@@ -6,16 +6,9 @@
  */
 
 #include "barroit/io.h"
-
-#ifdef _WIN32
-# include <io.h>
-#else
-# include <unistd.h>
-#endif
-
 #include "barroit/limits.h"
 #include <errno.h>
-#include "poll.h"
+#include "compat/poll.h"
 
 #if (defined __clang__ && defined _WIN32)
 # define read  _read
