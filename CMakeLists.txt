@@ -24,6 +24,9 @@ else() # Linux
   set(CMAKE_C_COMPILER ${CONFIG_CC_NAME})
 endif()
 
+# Let us handle flags
+set(CMAKE_BUILD_TYPE "")
+
 if (CONFIG_CROSS_COMPILING)
 set(CMAKE_SYSTEM_NAME Windows)
 set(CMAKE_SYSTEM_VERSION 22H2)
@@ -51,7 +54,10 @@ add_compile_options(-g${CONFIG_COMPILER_DEBUG})
 set_choiced_value(CONFIG_COMPILER_OPTIMIZE)
 add_compile_options(-O${CONFIG_COMPILER_OPTIMIZE})
 
-add_compile_options(-include $ENV{AUTOCONF})
+# By specifying a SHELL and quoting our options, we can disable Option
+# De-duplication
+add_compile_options("SHELL:-include $ENV{AUTOCONF}")
+add_compile_options("SHELL:-include $ENV{ROOT}/include/compat.h")
 
 list(APPEND languages C)
 
@@ -84,6 +90,11 @@ target_link_libraries(savesave platfree platspec)
 
 if (BUILD STREQUAL windows)
 target_link_libraries(savesave ws2_32)
+endif()
+
+# For the best portable
+if (CONFIG_CROSS_COMPILING)
+target_link_options(savesave PRIVATE -static-libgcc -static-libstdc++)
 endif()
 
 add_compile_definitions(_POSIX_C_SOURCE=200809L)

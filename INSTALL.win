@@ -22,8 +22,8 @@ build/ directory. If you want to do a config, you can do
 	# and run winbuild.ps1 again to build the program
 
 If you're willing to clean up build configs (and you better do this to avoid
-any inconsistency after running make menuconfig), you just delete the build
-directories
+any inconsistent config after running make menuconfig), you just delete the
+build directories
 
 	> rm build
 	> rm include/generated

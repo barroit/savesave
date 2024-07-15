@@ -114,20 +114,3 @@ config COMPILER_WARNING_EXTRA
 	bool "use -Wextra"
 
 endmenu # "Compiler flags"
-
-if CROSS_COMPILING || $(HOST) != "linux"
-
-menu "Features"
-
-config USE_UNICODE
-	bool "Use unicode"
-	default y
-	select LINKER_LINK_WMAIN if CXX_IS_GCC
-
-config LINKER_LINK_WMAIN
-	bool "Link unicode main"
-	depends on CXX_IS_GCC && USE_UNICODE
-
-endmenu # "Features"
-
-endif
