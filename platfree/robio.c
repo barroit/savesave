@@ -10,7 +10,7 @@
 #include <errno.h>
 #include "compat/poll.h"
 
-#if (defined __clang__ && defined _WIN32)
+#ifdef WINDOWS_NATIVE
 # define read  _read
 # define write _write
 #endif

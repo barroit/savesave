@@ -107,10 +107,13 @@ if (CONFIG_CROSS_COMPILING)
 target_link_options(savesave PRIVATE -static-libgcc -static-libstdc++)
 endif()
 
-add_compile_definitions(_POSIX_C_SOURCE=200809L)
+add_compile_definitions(_GNU_SOURCE)
 
 if (BUILD STREQUAL windows)
-add_compile_definitions(NTDDI_WIN10
-			WINVER=_WIN32_WINNT_WIN10
-			_WIN32_WINNT=_WIN32_WINNT_WIN10)
+  add_compile_definitions(NTDDI_WIN10
+			  WINVER=_WIN32_WINNT_WIN10
+			  _WIN32_WINNT=_WIN32_WINNT_WIN10)
+  if (NOT CONFIG_CROSS_COMPILING) # clang
+    add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+  endif()
 endif()

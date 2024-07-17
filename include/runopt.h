@@ -13,11 +13,17 @@ extern "C" {
 #endif
 
 enum optid {
-	OPT_VERSION = 'v',
+	OPT_DONE    = -1,
+	OPT_FLAG    = 0,
+	OPT_UNKNOWN = '?',
+	OPT_CONFIG  = 'f',
 	OPT_HELP    = 'h',
+	OPT_VERSION = 'v',
 };
 
-int parse_option(int argc, char *const *argv);
+extern char *optarg;
+
+enum optid parse_option(int argc, char *const *argv);
 
 #ifdef __cplusplus
 }

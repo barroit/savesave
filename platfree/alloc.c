@@ -30,6 +30,16 @@ void *xrealloc(void *p, size_t n)
 	return p;
 }
 
+void *xmalloc(size_t n)
+{
+	memory_limit_check(n);
+
+	void *p = malloc(n);
+	if (!p)
+		die("out of memory (tried to allocate %" PRIuMAX " bytes)", n);
+	return p;
+}
+
 void cap_grow(void **buf, size_t req, size_t *cap)
 {
 	if (req > *(cap)) {

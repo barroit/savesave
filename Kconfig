@@ -114,3 +114,11 @@ config COMPILER_WARNING_EXTRA
 	bool "use -Wextra"
 
 endmenu # "Compiler flags"
+
+menu "Features"
+
+config SS_CONF_NAME
+	string "savesave config name"
+	default ".savesave"
+
+endmenu # "Features"

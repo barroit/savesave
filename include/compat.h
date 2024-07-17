@@ -25,6 +25,10 @@ typedef SSIZE_T ssize_t;
 # endif
 #endif
 
+#if (defined __clang__ && defined _WIN32)
+# define WINDOWS_NATIVE
+#endif
+
 #ifdef __cplusplus
 }
 #endif

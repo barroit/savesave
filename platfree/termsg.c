@@ -12,7 +12,7 @@
 #include "barroit/io.h"
 #include <stdlib.h>
 
-#if (defined __clang__ && defined _WIN32)
+#ifdef WINDOWS_NATIVE
 # define fileno _fileno
 #endif
 
@@ -92,7 +92,7 @@ int error_routine(const char *extr, const char *fmt, ...)
 	vreportf(stderr, "error: ", fmt, ap, extr);
 	va_end(ap);
 
-	return 1;
+	return -1;
 }
 
 void die_routine(const char *extr, const char *fmt, ...)
@@ -119,11 +119,5 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 
 const char *getstrerror(void)
 {
-#if (defined __clang__ && defined _WIN32)
-	static char buf[256];
-	strerror_s(buf, sizeof(buf), errno);
-	return buf;
-#else
 	return strerror(errno);
-#endif
 }

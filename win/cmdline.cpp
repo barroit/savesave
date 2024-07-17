@@ -8,7 +8,6 @@
 #include "windows.h"
 #include <iomanip>
 #include <sstream>
-#include <string.h>
 #include "win/alloc.hpp"
 #include "alloc.h"
 #include "generated/appname.h"

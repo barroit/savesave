@@ -14,13 +14,17 @@ extern "C" {
 
 #ifdef _WIN32
 # include <io.h>
-#else
+# define USERHOME "USERPROFILE"
+#else /* linux */
 # include <unistd.h>
+# define USERHOME "HOME"
 #endif
 
 ssize_t robread(int fd, void *buf, size_t n);
 
 ssize_t robwrite(int fd, const void *buf, size_t n);
+
+char *readfile(const char *name);
 
 #ifdef __cplusplus
 }

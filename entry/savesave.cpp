@@ -7,6 +7,7 @@
 
 #include "windows.h"
 #include "win/console.hpp"
+#include "barroit/io.h"
 #include "runopt.h"
 #include <stdio.h>
 
@@ -16,12 +17,14 @@ static void handle_command_line(const char *cmdline)
 
 	char **argv;
 	int argc = cmdline2argv(cmdline, &argv);
-	int res = parse_option(argc, argv);
+	enum optid res = parse_option(argc, argv);
 
 	if (res == OPT_HELP || res == OPT_VERSION) {
 		putchar('\n');
 		waiting_user();
 		exit(0);
+	} else if (res == OPT_CONFIG) {
+		// readfile();
 	}
 
 	rmargv(argc, argv);
