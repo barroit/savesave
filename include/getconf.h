@@ -28,17 +28,13 @@ struct savesave {
 	u8 stack;
 };
 
-char *get_default_config_path(void);
+PLATSPEC const char *get_home_dir(void);
 
-char *read_config(const char *path);
+PLATSPEC int parse_save_path(const char *path, struct savesave *conf);
 
-int parse_config(char *strconf, struct savesave *conf);
+PLATSPEC int parse_backup_path(const char *path, struct savesave *conf);
 
-/* error message handled by this function */
-int parse_save_path(const char *path, struct savesave *conf);
-
-/* error message handled by this function */
-int parse_backup_path(const char *path, struct savesave *conf);
+int parse_savesave_config(const char *path, struct savesave *conf);
 
 #ifdef __cplusplus
 }

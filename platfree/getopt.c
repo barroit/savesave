@@ -23,23 +23,7 @@
    Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301,
    USA.  */
 
-/* This tells Alpha OSF/1 not to define a getopt prototype in <stdio.h>.
-   Ditto for AIX 3.2 and <stdlib.h>.  */
-#ifndef _NO_PROTO
-# define _NO_PROTO
-#endif
-
-#if !defined __STDC__ || !__STDC__
-/* This is a separate conditional since some stdc systems
-   reject `defined (const)'.  */
-# ifndef const
-#  define const
-# endif
-#endif
-
 #include "compat/ansidecl.h"
-#include <stdio.h>
-#include <string.h>
 
 /* Comment out all this code if we are using the GNU C Library, and are not
    actually compiling the library itself.  This code is part of the GNU C
@@ -59,32 +43,8 @@
 
 #ifndef ELIDE_CODE
 
-
-/* This needs to come after some library #include
-   to get __GNU_LIBRARY__ defined.  */
-#ifdef	__GNU_LIBRARY__
-/* Don't include stdlib.h for non-GNU C libraries because some of them
-   contain conflicting prototypes for getopt.  */
-# include <stdlib.h>
-# include <unistd.h>
-#endif	/* GNU C library.  */
-
-#ifdef VMS
-# include <unixlib.h>
-# if HAVE_STRING_H - 0
-#  include <string.h>
-# endif
-#endif
-
 #ifndef _
-/* This is for other GNU distributions with internationalized messages.
-   When compiling libc, the _ macro is predefined.  */
-# if (HAVE_LIBINTL_H && ENABLE_NLS) || defined _LIBC
-#  include <libintl.h>
-#  define _(msgid)	gettext (msgid)
-# else
-#  define _(msgid)	(msgid)
-# endif
+# define _(msgid)	(msgid)
 #endif
 
 /* This version of `getopt' appears to the caller like standard Unix `getopt'
@@ -188,65 +148,9 @@ static enum
 
 /* Value of POSIXLY_CORRECT environment variable.  */
 static char *posixly_correct;
-
-#ifdef	__GNU_LIBRARY__
-/* We want to avoid inclusion of string.h with non-GNU libraries
-   because there are many ways it can cause trouble.
-   On some systems, it contains special magic macros that don't work
-   in GCC.  */
-# include <string.h>
-# define my_index	strchr
-#else
 
-# if HAVE_STRING_H
-#  include <string.h>
-# else
-#  if HAVE_STRINGS_H
-#   include <strings.h>
-#  endif
-# endif
+#define my_index strchr
 
-/* Avoid depending on library functions or files
-   whose names are inconsistent.  */
-
-#if HAVE_STDLIB_H && HAVE_DECL_GETENV
-#  include <stdlib.h>
-#elif !defined(getenv)
-#  ifdef __cplusplus
-extern "C" {
-#  endif /* __cplusplus */
-extern char *getenv (const char *);
-#  ifdef __cplusplus
-}
-#  endif /* __cplusplus */
-#endif
-
-static char *
-my_index (const char *str, int chr)
-{
-  while (*str)
-    {
-      if (*str == chr)
-	return (char *) str;
-      str++;
-    }
-  return 0;
-}
-
-/* If using GCC, we can safely declare strlen this way.
-   If not using GCC, it is ok not to declare it.  */
-#ifdef __GNUC__
-/* Note that Motorola Delta 68k R3V7 comes with GCC but not stddef.h.
-   That was relevant to code that was here before.  */
-# if (!defined __STDC__ || !__STDC__) && !defined strlen
-/* gcc with -traditional declares the built-in strlen to return int,
-   and has done so at least since version 2.4.5. -- rms.  */
-extern int strlen (const char *);
-# endif /* not __STDC__ */
-#endif /* __GNUC__ */
-
-#endif /* not __GNU_LIBRARY__ */
-
 /* Handle permutation of arguments.  */
 
 /* Describe the part of ARGV that contains non-options that have

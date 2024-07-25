@@ -6,12 +6,11 @@
  */
 
 #include "runopt.h"
-#include <stdlib.h>
 #include "barroit/io.h"
 #include "termsg.h"
 #include "getconf.h"
 
-static const char *config_path;
+static const char *savconf_path;
 static struct savesave savconf;
 
 static void handle_option(int argc, char *const *argv)
@@ -19,29 +18,21 @@ static void handle_option(int argc, char *const *argv)
 	enum optid res = parse_option(argc, argv);
 
 	if (res == OPT_VERSION || res == OPT_HELP)
-		exit(0);
+		exit(128);
 	else if (res == OPT_CONFIG)
-		config_path = optarg;
+		savconf_path = optarg;
 }
-
-#include <stdio.h>
 
 int main(int argc, char *const *argv)
 {
+	int err;
+
 	if (argc > 1)
 		handle_option(argc, argv);
 
-	char *strconf = read_config(config_path);
-	if (!strconf)
-		exit(128);
-
-	int err = parse_config(strconf, &savconf);
+	err = parse_savesave_config(savconf_path, &savconf);
 	if (err)
 		exit(128);
-
-	free(strconf);
-	printf("save: %s\nbackup: %s\ninterval: %u\nstack: %u\n",
-	       savconf.save, savconf.backup, savconf.interval, savconf.stack);
 
 	return 0;
 }

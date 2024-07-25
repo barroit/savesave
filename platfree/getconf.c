@@ -7,34 +7,43 @@
 
 #include "getconf.h"
 #include "barroit/io.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include "alloc.h"
-#include <ctype.h>
-#include <inttypes.h>
 
-#ifdef WINDOWS_NATIVE
-# define access _access
-# define strdup _strdup
-# define R_OK 04
-#endif
-
-char *read_config(const char *path)
+static char *append_conf_path(const char *prefix, const char *conf)
 {
-	char *defpath = NULL;
-	if (!path) {
-		defpath = get_default_config_path();
-		path = defpath;
+	size_t len = strlen(prefix) + 1 + strlen(conf) + 1;
+	char *path = xmalloc(len);
+
+	if (snprintf(path, len, "%s/%s", prefix, conf) != len - 1)
+		die("unable to construct config path string");
+
+	return path;
+}
+
+static char *get_default_saveconf_path(void)
+{
+	char *path = getenv(DEFAULT_CONFIG_ENV);
+	if (path) {
+		path = strdup(path);
+		goto check_path;
 	}
 
-	if (!path) {
-		error("no configuration was provided");
-		return NULL;
-	}
+	const char *home = get_home_dir();
 
+	path = append_conf_path(home, DEFAULT_CONF_NAME);
+
+check_path:
+	if (access(path, R_OK) == 0)
+		return path;
+
+	free(path);
+	return NULL;
+
+}
+
+static char *read_config(const char *path)
+{
 	char *strconf = readfile(path);
-	free(defpath);
 	if (!strconf) {
 		error_errno("failed to read config from ‘%s’", path);
 		return NULL;
@@ -42,6 +51,108 @@ char *read_config(const char *path)
 
 	return strconf;
 }
+
+/* access() with error handling */
+static int access_directory(const char *path, int type)
+{
+	int err;
+
+	err = access(path, type);
+	if (err)
+		return error_errno("can’t access directory ‘%s’", path);
+	return 0;
+}
+
+/* stat with error handling */
+static int stat_file(const char *path, struct stat *f)
+{
+	int err;
+
+	err = stat(path, f);
+	if (err)
+		return error_errno("can’t access ‘%s’", path);
+	return 0;
+}
+
+static int parse_dir_save(const char *path, struct savesave *conf)
+{
+	int err;
+
+	err = access_directory(path, R_OK | X_OK);
+	if (err)
+		return 1;
+
+	/* TODO: check user defined use_snapshot compatibility here */
+
+	conf->use_snapshot = 1;
+	conf->use_zip = 1;
+
+	return 0;
+}
+
+static int parse_reg_save(const char *path, off_t size, struct savesave *conf)
+{
+	int err;
+
+	err = access(path, R_OK);
+	if (err)
+		return error_errno("can’t access file ‘%s’", path);
+
+	/* TODO: check user defined use_snapshot compatibility here */
+
+	if (size > CONFIG_SNAPSHOT_THRESHOLD_SIZE_KB * 1024)
+		conf->use_snapshot = 1;
+	if (size > CONFIG_ZIP_THRESHOLD_SIZE_KB * 1024)
+		conf->use_zip = 1;
+
+	return 0;
+}
+
+int parse_save_path(const char *path, struct savesave *conf)
+{
+	int err;
+	struct stat save;
+
+	err = stat_file(path, &save);
+	if (err)
+		return 1;
+
+	if (S_ISDIR(save.st_mode))
+		err = parse_dir_save(path, conf);
+	else if (S_ISREG(save.st_mode))
+		err = parse_reg_save(path, save.st_size, conf);
+	else
+		err = error("unsupported save file mode ‘%d’", save.st_mode);
+
+	if (err)
+		return 1;
+
+	conf->save = strdup(path);
+	return 0;
+}
+
+int parse_backup_path(const char *path, struct savesave *conf)
+{
+	int err;
+	struct stat backup;
+
+	err = stat_file(path, &backup);
+	if (err)
+		return 1;
+
+	if (!S_ISDIR(backup.st_mode))
+		return error("path ‘%s’ does not point to a directory", path);
+
+	err = access_directory(path, X_OK | W_OK);
+	if (err)
+		return 1;
+
+	conf->backup = strdup(path);
+	return 0;
+}
+
+
+
 
 static unsigned long str2ulong(const char *str, size_t len)
 {
@@ -141,7 +252,7 @@ static int parse_line(const char *line, size_t klen, const char *val,
 	return 0;
 }
 
-int parse_config(char *strconf, struct savesave *conf)
+static int parse_config(char *strconf, struct savesave *conf)
 {
 	unsigned lnum = 0;
 	char *line = strtok(strconf, "\n");
@@ -174,4 +285,28 @@ int parse_config(char *strconf, struct savesave *conf)
 err_incomp_conf:
 	return error("config contains an incomplete line at %u:‘%s’",
 		     lnum, line);
+}
+
+int parse_savesave_config(const char *path, struct savesave *conf)
+{
+	char *defpath = NULL;
+	if (!path) {
+		defpath = get_default_saveconf_path();
+		path = defpath;
+	}
+
+	if (!path)
+		return error("no configuration was provided");
+
+	char *strconf = read_config(path);
+	free(defpath);
+	if (!strconf)
+		return 1;
+
+	int err = parse_config(strconf, conf);
+	free(strconf);
+	if (err)
+		return 1;
+
+	return 0;
 }

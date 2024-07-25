@@ -6,9 +6,7 @@
  */
 
 #include "win/alloc.hpp"
-#include <new>
 #include "termsg.h"
-#include <inttypes.h>
 #include "alloc.h"
 
 template <typename T>

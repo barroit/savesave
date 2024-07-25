@@ -6,7 +6,6 @@
  */
 
 #include "win/termsg.hpp"
-#include "windows.h"
 #include "calc.h"
 
 static char errbuf[256];

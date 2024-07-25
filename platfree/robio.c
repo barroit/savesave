@@ -7,13 +7,7 @@
 
 #include "barroit/io.h"
 #include "barroit/limits.h"
-#include <errno.h>
 #include "compat/poll.h"
-
-#ifdef WINDOWS_NATIVE
-# define read  _read
-# define write _write
-#endif
 
 static void handle_nonblock(int fd, short events)
 {

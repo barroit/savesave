@@ -12,7 +12,6 @@
 extern "C" {
 #endif
 
-#include <limits.h>
 #include "termsg.h"
 
 #define ARRAY_SIZEOF(arr) (sizeof(arr) / sizeof((arr)[0]))

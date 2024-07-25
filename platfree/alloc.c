@@ -7,10 +7,7 @@
 
 #include "alloc.h"
 #include "barroit/limits.h"
-#include <stdint.h>
 #include "termsg.h"
-#include <inttypes.h>
-#include <stdlib.h>
 
 void memory_limit_check(size_t n)
 {

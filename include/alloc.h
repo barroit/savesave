@@ -12,7 +12,6 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
 #include "calc.h"
 
 void memory_limit_check(size_t n);

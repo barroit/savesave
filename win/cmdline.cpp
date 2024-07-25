@@ -5,12 +5,8 @@
  * Contact: barroit@linux.com
  */
 
-#include "windows.h"
-#include <iomanip>
-#include <sstream>
 #include "win/alloc.hpp"
 #include "alloc.h"
-#include "generated/appname.h"
 #include "list.h"
 
 struct argarr {

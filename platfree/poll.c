@@ -24,46 +24,12 @@
 # pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
 
-#if defined(_WIN32)
-# include <malloc.h>
-#endif
-
-#include <sys/types.h>
-
-#include <errno.h>
-#include <limits.h>
-#include <assert.h>
-
 #if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
 # define WIN32_NATIVE
-# if defined (_MSC_VER) && !defined(_WIN32_WINNT)
-#  define _WIN32_WINNT 0x0502
-# endif
-# include <winsock2.h>
-# include <windows.h>
-# include <io.h>
-# include <stdio.h>
-# include <conio.h>
-#else
-# include <sys/time.h>
-# include <sys/socket.h>
-# ifndef NO_SYS_SELECT_H
-#  include <sys/select.h>
-# endif
-# include <unistd.h>
 #endif
 
 /* Specification.  */
 #include "compat/poll.h"
-
-#ifdef HAVE_SYS_IOCTL_H
-# include <sys/ioctl.h>
-#endif
-#ifdef HAVE_SYS_FILIO_H
-# include <sys/filio.h>
-#endif
-
-#include <time.h>
 
 #ifndef INFTIM
 # define INFTIM (-1)

@@ -65,6 +65,8 @@ if (BUILD STREQUAL windows)
 list(APPEND languages CXX)
 endif()
 
+project(savesave VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
+
 configure_file($ENV{ROOT}/scripts/version.h.in
 	       $ENV{ROOT}/include/generated/version.h)
 
@@ -74,8 +76,6 @@ configure_file($ENV{ROOT}/scripts/appname.h.in
 configure_file($ENV{ROOT}/scripts/apphelp.h.in
 	       $ENV{ROOT}/include/generated/apphelp.h
 	       COPYONLY)
-
-project(savesave VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
 
 include_directories($ENV{ROOT}/include)
 

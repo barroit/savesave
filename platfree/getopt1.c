@@ -18,20 +18,6 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301,
    USA.  */
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#if !defined __STDC__ || !__STDC__
-/* This is a separate conditional since some stdc systems
-   reject `defined (const)'.  */
-#ifndef const
-#define const
-#endif
-#endif
-
-#include <stdio.h>
 
 #include "compat/getopt.h"
 
@@ -52,17 +38,6 @@
 #endif
 
 #ifndef ELIDE_CODE
-
-
-/* This needs to come after some library #include
-   to get __GNU_LIBRARY__ defined.  */
-#ifdef __GNU_LIBRARY__
-#include <stdlib.h>
-#endif
-
-#ifndef	NULL
-#define NULL 0
-#endif
 
 int
 getopt_long (int argc,  char *const *argv,  const char *options,

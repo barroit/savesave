@@ -12,9 +12,6 @@
 extern "C" {
 #endif
 
-#include "compiler.h"
-#include <errno.h>
-
 void warn_routine(const char *extr, const char *fmt, ...) __format(2, 3);
 
 int error_routine(const char *extr, const char *fmt, ...) __format(2, 3);

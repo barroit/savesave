@@ -6,15 +6,7 @@
  */
 
 #include "termsg.h"
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
 #include "barroit/io.h"
-#include <stdlib.h>
-
-#ifdef WINDOWS_NATIVE
-# define fileno _fileno
-#endif
 
 #define UPDATE_BUF(buf, n, len)		\
 	do {				\

@@ -5,12 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#include "windows.h"
-#include <stdio.h>
-#include <iostream>
-#include <string>
-#include <conio.h>
-
 static FILE *console;
 
 void setup_console()

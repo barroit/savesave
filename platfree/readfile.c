@@ -5,18 +5,8 @@
  * Contact: barroit@linux.com
  */
 
-#include <fcntl.h>
-#include <sys/stat.h>
 #include "barroit/io.h"
 #include "alloc.h"
-#include <stdlib.h>
-
-#ifdef WINDOWS_NATIVE
-# define open  _open
-# define fstat _fstat
-# define close _close
-# define stat  _stat64i32
-#endif
 
 char *readfile(const char *name)
 {

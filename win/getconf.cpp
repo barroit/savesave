@@ -5,10 +5,9 @@
  * Contact: barroit@linux.com
  */
 
-#pragma once
+#include "getconf.h"
 
-template <typename T>
-T* xnew();
-
-template <typename T>
-T* xnew(size_t n);
+const char *get_home_dir()
+{
+	return getenv("USERPROFILE");
+}
