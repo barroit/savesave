@@ -3,7 +3,9 @@
 /.gdbinit
 /.config
 /.config.old
+/.savesave
 
 /build
+/draft
 
 /include/generated

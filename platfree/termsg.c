@@ -84,6 +84,15 @@ static void vreportf(FILE *stream, const char *lead,
 	robwrite(fd, msg, n);
 }
 
+void warn_routine(const char *extr, const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	vreportf(stderr, "warning: ", fmt, ap, extr);
+	va_end(ap);
+}
+
 int error_routine(const char *extr, const char *fmt, ...)
 {
 	va_list ap;
@@ -92,7 +101,7 @@ int error_routine(const char *extr, const char *fmt, ...)
 	vreportf(stderr, "error: ", fmt, ap, extr);
 	va_end(ap);
 
-	return -1;
+	return 1;
 }
 
 void die_routine(const char *extr, const char *fmt, ...)

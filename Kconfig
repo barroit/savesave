@@ -57,7 +57,7 @@ menu "Compiler flags"
 
 choice
 	prompt "Debug level"
-	default COMPILER_DEBUG_0
+	default COMPILER_DEBUG_3
 
 config COMPILER_DEBUG_0
 	bool "0 - produces no debug information at all"
@@ -75,7 +75,7 @@ endchoice
 
 choice
 	prompt "Optimizations"
-	default COMPILER_OPTIMIZE_2
+	default COMPILER_OPTIMIZE_0
 
 config COMPILER_OPTIMIZE_0
 	bool "0 - reduce compilation time"
@@ -117,8 +117,12 @@ endmenu # "Compiler flags"
 
 menu "Features"
 
-config SS_CONF_NAME
-	string "savesave config name"
-	default ".savesave"
+config SNAPSHOT_THRESHOLD_SIZE_KB
+	int "size threshold for creating snapshot (in KB)"
+	default 10240
+
+config ZIP_THRESHOLD_SIZE_KB
+	int "size threshold for compression (in KB)"
+	default 30720
 
 endmenu # "Features"

@@ -26,7 +26,7 @@ char *readfile(const char *name)
 
 	struct stat st;
 	if (fstat(fd, &st) == -1)
-		goto err_stat_df;
+		goto err_stat_fd;
 
 	char *buf = xmalloc(st.st_size + 1);
 	buf[st.st_size] = 0;
@@ -39,7 +39,7 @@ char *readfile(const char *name)
 
 err_read_file:
 	free(buf);
-err_stat_df:
+err_stat_fd:
 	close(fd);
 err_open_file:
 	return NULL;

@@ -15,6 +15,8 @@ extern "C" {
 #include "compiler.h"
 #include <errno.h>
 
+void warn_routine(const char *extr, const char *fmt, ...) __format(2, 3);
+
 int error_routine(const char *extr, const char *fmt, ...) __format(2, 3);
 
 NORETURN die_routine(const char *extr, const char *fmt, ...) __format(2, 3);
@@ -23,6 +25,9 @@ NORETURN bug_routine(const char *file,
 		     int line, const char *fmt, ...) __format(3, 4);
 
 const char *getstrerror(void);
+
+#define warn(...)       warn_routine(0, __VA_ARGS__)
+#define warn_errno(...) warn_routine(getstrerror(), __VA_ARGS__)
 
 #define error(...)       error_routine(0, __VA_ARGS__)
 #define error_errno(...) error_routine(getstrerror(), __VA_ARGS__)

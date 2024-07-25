@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: GPL-3.0
+# Lines starting with ‘#’ are comments.
+
+# Only the first column is the key; the entire rest is recognized as the value.
+# You can safely write something like ‘save C:\Program Files\...’. The save may
+# be either a regular file or a directory; directories will be automatically
+# zipped.
+save     /home/barroit/game/save/xxx
+
+# Backed up files will be stored in this path, which must point to a directory.
+backup   /home/barroit/.save/game
+
+# The interval between each backup. Specify the time units using s(S), m(M), or
+# h(H), with the default unit being minutes. Mixing different time units is not
+# allowed; floating point numbers are also invalid.
+interval 1H
+
+# The maximum number of backups that can be stored at a time.
+stack    5
+
+# Using the snapshot mechanism for consistent write.
+snapshot 1
+
+# Enbale compression of save into ZIP format.
+zip      1

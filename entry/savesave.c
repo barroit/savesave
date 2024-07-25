@@ -12,6 +12,7 @@
 #include "getconf.h"
 
 static const char *config_path;
+static struct savesave savconf;
 
 static void handle_option(int argc, char *const *argv)
 {
@@ -23,24 +24,24 @@ static void handle_option(int argc, char *const *argv)
 		config_path = optarg;
 }
 
+#include <stdio.h>
+
 int main(int argc, char *const *argv)
 {
 	if (argc > 1)
 		handle_option(argc, argv);
 
-	if (!config_path)
-		config_path = get_default_config_path();
-
-	if (!config_path) {
-		error("no configuration was provided");
+	char *strconf = read_config(config_path);
+	if (!strconf)
 		exit(128);
-	}
 
-	const char *strconf = readfile(config_path);
-	if (!strconf) {
-		error_errno("failed to read config from ‘%s’", config_path);
+	int err = parse_config(strconf, &savconf);
+	if (err)
 		exit(128);
-	}
+
+	free(strconf);
+	printf("save: %s\nbackup: %s\ninterval: %u\nstack: %u\n",
+	       savconf.save, savconf.backup, savconf.interval, savconf.stack);
 
 	return 0;
 }

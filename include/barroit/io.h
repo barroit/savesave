@@ -14,10 +14,8 @@ extern "C" {
 
 #ifdef _WIN32
 # include <io.h>
-# define USERHOME "USERPROFILE"
 #else /* linux */
 # include <unistd.h>
-# define USERHOME "HOME"
 #endif
 
 ssize_t robread(int fd, void *buf, size_t n);
