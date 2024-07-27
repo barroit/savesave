@@ -22,7 +22,7 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301,
    USA.  */
-
+
 #include "compat/ansidecl.h"
 
 /* Comment out all this code if we are using the GNU C Library, and are not
@@ -361,7 +361,7 @@ _getopt_initialize (int argc ATTRIBUTE_UNUSED,
 
   return optstring;
 }
-
+
 /* Scan elements of ARGV (whose length is ARGC) for option characters
    given in OPTSTRING.
 

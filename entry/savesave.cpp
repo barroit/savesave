@@ -33,7 +33,7 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	int err;
 
 	setup_console();
-	
+
 	if (!IsWindows7OrGreater()) {
 		error("unsupported windows version (at least win7)");
 		exit(128);
