@@ -7,6 +7,7 @@
 
 #include "termsg.h"
 #include "barroit/io.h"
+#include "list.h"
 
 #define UPDATE_BUF(buf, n, len)		\
 	do {				\
@@ -67,6 +68,11 @@ static void vreportf(FILE *stream, const char *lead,
 
 	if (extr && avail > 2)
 		vreport_extr(&buf, &avail, extr);
+
+	for (buf -= 1; buf != msg; buf--) {
+		if (iscntrl(*buf) && *buf != '\t' && *buf != '\n')
+			*buf = '?';
+	}
 
 	size_t n = sizeof(msg) - avail;
 	msg[n - 1] = '\n';

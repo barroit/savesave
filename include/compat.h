@@ -52,6 +52,7 @@ extern "C" {
 # include <malloc.h>
 # include <winsock2.h>
 # include <windows.h>
+# include <versionhelpers.h>
 #else /* linux */
 # include <unistd.h>
 # include <pwd.h>

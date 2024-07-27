@@ -151,9 +151,6 @@ int parse_backup_path(const char *path, struct savesave *conf)
 	return 0;
 }
 
-
-
-
 static unsigned long str2ulong(const char *str, size_t len)
 {
 	if (isspace(*str) || *str == '-')
@@ -264,6 +261,8 @@ static int parse_config(char *strconf, struct savesave *conf)
 		lnum++;
 		if (*line == '#') /* comment */
 			continue;
+		else if (isspace(*line))
+			goto err_incomp_conf;
 
 		char *col2 = strchr(line, ' ');
 		if (!col2)
@@ -283,8 +282,8 @@ static int parse_config(char *strconf, struct savesave *conf)
 	return 0;
 
 err_incomp_conf:
-	return error("config contains an incomplete line at %u:‘%s’",
-		     lnum, line);
+	return error("savesave configuration contains an invalid line\n"
+		     "line%u:%s", lnum, line);
 }
 
 int parse_savesave_config(const char *path, struct savesave *conf)
@@ -296,7 +295,7 @@ int parse_savesave_config(const char *path, struct savesave *conf)
 	}
 
 	if (!path)
-		return error("no configuration was provided");
+		return error("no savesave configuration was provided");
 
 	char *strconf = read_config(path);
 	free(defpath);

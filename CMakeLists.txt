@@ -94,7 +94,7 @@ add_library(platfree OBJECT ${platfree_src})
 if (BUILD STREQUAL linux)
   add_executable(savesave ${mainfile})
 else()
-  add_executable(savesave WIN32 ${mainfile})
+  add_executable(savesave WIN32 ${mainfile} savesave.res)
 endif()
 target_link_libraries(savesave platfree platspec)
 

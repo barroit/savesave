@@ -10,6 +10,7 @@ static FILE *console;
 void setup_console()
 {
 	AllocConsole();
+	SetConsoleOutputCP(CP_UTF8);
 
 	freopen_s(&console, "CONOUT$", "w", stdout);
 	freopen_s(&console, "CONOUT$", "w", stderr);

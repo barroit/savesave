@@ -1,5 +1,0 @@
-// SPDX-License-Identifier: GPL-3.0
-
-OIC_TRAY_ICON ICON "grape.ico"
-
-1 24 "keylogger.manifest"

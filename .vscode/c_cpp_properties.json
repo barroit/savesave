@@ -26,6 +26,9 @@
 			"includePath": [
 				"${workspaceFolder}/include"
 			],
+			"forcedInclude": [
+				"${workspaceFolder}/include/compat.h"
+			],
 			"compilerPath": "/usr/bin/x86_64-w64-mingw32-gcc"
 		},
 		{

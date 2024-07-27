@@ -9,6 +9,7 @@
 #include "barroit/io.h"
 #include "runopt.h"
 #include "getconf.h"
+#include "termsg.h"
 
 static const char *savconf_path;
 static struct savesave savconf;
@@ -31,10 +32,17 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 {
 	int err;
 
-	if (*cmdline) {
-		setup_console();
-		handle_command_line(cmdline);
+	setup_console();
+	
+	if (!IsWindows7OrGreater()) {
+		error("unsupported windows version (at least win7)");
+		exit(128);
 	}
+
+	// co init here
+
+	if (*cmdline)
+		handle_command_line(cmdline);
 
 	err = parse_savesave_config(savconf_path, &savconf);
 	if (err)
