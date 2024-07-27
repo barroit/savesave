@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0
 if (! (Test-Path ./Kconfig)) {
 	Write-Error "Can't find Kconfig, make sure you are in root directory" `
 		    -Category ObjectNotFound
