@@ -18,7 +18,7 @@
 		{
 			"name": "mingw64",
 			"defines": [
-				"_POSIX_C_SOURCE=200809L",
+				"_GNU_SOURCE",
 				"NTDDI_WIN10",
 				"WINVER=_WIN32_WINNT_WIN10",
 				"_WIN32_WINNT=_WIN32_WINNT_WIN10"
@@ -31,19 +31,6 @@
 				"${workspaceFolder}/include/compat.h"
 			],
 			"compilerPath": "/usr/bin/x86_64-w64-mingw32-gcc"
-		},
-		{
-			"name": "clang",
-			"defines": [
-				"_POSIX_C_SOURCE=200809L"
-			],
-			"intelliSenseMode": "linux-clang-x64",
-			"includePath": [
-				"${workspaceFolder}/include"
-			],
-			"forcedInclude": [
-				"${workspaceFolder}/include/compat.h"
-			]
 		}
 	],
 	"version": 4
