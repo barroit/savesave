@@ -106,6 +106,10 @@ config COMPILER_OPTIMIZE_Z
 
 endchoice
 
+config CONFIG_COMPILER_NDEBUG
+	bool "define NDEBUG"
+	default n
+
 config COMPILER_WARNING_ALL
 	bool "use -Wall"
 	default y
@@ -116,6 +120,10 @@ config COMPILER_WARNING_EXTRA
 endmenu # "Compiler flags"
 
 menu "Features"
+
+config CNTRL_CHAR_REPLACEMENT
+	string "control char replacement"
+	default "�"
 
 config SNAPSHOT_THRESHOLD_SIZE_KB
 	int "size threshold for creating snapshot (in KB)"

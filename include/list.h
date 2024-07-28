@@ -14,6 +14,12 @@ extern "C" {
 
 #define for_each_idx(i, n) for (i = 0; i < n; i++)
 
+/*
+ * the n that this for loop macro can handle is up to SIZE_MAX - 1
+ */
+#define for_each_idx_back(i, n) \
+	for (i = n; i != SIZE_MAX; i--)
+
 #ifdef __cplusplus
 }
 #endif

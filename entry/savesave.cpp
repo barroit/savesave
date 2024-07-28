@@ -10,11 +10,14 @@
 #include "runopt.h"
 #include "getconf.h"
 #include "termsg.h"
+#include "win/notifarea.hpp"
+#include "win/termsg.hpp"
+#include "win/window.hpp"
 
 static const char *savconf_path;
 static struct savesave savconf;
 
-static void handle_command_line(const char *cmdline)
+static void handle_command_line_option(const char *cmdline)
 {
 	char **argv;
 	int argc = cmdline2argv(cmdline, &argv);
@@ -28,25 +31,27 @@ static void handle_command_line(const char *cmdline)
 	rmargv(argc, argv);
 }
 
+static void validate_os_version()
+{
+	if (!IsWindows7OrGreater())
+		die("unsupported windows version (at least win7)");
+}
+
 int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 {
 	int err;
 
 	setup_console();
-
-	if (!IsWindows7OrGreater()) {
-		error("unsupported windows version (at least win7)");
-		exit(128);
-	}
-
-	// co init here
+	validate_os_version();
 
 	if (*cmdline)
-		handle_command_line(cmdline);
+		handle_command_line_option(cmdline);
 
 	err = parse_savesave_config(savconf_path, &savconf);
-	if (err)
-		exit(128);
+	EXIT_ON(err);
+
+	WNDCLASSEX window;
+	create_app_window(app, &window);
 
 	return 0;
 }
