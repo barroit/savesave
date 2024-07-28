@@ -256,14 +256,19 @@ static int parse_line(const char *line, size_t klen, const char *val,
 static int parse_config(char *strconf, struct savesave *conf)
 {
 	unsigned lnum = 0;
-	char *line = strtok(strconf, "\n");
-	if (!line)
-		return errconf("no meaningful line was found");
+	char *line = strconf;
+	char *next = strchr(strconf, '\n');
+	if (!next)
+		return errconf("not a valid file");
+	*next = 0;
+	next += 1;
 
 	int err;
 	do {
 		lnum++;
-		if (*line == '#') /* comment */
+		if (*line == 0) /* empty line */
+			goto get_next_line;
+		else if (*line == '#') /* comment */
 			goto get_next_line;
 		else if (isspace(*line))
 			goto err_incomp_conf;
@@ -282,8 +287,17 @@ static int parse_config(char *strconf, struct savesave *conf)
 		EXIT_ON(err);
 
 get_next_line:
-		line = strtok(NULL, "\n");
+		line = next;
+		next = strchr(next, '\n');
+		if (unlikely(!next)) {
+			line = NULL;
+		} else {
+			*next = 0;
+			next += 1;
+		}
 	} while (line != NULL);
+
+	return 0;
 
 err_incomp_conf:
 	return errconf("an invalid line was found at line\n"
@@ -305,6 +319,8 @@ int parse_savesave_config(const char *path, struct savesave *conf)
 	free(defpath);
 	if (!strconf)
 		return errconf_errno("failed to read content from ‘%s’", path);
+	else if (*strconf == 0)
+		return errconf("file is empty");
 
 	int err = parse_config(strconf, conf);
 	EXIT_ON(err);
