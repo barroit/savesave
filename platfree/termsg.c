@@ -152,7 +152,7 @@ static void vreportf(FILE *stream, const char *lead,
 		    const char *fmt, va_list ap,
 		    const char *extr)
 {
-	char msg[2048];
+	char msg[4096];
 	size_t avail = sizeof(msg) - 1; /* -1 for \n */
 	char *buf = msg;
 
@@ -173,32 +173,32 @@ static void vreportf(FILE *stream, const char *lead,
 	robwrite(fd, msg, len);
 }
 
-void warn_routine(const char *extr, const char *fmt, ...)
+void __warn_routine(const char *pref, const char *extr, const char *fmt, ...)
 {
 	va_list ap;
 
 	va_start(ap, fmt);
-	vreportf(stderr, "warning: ", fmt, ap, extr);
+	vreportf(stderr, pref, fmt, ap, extr);
 	va_end(ap);
 }
 
-int error_routine(const char *extr, const char *fmt, ...)
+int __error_routine(const char *pref, const char *extr, const char *fmt, ...)
 {
 	va_list ap;
 
 	va_start(ap, fmt);
-	vreportf(stderr, "error: ", fmt, ap, extr);
+	vreportf(stderr, pref, fmt, ap, extr);
 	va_end(ap);
 
 	return 1;
 }
 
-void die_routine(const char *extr, const char *fmt, ...)
+void __die_routine(const char *pref, const char *extr, const char *fmt, ...)
 {
 	va_list ap;
 
 	va_start(ap, fmt);
-	vreportf(stderr, "fatal: ", fmt, ap, extr);
+	vreportf(stderr, pref, fmt, ap, extr);
 
 	exit(128);
 }

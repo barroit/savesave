@@ -27,11 +27,11 @@ int cmdline2argv(const char *cmdline, char ***argv)
 		char *buf = xnew<char>(nr);
 		memcpy(buf, arg.c_str(), nr);
 
-		cap_grow((void **)&args.buf, args.nr + 1, &args.cap);
+		CAP_GROW(&args.buf, args.nr + 1, &args.cap);
 		args.buf[args.nr++] = buf;
 	}
 
-	cap_grow((void **)&args.buf, args.nr + 1, &args.cap);
+	CAP_GROW(&args.buf, args.nr + 1, &args.cap);
 	args.buf[args.nr] = NULL;
 
 	*argv = args.buf;

@@ -12,27 +12,41 @@
 extern "C" {
 #endif
 
-void warn_routine(const char *extr, const char *fmt, ...) __format(2, 3);
+void __warn_routine(const char *pref, const char *extr,
+		    const char *fmt, ...) FORMAT(3, 4);
 
-int error_routine(const char *extr, const char *fmt, ...) __format(2, 3);
+int __error_routine(const char *pref, const char *extr,
+		    const char *fmt, ...) FORMAT(3, 4);
 
-NORETURN die_routine(const char *extr, const char *fmt, ...) __format(2, 3);
+int __error_routine(const char *pref, const char *extr,
+		    const char *fmt, ...) FORMAT(3, 4);
 
-NORETURN bug_routine(const char *file,
-		     int line, const char *fmt, ...) __format(3, 4);
+NORETURN __die_routine(const char *pref, const char *extr,
+		       const char *fmt, ...) FORMAT(3, 4);
+
+NORETURN bug_routine(const char *file, int line,
+		     const char *fmt, ...) FORMAT(3, 4);
 
 const char *getstrerror(void);
 
-#define warn(...)       warn_routine(0, __VA_ARGS__)
-#define warn_errno(...) warn_routine(getstrerror(), __VA_ARGS__)
+#define warn(...)       __warn_routine("warning: ", 0, __VA_ARGS__)
+#define warn_errno(...) __warn_routine("warning: ", getstrerror(), __VA_ARGS__)
 
-#define error(...)       error_routine(0, __VA_ARGS__)
-#define error_errno(...) error_routine(getstrerror(), __VA_ARGS__)
+#define error(...)       __error_routine("error: ", 0, __VA_ARGS__)
+#define error_errno(...) __error_routine("error: ", getstrerror(), __VA_ARGS__)
 
-#define die(...)       die_routine(0, __VA_ARGS__)
-#define die_errno(...) die_routine(getstrerror(), __VA_ARGS__)
+#define die(...)       __die_routine("fatal: ", 0, __VA_ARGS__)
+#define die_errno(...) __die_routine("fatal: ", getstrerror(), __VA_ARGS__)
 
 #define bug(...) bug_routine(__FILE__, __LINE__, __VA_ARGS__)
+
+#ifdef NDEBUG
+# define BUG_ON(cond) do { if (cond) {} } while (0)
+#else
+# define BUG_ON(cond) assert(!(cond))
+#endif
+
+#define EXIT_ON(cond) do { if (cond) exit(128); } while (0)
 
 #ifdef __cplusplus
 }

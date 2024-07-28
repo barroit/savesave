@@ -11,4 +11,7 @@
 
 const char *strwinerror(void);
 
-#define error_winerr(...) error_routine(strwinerror(), __VA_ARGS__)
+#define error_winerr(...) \
+	__error_routine("error: ", strwinerror(), __VA_ARGS__)
+
+#define die_winerr(...) __die_routine("fatal: ", strwinerror(), __VA_ARGS__)

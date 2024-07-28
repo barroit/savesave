@@ -30,7 +30,9 @@ char *readfile(const char *name)
 err_read_file:
 	free(buf);
 err_stat_fd:
+	int errnum = errno;
 	close(fd);
+	errno = errnum;
 err_open_file:
 	return NULL;
 }

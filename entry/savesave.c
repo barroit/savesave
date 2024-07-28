@@ -31,8 +31,7 @@ int main(int argc, char *const *argv)
 		handle_option(argc, argv);
 
 	err = parse_savesave_config(savconf_path, &savconf);
-	if (err)
-		exit(128);
+	EXIT_ON(err);
 
 	return 0;
 }

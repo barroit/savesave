@@ -22,15 +22,9 @@ void *xmalloc(size_t n);
 
 #define REALLOC_ARRAY(p, n) xrealloc(p, st_mult(sizeof(*(p)), n))
 
-#define CAP_GROW(p, req, cap)					\
-	do {							\
-		if (req > *(cap)) {				\
-			*(cap) = fix_grow(*(cap));		\
-			if (*(cap) < req)			\
-				*(cap) = req;			\
-			*(p) = REALLOC_ARRAY(*(p), *(cap));	\
-		}						\
-	} while (0)
+void cap_grow(void **buf, size_t req, size_t *cap);
+
+#define CAP_GROW(buf, req, cap) cap_grow((void **)buf, req, cap)
 
 #ifdef __cplusplus
 }

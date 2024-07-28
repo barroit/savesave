@@ -36,16 +36,14 @@ enum optid parse_option(int argc, char *const *argv)
 		opt = getopt_long(argc, argv, aliases, options, &optidx);
 		switch (opt) {
 		case OPT_VERSION:
-			printf("savesave-%s\n", SAVESAVE_VERSION);
+			puts(APPNAME "-" SAVESAVE_VERSION);
 			return OPT_VERSION;
 		case OPT_HELP:
 			puts(HELP_MESSAGE);
 			return OPT_HELP;
 		case OPT_CONFIG:
-			if (*optarg == 0) {
-				error("empty config file is not allowed");
-				exit(128);
-			}
+			if (*optarg == 0)
+				die("empty config file is not allowed");
 			return OPT_CONFIG;
 		case OPT_UNKNOWN:
 			exit(128);

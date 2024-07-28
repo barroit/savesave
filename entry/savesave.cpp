@@ -39,7 +39,7 @@ static void validate_os_version()
 
 int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 {
-	int err;
+	int err, pass;
 
 	setup_console();
 	validate_os_version();
@@ -50,8 +50,12 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	err = parse_savesave_config(savconf_path, &savconf);
 	EXIT_ON(err);
 
-	WNDCLASSEX window;
-	create_app_window(app, &window);
+	HWND window;
+	err = create_app_window(app, &window);
+	EXIT_ON(err);
+
+	pass = ShowWindow(window, SW_HIDE);
+	BUG_ON(!pass);
 
 	return 0;
 }

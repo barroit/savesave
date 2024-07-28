@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#define __format(sta, fir) __attribute__((format(printf, sta, fir)))
+#define FORMAT(sta, fir) __attribute__((format(printf, sta, fir)))
 
 #define NORETURN void __attribute__((noreturn))
 
