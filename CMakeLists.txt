@@ -110,9 +110,9 @@ endif()
 add_compile_definitions(_GNU_SOURCE)
 
 if (BUILD STREQUAL windows)
-  add_compile_definitions(NTDDI_WIN10
-			  WINVER=_WIN32_WINNT_WIN10
-			  _WIN32_WINNT=_WIN32_WINNT_WIN10)
+  add_compile_definitions(NTDDI_WIN7
+			  WINVER=_WIN32_WINNT_WIN7
+			  _WIN32_WINNT=_WIN32_WINNT_WIN7)
   if (NOT CONFIG_CROSS_COMPILING) # clang
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
   endif()

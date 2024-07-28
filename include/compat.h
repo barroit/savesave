@@ -47,6 +47,7 @@ extern "C" {
 #endif
 
 #ifdef _WIN32
+# include <sdkddkver.h>
 # include <io.h>
 # include <conio.h>
 # include <malloc.h>

@@ -19,9 +19,9 @@
 			"name": "mingw64",
 			"defines": [
 				"_GNU_SOURCE",
-				"NTDDI_WIN10",
-				"WINVER=_WIN32_WINNT_WIN10",
-				"_WIN32_WINNT=_WIN32_WINNT_WIN10"
+				"NTDDI_WIN7",
+				"WINVER=_WIN32_WINNT_WIN7",
+				"_WIN32_WINNT=_WIN32_WINNT_WIN7"
 			],
 			"intelliSenseMode": "windows-gcc-x64",
 			"includePath": [
