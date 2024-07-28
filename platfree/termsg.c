@@ -16,7 +16,7 @@
 		*(buf) += __len;	\
 	} while (0)
 
-static void vreport_lead(char **buf, size_t *avail, const char *lead)
+static void vreport_prefix(char **buf, size_t *avail, const char *lead)
 {
 	size_t n = strlen(lead);
 	if (n > *avail) {
@@ -28,7 +28,8 @@ static void vreport_lead(char **buf, size_t *avail, const char *lead)
 	UPDATE_BUF(buf, avail, n);
 }
 
-static void vreport_ap(char **buf, size_t *avail, const char *fmt, va_list ap)
+static void vreport_message(char **buf, size_t *avail,
+			    const char *fmt, va_list ap)
 {
 	int nr = vsnprintf(*buf, *avail + 1, /* \0 is unnecessary */ fmt, ap);
 	if (nr < 0) {
@@ -41,7 +42,7 @@ static void vreport_ap(char **buf, size_t *avail, const char *fmt, va_list ap)
 	UPDATE_BUF(buf, avail, nr);
 }
 
-static void vreport_extr(char **buf, size_t *avail, const char *extr)
+static void vreport_extra(char **buf, size_t *avail, const char *extr)
 {
 	memcpy(*buf, "; ", 2);
 	UPDATE_BUF(buf, avail, 2);
@@ -62,12 +63,12 @@ static void vreportf(FILE *stream, const char *lead,
 	size_t avail = sizeof(msg) - 1; /* -1 for \n */
 	char *buf = msg;
 
-	vreport_lead(&buf, &avail, lead);
+	vreport_prefix(&buf, &avail, lead);
 
-	vreport_ap(&buf, &avail, fmt, ap);
+	vreport_message(&buf, &avail, fmt, ap);
 
 	if (extr && avail > 2)
-		vreport_extr(&buf, &avail, extr);
+		vreport_extra(&buf, &avail, extr);
 
 	for (buf -= 1; buf != msg; buf--) {
 		if (iscntrl(*buf) && *buf != '\t' && *buf != '\n')
