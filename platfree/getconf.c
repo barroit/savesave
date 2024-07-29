@@ -11,16 +11,16 @@
 #include "termsg.h"
 
 #define errconf(...) \
-	__error_routine("savconf error: ", 0, __VA_ARGS__)
+	__error_routine("error:config: ", 0, __VA_ARGS__)
 
 #define errconf_errno(...) \
-	__error_routine("savconf error: ", getstrerror(), __VA_ARGS__)
+	__error_routine("error:config: ", getstrerror(), __VA_ARGS__)
 
 #define dieconf(...) \
-	__die_routine("savconf fatal: ", 0, __VA_ARGS__)
+	__die_routine("fatal:config: ", 0, __VA_ARGS__)
 
 #define dieconf_errno(...) \
-	__die_routine("savconf fatal: ", getstrerror(), __VA_ARGS__)
+	__die_routine("fatal:config: ", getstrerror(), __VA_ARGS__)
 
 static char *append_conf_path(const char *prefix, const char *conf)
 {
@@ -246,8 +246,8 @@ static int parse_line(const char *line, size_t klen, const char *val,
 		conf->use_zip = !!str2ulong(val, strlen(val));
 
 	} else {
-		return errconf("an unrecognized key was found at line\n"
-			       "line%9u: %s", lnum, line);
+		return errconf("an unrecognized key was found at\n"
+			       "line%8u: %s", lnum, line);
 	}
 
 	return 0;
@@ -300,8 +300,8 @@ get_next_line:
 	return 0;
 
 err_incomp_conf:
-	return errconf("an invalid line was found at line\n"
-		       "line%9u: %s", lnum, line);
+	return errconf("an invalid line was found at\n"
+		       "line%8u: %s", lnum, line);
 }
 
 int parse_savesave_config(const char *path, struct savesave *conf)
