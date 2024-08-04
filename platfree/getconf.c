@@ -14,13 +14,13 @@
 	__error_routine("error:config: ", 0, __VA_ARGS__)
 
 #define errconf_errno(...) \
-	__error_routine("error:config: ", getstrerror(), __VA_ARGS__)
+	__error_routine("error:config: ", strerror(errno), __VA_ARGS__)
 
 #define dieconf(...) \
 	__die_routine("fatal:config: ", 0, __VA_ARGS__)
 
 #define dieconf_errno(...) \
-	__die_routine("fatal:config: ", getstrerror(), __VA_ARGS__)
+	__die_routine("fatal:config: ", strerror(errno), __VA_ARGS__)
 
 static char *append_conf_path(const char *prefix, const char *conf)
 {

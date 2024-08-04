@@ -10,7 +10,7 @@
 
 static char errbuf[256];
 
-const char *strwinerror(void)
+const char *strwinerror()
 {
 	int errnum = GetLastError();
 	int langid = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);

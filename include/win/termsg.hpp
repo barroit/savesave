@@ -9,7 +9,7 @@
 
 #include "termsg.h"
 
-const char *strwinerror(void);
+const char *strwinerror();
 
 #define error_winerr(...) \
 	__error_routine("error: ", strwinerror(), __VA_ARGS__)
