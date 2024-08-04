@@ -17,13 +17,21 @@ enum optid {
 	OPT_FLAG    = 0,
 	OPT_UNKNOWN = '?',
 	OPT_CONFIG  = 'f',
+	OPT_STDOUT  = -2,
+	OPT_STDERR  = -3,
 	OPT_HELP    = 'h',
 	OPT_VERSION = 'v',
 };
 
+struct cmdarg {
+	const char *confpath;
+	const char *fout;
+	const char *ferr;
+};
+
 extern char *optarg;
 
-enum optid parse_option(int argc, char *const *argv);
+int parse_option(int argc, char *const *argv, struct cmdarg *args);
 
 #ifdef __cplusplus
 }

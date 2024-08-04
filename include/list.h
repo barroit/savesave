@@ -20,6 +20,8 @@ extern "C" {
 #define for_each_idx_back(i, n) \
 	for (i = n; i != SIZE_MAX; i--)
 
+#define for_each_idx_from(i, n) for (; i < n; i++)
+
 #ifdef __cplusplus
 }
 #endif
