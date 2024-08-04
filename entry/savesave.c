@@ -26,7 +26,7 @@ int main(int argc, char *const *argv)
 	int err;
 
 	if (argc > 1)
-		handle_option(--argc, ++argv);
+		handle_option(argc, argv);
 
 	err = parse_savesave_config(args.confpath, &savconf);
 	EXIT_ON(err);

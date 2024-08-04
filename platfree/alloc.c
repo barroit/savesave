@@ -37,6 +37,14 @@ void *xmalloc(size_t n)
 	return p;
 }
 
+char *xstrdup(const char *src)
+{
+	char *str = strdup(src);
+	if (!str)
+		die_errno("failed to duplicate string");
+	return str;
+}
+
 void cap_grow(void **buf, size_t req, size_t *cap)
 {
 	if (req > *(cap)) {

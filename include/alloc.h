@@ -20,6 +20,8 @@ void *xrealloc(void *p, size_t n);
 
 void *xmalloc(size_t n);
 
+char *xstrdup(const char *src);
+
 #define REALLOC_ARRAY(p, n) xrealloc(p, st_mult(sizeof(*(p)), n))
 
 void cap_grow(void **buf, size_t req, size_t *cap);

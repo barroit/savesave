@@ -24,8 +24,7 @@ static struct option options[] = {
 	OPT("version", no_argument, NULL, OPT_VERSION),
 	OPT("help",    no_argument, NULL, OPT_HELP),
 	OPT("config",  required_argument, NULL, OPT_CONFIG),
-	OPT("stdout",  required_argument, NULL, OPT_STDOUT),
-	OPT("stderr",  required_argument, NULL, OPT_STDERR),
+	OPT("output",  required_argument, NULL, OPT_OUTPUT),
 	OPT(0, 0, 0, 0),
 };
 
@@ -83,20 +82,17 @@ static void report_positional_argument(int idx, int argc, char *const *argv)
 
 int parse_option(int argc, char *const *argv, struct cmdarg *args)
 {
-	int optidx = 0;
 	enum optid opt;
+	memset(args, 0, sizeof(*args));
 
 	while (39) {
-		opt = getopt_long(argc, argv, aliases, options, &optidx);
+		opt = getopt_long(argc, argv, aliases, options, NULL);
 		switch (opt) {
 		case OPT_CONFIG:
 			get_optarg(&args->confpath);
 			break;
-		case OPT_STDOUT:
-			get_optarg(&args->fout);
-			break;
-		case OPT_STDERR:
-			get_optarg(&args->ferr);
+		case OPT_OUTPUT:
+			get_optarg(&args->output);
 			break;
 		case OPT_UNKNOWN:
 			/* error message already printed out */
@@ -110,13 +106,13 @@ int parse_option(int argc, char *const *argv, struct cmdarg *args)
 		case -1:
 			goto finish;
 		case OPT_FLAG:
-			/* make gcc happy */
+			break;
 		}
 	}
 
 finish:
-	if (optidx < argc) {
-		report_positional_argument(optidx, argc, argv);
+	if (optind < argc) {
+		report_positional_argument(optind, argc, argv);
 		return 1;
 	}
 

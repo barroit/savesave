@@ -214,3 +214,29 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 
 	exit(128);
 }
+
+int redirect_output(const char *filename)
+{
+	int fd = open(filename, O_RDWR);
+	if (fd == -1) {
+		error_errno("failed to open ‘%s’", filename);
+		goto err_open_file;
+	}
+
+	if (dup2(fd, fileno(stdout)) == -1) {
+		error_errno("cannot redirect stdout");
+		goto close_file;
+	}
+
+	if (dup2(fd, fileno(stderr)) == -1) {
+		error_errno("cannot redirect stderr");
+		goto close_file;
+	}
+
+	return 0;
+
+close_file:
+	close(fd);
+err_open_file:
+	return 1;
+}

@@ -7,10 +7,14 @@
 
 #pragma once
 
-void setup_console();
-
 int cmdline2argv(const char *cmdline, char ***argv);
 
-void rmargv(int argc, char **argv);
+void setup_console();
+
+void hide_console();
+
+void show_console();
+
+void teardown_console();
 
 void waiting_user();

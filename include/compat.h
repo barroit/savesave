@@ -87,13 +87,14 @@ typedef SSIZE_T ssize_t;
 #endif
 
 #ifdef WINDOWS_NATIVE
-# define read   _read
-# define write  _write
-# define open   _open
-# define close  _close
-# define strdup _strdup
-# define access _access
-# define fileno _fileno
+# define read	_read
+# define write	_write
+# define open	_open
+# define close	_close
+# define strdup	_strdup
+# define access	_access
+# define fileno	_fileno
+# define dup2	_dup2
 #endif
 
 /*

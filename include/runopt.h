@@ -17,16 +17,14 @@ enum optid {
 	OPT_FLAG    = 0,
 	OPT_UNKNOWN = '?',
 	OPT_CONFIG  = 'f',
-	OPT_STDOUT  = -2,
-	OPT_STDERR  = -3,
+	OPT_OUTPUT  = -2,
 	OPT_HELP    = 'h',
 	OPT_VERSION = 'v',
 };
 
 struct cmdarg {
 	const char *confpath;
-	const char *fout;
-	const char *ferr;
+	const char *output;
 };
 
 extern char *optarg;

@@ -7,12 +7,17 @@
 
 #undef exit
 
-#include "win/console.hpp"
+#include "win/termsg.hpp"
+
+bool is_console_output();
 
 void winexit(int code)
 {
-	if (code)
+	if (code) {
+		if (is_console_output())
+			show_console();
 		waiting_user();
+	}
 
 	exit(code);
 }

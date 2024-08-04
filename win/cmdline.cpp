@@ -23,9 +23,7 @@ int cmdline2argv(const char *cmdline, char ***argv)
 
 	struct argarr args = { 0 };
 	while (stream >> std::quoted(arg)) {
-		size_t nr = arg.size() + 1;
-		char *buf = xnew<char>(nr);
-		memcpy(buf, arg.c_str(), nr);
+		char *buf = xstrdup(arg.c_str());
 
 		CAP_GROW(&args.buf, args.nr + 1, &args.cap);
 		args.buf[args.nr++] = buf;
@@ -36,13 +34,4 @@ int cmdline2argv(const char *cmdline, char ***argv)
 
 	*argv = args.buf;
 	return args.nr;
-}
-
-void rmargv(int argc, char **argv)
-{
-	int i;
-	for_each_idx(i, argc)
-		delete[] argv[i];
-
-	free(argv);
 }

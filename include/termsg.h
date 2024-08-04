@@ -49,6 +49,8 @@ NORETURN bug_routine(const char *file, int line,
 
 #define EXIT_ON(cond) do { if (cond) exit(128); } while (0)
 
+int redirect_output(const char *filename);
+
 #ifdef __cplusplus
 }
 #endif
