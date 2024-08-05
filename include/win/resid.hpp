@@ -8,4 +8,4 @@
 #pragma once
 
 #define APP_MANIFEST 1
-#define NOTIF_ICON   101
+#define NOTIFY_ICON  101

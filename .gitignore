@@ -3,6 +3,7 @@
 /.config
 /.config.old
 /.savesave
+/savesave.manifest
 
 /build
 /draft

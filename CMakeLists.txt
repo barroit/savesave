@@ -67,15 +67,9 @@ endif()
 
 project(savesave VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
 
-configure_file($ENV{ROOT}/scripts/version.h.in
-	       $ENV{ROOT}/include/generated/version.h)
+include($ENV{ROOT}/scripts/genheader.cmake)
 
-configure_file($ENV{ROOT}/scripts/appname.h.in
-	       $ENV{ROOT}/include/generated/appname.h)
-
-configure_file($ENV{ROOT}/scripts/apphelp.h.in
-	       $ENV{ROOT}/include/generated/apphelp.h
-	       COPYONLY)
+configure_file($ENV{ROOT}/savesave.manifest.in $ENV{ROOT}/savesave.manifest)
 
 include_directories($ENV{ROOT}/include)
 
@@ -94,12 +88,12 @@ add_library(platfree OBJECT ${platfree_src})
 if (BUILD STREQUAL linux)
   add_executable(savesave ${mainfile})
 else()
-  add_executable(savesave WIN32 ${mainfile} savesave.res)
+  add_executable(savesave WIN32 ${mainfile} savesave.rc)
 endif()
 target_link_libraries(savesave platfree platspec)
 
 if (BUILD STREQUAL windows)
-target_link_libraries(savesave ws2_32)
+target_link_libraries(savesave comctl32 ws2_32)
 endif()
 
 # For the best portable

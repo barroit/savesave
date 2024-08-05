@@ -1,0 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0
+#include "win/resid.hpp"
+
+APP_MANIFEST MANIFEST "savesave.manifest"
+NOTIFY_ICON  ICON     "orange.ico"
