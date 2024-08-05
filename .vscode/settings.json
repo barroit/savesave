@@ -6,5 +6,8 @@
 			"project": "savesave",
 			"year": "2024"
 		}
+	},
+	"files.associations": {
+		".savesave": "plaintext"
 	}
 }
