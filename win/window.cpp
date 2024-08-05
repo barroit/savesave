@@ -5,18 +5,40 @@
  * Contact: barroit@linux.com
  */
 
-#include "win/window.hpp"
-#include "win/notifyicon.hpp"
+#include "win/ui.hpp"
 #include "win/termsg.hpp"
 
 #define CLASS_ID APPNAME
 
-static LRESULT CALLBACK handle_window_message(HWND window, UINT message,
-					      WPARAM arg1, LPARAM arg2)
+static bool is_request_menu(unsigned type)
+{
+	return type == WM_CONTEXTMENU ||
+	       type == NIN_KEYSELECT ||
+	       type == NIN_SELECT;
+}
+
+static LRESULT handle_notifyicon(HWND window, UINT message,
+				 WPARAM arg1, LPARAM arg2)
+{
+	unsigned type = LOWORD(arg2);
+	if (is_request_menu(type)) {
+		POINT cursor = {
+			.x = GET_X_LPARAM(arg1),
+			.y = GET_Y_LPARAM(arg1),
+		};
+
+		return show_popup_menu(window, &cursor);
+	}
+
+	return DefWindowProc(window, message, arg1, arg2);
+}
+
+static LRESULT CALLBACK receive_window_message(HWND window, UINT message,
+					       WPARAM arg1, LPARAM arg2)
 {
 	switch (message) {
-	case NOTIFYICON_CLICK:
-		return S_OK;
+	case SS_NOTIFYICON:
+		return handle_notifyicon(window, message, arg1, arg2);
 	case WM_MENUCOMMAND:
 		return S_OK;
 	case WM_DESTROY:
@@ -31,7 +53,7 @@ int create_app_window(HINSTANCE app, HWND *window)
 {
 	WNDCLASSEX wclass = {
 		.cbSize        = sizeof(WNDCLASSEX),
-		.lpfnWndProc   = handle_window_message,
+		.lpfnWndProc   = receive_window_message,
 		.hInstance     = app,
 		.lpszClassName = CLASS_ID,
 	};

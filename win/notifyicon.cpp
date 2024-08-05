@@ -5,15 +5,21 @@
  * Contact: barroit@linux.com
  */
 
-#include "win/notifyicon.hpp"
-#include "calc.h"
+#include "win/ui.hpp"
 #include "win/resid.hpp"
+#include "calc.h"
 #include "termsg.h"
 
-void init_notifyicon(HWND window, NOTIFYICONDATA *icon)
+static void load_icon_resource(HINSTANCE app, HICON *icon)
+{
+	int err = LoadIconMetric(app, MAKEINTRESOURCEW(NOTIFY_ICON),
+				 LIM_SMALL, icon);
+	BUG_ON(err);
+}
+
+void setup_notifyicon(HINSTANCE app, HWND window, NOTIFYICONDATA *icon)
 {
 	memset(icon, 0, sizeof(*icon));
-
 	icon->cbSize = sizeof(*icon);
 
 	icon->hWnd = window;
@@ -22,31 +28,21 @@ void init_notifyicon(HWND window, NOTIFYICONDATA *icon)
 	icon->uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP | NIF_SHOWTIP;
 
 	icon->uVersion = NOTIFYICON_VERSION_4;
-	icon->uCallbackMessage = NOTIFYICON_CLICK;
+	icon->uCallbackMessage = SS_NOTIFYICON;
 
-	strncpy(icon->szTip, APPNAME "-" SAVESAVE_VERSION,
+	strncpy(icon->szTip, APPNAME " - " SAVESAVE_VERSION,
 		ARRAY_SIZEOF(icon->szTip));
+
+	load_icon_resource(app, &icon->hIcon);
 }
 
-int load_icon_resource(HINSTANCE app, NOTIFYICONDATA *icon)
-{
-	int err;
-
-	err = LoadIconMetric(app, MAKEINTRESOURCEW(NOTIFY_ICON),
-			     LIM_SMALL, &icon->hIcon);
-	if (err)
-		return error("failed to load icon resource");
-
-	return 0;
-}
-
-int show_icon(NOTIFYICONDATA *icon)
+void show_notifyicon(NOTIFYICONDATA *icon)
 {
 	int err;
 
 	err = !Shell_NotifyIcon(NIM_ADD, icon);
-	if (err)
-		return error("failed to add the notification icon");
+	BUG_ON(err);
 
-	return 0;
+	err = !Shell_NotifyIcon(NIM_SETVERSION, icon);
+	BUG_ON(err);
 }

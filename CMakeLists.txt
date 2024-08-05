@@ -93,7 +93,7 @@ endif()
 target_link_libraries(savesave platfree platspec)
 
 if (BUILD STREQUAL windows)
-target_link_libraries(savesave comctl32 ws2_32)
+target_link_libraries(savesave ws2_32 comctl32 dwmapi)
 endif()
 
 # For the best portable

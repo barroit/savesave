@@ -12,8 +12,6 @@
 extern "C" {
 #endif
 
-#include "termsg.h"
-
 #define ARRAY_SIZEOF(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 #define fix_grow(x) ((x + 16) * 3 / 2)
@@ -24,11 +22,15 @@ extern "C" {
 
 #define uint_mult_overflows(a, b) ((a) && ((b) > (max_uint_val(a) / (a))))
 
+extern NORETURN __die_routine(const char *, const char *, const char *, ...);
+
 #define st_mult(a, b)							\
 	({								\
-		if (uint_mult_overflows(a, b))				\
-			die("size overflow: %" PRIuMAX " * %" PRIuMAX,	\
-			    (uintmax_t)a, (uintmax_t)b);		\
+		if (uint_mult_overflows(a, b)) {			\
+			__die_routine("fatal: ", NULL, "size overflow: "\
+				      "%" PRIuMAX " * %" PRIuMAX ,	\
+				      (uintmax_t)a, (uintmax_t)b);	\
+		}							\
 		a * b;							\
 	})
 

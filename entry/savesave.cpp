@@ -6,13 +6,11 @@
  */
 
 #include "win/console.hpp"
+#include "win/ui.hpp"
+#include "win/termsg.hpp"
 #include "barroit/io.h"
 #include "runopt.h"
 #include "getconf.h"
-#include "win/notifyicon.hpp"
-#include "win/termsg.hpp"
-#include "win/window.hpp"
-#include "alloc.h"
 
 static struct cmdarg args;
 static struct savesave savconf;
@@ -43,7 +41,7 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 		teardown_console();
 		redirect_output(args.output);
 	} else {
-		hide_console();
+		// hide_console();
 	}
 
 	err = parse_savesave_config(args.confpath, &savconf);
@@ -54,13 +52,9 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	EXIT_ON(err);
 
 	NOTIFYICONDATA icon;
-	init_notifyicon(window, &icon);
+	setup_notifyicon(app, window, &icon);
 
-	err = load_icon_resource(app, &icon);
-	EXIT_ON(err);
-
-	err = show_icon(&icon);
-	EXIT_ON(err);
+	show_notifyicon(&icon);
 
 	MSG message;
 	while (GetMessage(&message, NULL, 0, 0) > 0) {

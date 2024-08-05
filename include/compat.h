@@ -53,8 +53,10 @@ extern "C" {
 # include <malloc.h>
 # include <winsock2.h>
 # include <windows.h>
+# include <windowsx.h>
 # include <versionhelpers.h>
 # include <commctrl.h>
+# include <dwmapi.h>
 #else /* linux */
 # include <unistd.h>
 # include <pwd.h>
