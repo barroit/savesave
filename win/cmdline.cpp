@@ -5,7 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#include "win/alloc.hpp"
 #include "alloc.h"
 #include "list.h"
 

@@ -54,6 +54,7 @@ extern "C" {
 # include <winsock2.h>
 # include <windows.h>
 # include <versionhelpers.h>
+# include <commctrl.h>
 #else /* linux */
 # include <unistd.h>
 # include <pwd.h>

@@ -9,5 +9,8 @@
 
 #define NOTIFYICON_CLICK (WM_APP + 1)
 
-void init_notifyicon_data(HWND hwnd, NOTIFYICONDATA *data);
+void init_notifyicon(HWND window, NOTIFYICONDATA *icon);
 
+int load_icon_resource(HINSTANCE app, NOTIFYICONDATA *icon);
+
+int show_icon(NOTIFYICONDATA *icon);

@@ -53,6 +53,15 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	err = create_app_window(app, &window);
 	EXIT_ON(err);
 
+	NOTIFYICONDATA icon;
+	init_notifyicon(window, &icon);
+
+	err = load_icon_resource(app, &icon);
+	EXIT_ON(err);
+
+	err = show_icon(&icon);
+	EXIT_ON(err);
+
 	MSG message;
 	while (GetMessage(&message, NULL, 0, 0) > 0) {
 		TranslateMessage(&message);
