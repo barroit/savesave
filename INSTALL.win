@@ -15,6 +15,12 @@ Before install SaveSave, the following requirements need to be met
 
 	MSVC (tested with version v143)
 
+First, you need to set the environment variable ‘MT_PATH’ to the mt.exe path.
+Obtaining the mt.exe path can be done very simply by opening ‘developer Command
+Prompt for VS 201X’, then use the ‘where’ command to output the path of mt.exe.
+
+	> where mt.exe
+
 Normally you can just do ‘winbuild.ps1’, and that will build the program under
 build/ directory. If you want to do a config, you can do
 
