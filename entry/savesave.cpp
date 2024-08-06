@@ -62,6 +62,10 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 		DispatchMessage(&message);
 	}
 
+	DestroyIcon(icon.hIcon);
+
+	Shell_NotifyIcon(NIM_DELETE, &icon);
+
 	return 0;
 }
 

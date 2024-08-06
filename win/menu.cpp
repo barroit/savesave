@@ -10,16 +10,12 @@
 #include "barroit/types.h"
 #include "alloc.h"
 
-#define ARGB_MASK 0xFF
-
 static int setup_menu(HMENU menu)
 {
 	int err;
 
 	MENUINFO info = {
 		.cbSize  = sizeof(MENUINFO),
-		.fMask   = MIM_STYLE,
-		.dwStyle = MNS_NOTIFYBYPOS,
 	};
 
 	err = !SetMenuInfo(menu, &info);
@@ -29,23 +25,22 @@ static int setup_menu(HMENU menu)
 	return 0;
 }
 
-static int populate_menu_item(HMENU menu)
+static int add_menu_button(HMENU menu, unsigned id, const char *name)
 {
 	int err;
 
 	MENUITEMINFO button = {
-		.cbSize = sizeof(MENUITEMINFO),
-		.fMask  = MIIM_FTYPE,
-		.fType  = MFT_OWNERDRAW,
+		.cbSize     = sizeof(MENUITEMINFO),
+		.fMask      = MIIM_STRING | MIIM_ID,
+		.fType      = MFT_STRING,
+		.wID        = id,
+		.dwTypeData = (char *)name,
+		.cch        = (UINT)strlen(name),
 	};
 
-	err = !InsertMenuItem(menu, BUTTON_CLOSE, false, &button);
+	err = !InsertMenuItem(menu, id, false, &button);
 	if (err)
-		return error_winerr("failed to add ‘Close’ button");
-
-	err = !InsertMenuItem(menu, BUTTON_CLOSE, false, &button);
-	if (err)
-		return error_winerr("failed to add ‘About’ button");
+		return error_winerr("failed to add ‘%s’ button", name);
 
 	return 0;
 }
@@ -62,7 +57,11 @@ int show_popup_menu(HWND window, POINT *cursor)
 	if (err)
 		goto cleanup;
 
-	err = populate_menu_item(menu);
+	err = add_menu_button(menu, BUTTON_ABOUT, "About");
+	if (err)
+		goto cleanup;
+
+	err = add_menu_button(menu, BUTTON_CLOSE, "Close");
 	if (err)
 		goto cleanup;
 

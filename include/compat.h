@@ -56,7 +56,6 @@ extern "C" {
 # include <windowsx.h>
 # include <versionhelpers.h>
 # include <commctrl.h>
-# include <dwmapi.h>
 #else /* linux */
 # include <unistd.h>
 # include <pwd.h>

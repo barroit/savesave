@@ -10,27 +10,40 @@
 
 #define CLASS_ID APPNAME
 
-static bool is_request_menu(unsigned type)
+static bool is_request_menu(LPARAM arg)
 {
+	unsigned type = LOWORD(arg);
 	return type == WM_CONTEXTMENU ||
 	       type == NIN_KEYSELECT ||
 	       type == NIN_SELECT;
 }
 
-static LRESULT handle_notifyicon(HWND window, UINT message,
-				 WPARAM arg1, LPARAM arg2)
+static LRESULT handle_notifyicon(HWND window, LONG x, LONG y)
 {
-	unsigned type = LOWORD(arg2);
-	if (is_request_menu(type)) {
-		POINT cursor = {
-			.x = GET_X_LPARAM(arg1),
-			.y = GET_Y_LPARAM(arg1),
-		};
+	POINT cursor = {
+		.x = x,
+		.y = y,
+	};
 
-		return show_popup_menu(window, &cursor);
+	return show_popup_menu(window, &cursor);
+}
+
+static int is_menu_command(WPARAM arg)
+{
+	return HIWORD(arg) == 0;
+}
+
+static LRESULT handle_menu_click(HWND window, enum menu_button button)
+{
+	switch (button) {
+	case BUTTON_CLOSE:
+		DestroyWindow(window);
+		break;
+	case BUTTON_ABOUT:
+		warn("‘About’ feature is not available yet");
 	}
 
-	return DefWindowProc(window, message, arg1, arg2);
+	return 0;
 }
 
 static LRESULT CALLBACK receive_window_message(HWND window, UINT message,
@@ -38,15 +51,21 @@ static LRESULT CALLBACK receive_window_message(HWND window, UINT message,
 {
 	switch (message) {
 	case SS_NOTIFYICON:
-		return handle_notifyicon(window, message, arg1, arg2);
-	case WM_MENUCOMMAND:
-		return S_OK;
+		if (!is_request_menu(arg2))
+			break;
+		return handle_notifyicon(window, GET_X_LPARAM(arg1),
+					 GET_Y_LPARAM(arg1));
+	case WM_COMMAND:
+		if (!is_menu_command(arg1))
+			break;
+		return handle_menu_click(window,
+					 (enum menu_button)LOWORD(arg1));
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return S_OK;
-	default:
-		return DefWindowProc(window, message, arg1, arg2);
 	}
+
+	return DefWindowProc(window, message, arg1, arg2);
 }
 
 int create_app_window(HINSTANCE app, HWND *window)

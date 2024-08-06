@@ -36,8 +36,7 @@ menuconfig:
 clean:
 	@make -C $(abs_build) clean
 
-distclean: confclean
+distclean:
 	@rm -f $(abs_gen)/*
 	@rm -rf $(abs_build)/*
 	@rm -f $(abs_root)/.config*
-	@rm -f $(abs_root)/savesave*

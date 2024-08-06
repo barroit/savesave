@@ -88,17 +88,17 @@ add_library(platfree OBJECT ${platfree_src})
 if (BUILD STREQUAL linux)
   add_executable(savesave ${mainfile})
 else()
-  add_executable(savesave WIN32 ${mainfile} savesave.rc)
+  add_executable(savesave WIN32 ${mainfile} $ENV{ROOT}/savesave.rc)
 endif()
 target_link_libraries(savesave platfree platspec)
 
 if (BUILD STREQUAL windows)
-target_link_libraries(savesave ws2_32 comctl32 dwmapi)
+target_link_libraries(savesave ws2_32 comctl32)
 endif()
 
 # For the best portable
 if (CONFIG_CROSS_COMPILING)
-target_link_options(savesave PRIVATE -static-libgcc -static-libstdc++)
+target_link_options(savesave PRIVATE -static-libstdc++)
 endif()
 
 add_compile_definitions(_GNU_SOURCE)
