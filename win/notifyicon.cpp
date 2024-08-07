@@ -12,8 +12,8 @@
 
 static void load_icon_resource(HINSTANCE app, HICON *icon)
 {
-	int err = LoadIconMetric(app, MAKEINTRESOURCEW(NOTIFY_ICON),
-				 LIM_SMALL, icon);
+	LPWSTR res = MAKEINTRESOURCEW(NOTIFY_ICON);
+	int err = LoadIconMetric(app, res, LIM_SMALL, icon);
 	BUG_ON(err);
 }
 
