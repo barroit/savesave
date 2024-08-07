@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-3.0
+# SPDX-License-Identifier: GPL-3.0-only
 
 if (! $env:MT_PATH) {
 	$message = "`$MT_PATH is undefined, refer to the INSTALL.win for " `

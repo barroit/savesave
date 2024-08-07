@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-3.0
+# SPDX-License-Identifier: GPL-3.0-only
 # Lines starting with ‘#’ are comments.
 
 # Only the first column is the key; the entire rest is recognized as the value.

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-3.0
+# SPDX-License-Identifier: GPL-3.0-only
 function (set_choiced_value prefix)
 
   foreach(var ${DOTCONFIG_VARIABLES})

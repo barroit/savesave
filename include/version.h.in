@@ -1,4 +1,10 @@
-// SPDX-License-Identifier: GPL-3.0
+/* SPDX-License-Identifier: GPL-3.0-only */
+/*
+ * Copyright 2024 Jiamu Sun
+ *
+ * Contact: barroit@linux.com
+ */
+
 #ifndef APPVERSION_H
 #define APPVERSION_H
 

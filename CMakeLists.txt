@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-3.0
+# SPDX-License-Identifier: GPL-3.0-only
 cmake_minimum_required(VERSION 3.21)
 
 set(MAJOR_VERSION  0)
