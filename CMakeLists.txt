@@ -9,9 +9,9 @@ set(SAVESAVE_VERSION ${MAJOR_VERSION}.${PATCH_VERSION}.${TWEAK_VERSION})
 include($ENV{ROOT}/scripts/kconfig.cmake)
 
 if (CONFIG_CROSS_COMPILING OR NOT $ENV{HOST} STREQUAL linux)
-set(BUILD windows)
+  set(BUILD windows)
 else()
-set(BUILD linux)
+  set(BUILD linux)
 endif()
 
 if (CONFIG_CROSS_COMPILING)

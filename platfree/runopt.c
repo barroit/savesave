@@ -9,7 +9,7 @@
 #include "compat/getopt.h"
 #include "termsg.h"
 #include "list.h"
-#include "alloc.h"
+#include "strbuf.h"
 
 #ifdef __linux
 # define HELP_MESSAGE HELP_MESSAGE_LINUX
@@ -28,11 +28,6 @@ static struct option options[] = {
 	OPT(0, 0, 0, 0),
 };
 
-struct posarg {
-	char *buf;
-	size_t len;
-	size_t cap;
-};
 
 static const char *aliases = "f:";
 
@@ -44,40 +39,23 @@ static void get_optarg(const char **key)
 	*key = optarg;
 }
 
-static void push_arg(const char *arg, struct posarg *args)
-{
-	size_t len;
-
-	if (!*arg) {
-		len = strlen("‘none’, ");
-
-		CAP_GROW(&args->buf, args->len + len, &args->cap);
-		memcpy(args->buf + args->len, "‘none’, ", len);
-	} else {
-		len = strlen(arg) + strlen("‘’, ") + 1;
-
-		CAP_GROW(&args->buf, args->len + len, &args->cap);
-		snprintf(args->buf + args->len, len, "‘%s’, ", arg);
-		len -= 1; /* no nul-term */
-	}
-
-	args->len += len;
-}
-
 static void report_positional_argument(int idx, int argc, char *const *argv)
 {
-	struct posarg args = { 0 };
-	int npos = (argc - 1) - idx;
+	int n = argc - (idx + 1);
+	struct strbuf sb = STRBUF_INIT;
 
-	CAP_GROW(&args.buf, npos * 10, &args.cap);
-	for_each_idx_from(idx, argc)
-		push_arg(argv[idx], &args);
+	for_each_idx_from(idx, argc) {
+		if (!argv[idx])
+			strbuf_append(&sb, "‘none’, ");
+		else
+			strbuf_printf(&sb, "‘%s’, ", argv[idx]);
+	}
 
-	args.buf[args.len - 2] = 0;
+	strbuf_truncate(&sb, 2);
 	error("positional argument%s %s %s not allowd",
-	      npos > 1 ? "s" : "", args.buf, npos > 1 ? "are" : "is");
+	      n > 1 ? "s" : "", sb.str, n > 1 ? "are" : "is");
 
-	free(args.buf);
+	strbuf_destory(&sb);
 }
 
 int parse_option(int argc, char *const *argv, struct cmdarg *args)

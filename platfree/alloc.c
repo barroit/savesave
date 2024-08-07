@@ -45,12 +45,12 @@ char *xstrdup(const char *src)
 	return str;
 }
 
-void cap_grow(void **buf, size_t req, size_t *cap)
+void cap_grow(void **buf, size_t nl, size_t *cap)
 {
-	if (req > *(cap)) {
-		*(cap) = fix_grow(*(cap));
-		if (*(cap) < req)
-			*(cap) = req;
-		*(buf) = REALLOC_ARRAY(*(buf), *(cap));
+	if (nl > *cap) {
+		*cap = fix_grow(*cap);
+		if (*cap < nl)
+			*cap = nl;
+		*buf = REALLOC_ARRAY(*buf, *cap);
 	}
 }
