@@ -46,6 +46,13 @@ ssize_t robwrite(int fd, const void *buf, size_t n);
 
 char *readfile(const char *name);
 
+/**
+ * mk_file_dir - make file directory
+ * @name: file path
+ * @note: this function success if the directory already exists
+ */
+int mk_file_dir(const char *name);
+
 #ifdef __cplusplus
 }
 #endif

@@ -16,6 +16,7 @@
 # include <sstream>
 # include <iostream>
 # include <string>
+# include <filesystem>
 #endif
 
 #ifdef __cplusplus
@@ -56,11 +57,13 @@ extern "C" {
 # include <windowsx.h>
 # include <versionhelpers.h>
 # include <commctrl.h>
+# include <direct.h>
 #else /* linux */
 # include <unistd.h>
 # include <pwd.h>
 # include <sys/socket.h>
 # include <sys/time.h>
+# include <libgen.h>
 # ifndef NO_SYS_SELECT_H
 #  include <sys/select.h>
 # endif
@@ -97,6 +100,7 @@ typedef SSIZE_T ssize_t;
 # define access	_access
 # define fileno	_fileno
 # define dup2	_dup2
+# define mkdir  _mkdir
 #endif
 
 /*

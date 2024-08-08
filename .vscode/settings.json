@@ -7,6 +7,6 @@
 		}
 	},
 	"files.associations": {
-		".savesave": "plaintext"
+		".savesave*": "plaintext"
 	}
 }

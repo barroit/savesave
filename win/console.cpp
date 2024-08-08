@@ -32,13 +32,19 @@ void console::setup_console()
 bool console::update_stdio_on(const char *output)
 {
 	if (output) {
-		fclose(dest);
-		FreeConsole();
+		int err;
 
 		handle = NULL;
 		is_live = false;
 
-		redirect_stdio(output);
+		/*
+		 * dup2() closes stdout and stderr
+		 */
+		err = redirect_stdio(output);
+		EXIT_ON(err);
+
+		dest = NULL;
+		FreeConsole();
 	}
 
 	return !!output;

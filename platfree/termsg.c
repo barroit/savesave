@@ -215,11 +215,17 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 	exit(128);
 }
 
-int redirect_stdio(const char *filename)
+int redirect_stdio(const char *name)
 {
-	int fd = open(filename, O_RDWR);
+	int err;
+
+	err = mk_file_dir(name);
+	if (err)
+		return error_errno("failed to mkdir for log file ‘%s’", name);
+
+	int fd = open(name, O_WRONLY | O_CREAT, 0664);
 	if (fd == -1) {
-		error_errno("failed to open ‘%s’", filename);
+		error_errno("failed to open ‘%s’", name);
 		goto err_open_file;
 	}
 
