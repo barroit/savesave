@@ -5,47 +5,41 @@
  * Contact: barroit@linux.com
  */
 
+#include "win/console.hpp"
 #include "termsg.h"
 
-static FILE *output;
-
-void setup_console()
+void console::setup_console()
 {
-	AllocConsole();
-	SetConsoleOutputCP(CP_UTF8);
+	int err;
 
-	output = freopen("CONOUT$", "w", stdout);
-	BUG_ON(!output);
+	err = !AllocConsole();
+	BUG_ON(err);
 
-	output = freopen("CONOUT$", "w", stderr);
-	BUG_ON(!output);
+	dest = freopen("CONOUT$", "w", stdout);
+	BUG_ON(!dest);
+
+	dest = freopen("CONOUT$", "w", stderr);
+	BUG_ON(!dest);
+
+	err = !SetConsoleOutputCP(CP_UTF8);
+	if (err)
+		warn("failed to set console code page to utf-8");
+
+	handle = GetConsoleWindow();
+	BUG_ON(!handle);
 }
 
-void hide_console()
+bool console::update_stdio_on(const char *output)
 {
-	HWND console = GetConsoleWindow();
-	BUG_ON(!console);
+	if (output) {
+		fclose(dest);
+		FreeConsole();
 
-	ShowWindow(console, SW_HIDE);
-}
+		handle = NULL;
+		is_live = false;
 
-void show_console()
-{
-	HWND console = GetConsoleWindow();
-	BUG_ON(!console);
+		redirect_stdio(output);
+	}
 
-	ShowWindow(console, SW_SHOW);
-}
-
-void teardown_console()
-{
-	fclose(output);
-
-	FreeConsole();
-}
-
-void waiting_user()
-{
-	puts("Press any key to continue...");
-	_getch();
+	return !!output;
 }

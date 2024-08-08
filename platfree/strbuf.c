@@ -13,7 +13,7 @@ void strbuf_alloc(struct strbuf *sb, size_t nl)
 {
 	BUG_ON(nl == 0);
 
-	CAP_GROW(&sb->str, sb->len + nl, &sb->cap);
+	CAP_ALLOC(&sb->str, sb->len + nl, &sb->cap);
 }
 
 size_t strbuf_append(struct strbuf *sb, const char *str)

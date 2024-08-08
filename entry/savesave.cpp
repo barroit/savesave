@@ -9,43 +9,20 @@
 #include "win/ui.hpp"
 #include "win/termsg.hpp"
 #include "barroit/io.h"
-#include "runopt.h"
+#include "win/cmdline.hpp"
 #include "getconf.h"
 
-static struct cmdarg args;
-static struct savesave savconf;
+static class console *console_reference;
 
-static int argc;
-static char **argv;
-
-static void validate_os_version()
+static void check_os_version()
 {
 	if (!IsWindows7OrGreater())
 		die("unsupported windows version (at least win7)");
 }
 
-int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
+static void init_ui_component(HINSTANCE app)
 {
 	int err;
-
-	setup_console();
-	validate_os_version();
-
-	argc = cmdline2argv(cmdline, &argv);
-	if (argc > 1) {
-		err = parse_option(argc, argv, &args);
-		EXIT_ON(err);
-	}
-
-	if (args.output) {
-		teardown_console();
-		redirect_output(args.output);
-	} else {
-		// hide_console();
-	}
-
-	err = parse_savesave_config(args.confpath, &savconf);
-	EXIT_ON(err);
 
 	HWND window;
 	err = create_app_window(app, &window);
@@ -55,21 +32,41 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	setup_notifyicon(app, window, &icon);
 
 	show_notifyicon(&icon);
+}
 
+static void loop_ui_message()
+{
 	MSG message;
 	while (GetMessage(&message, NULL, 0, 0) > 0) {
 		TranslateMessage(&message);
 		DispatchMessage(&message);
 	}
+}
 
-	DestroyIcon(icon.hIcon);
+int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
+{
+	class console con;
+	con.setup_console();
+	console_reference = &con;
 
-	Shell_NotifyIcon(NIM_DELETE, &icon);
+	check_os_version();
+
+	static class uarg_parser parser;
+	parser.dump_cmdline(cmdline);
+
+	parser.parse_cmdline();
+	if (!con.update_stdio_on(parser.args.output))
+		con.hide_console();
+
+	parser.parse_savconf();
+
+	init_ui_component(app);
+	loop_ui_message();
 
 	return 0;
 }
 
-bool is_console_output()
+class console *get_console()
 {
-	return !args.output;
+	return console_reference;
 }

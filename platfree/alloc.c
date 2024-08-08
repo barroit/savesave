@@ -9,7 +9,7 @@
 #include "barroit/limits.h"
 #include "termsg.h"
 
-void memory_limit_check(size_t n)
+void alloc_limit_check(size_t n)
 {
 	if (n > MAX_ALLOC_SIZE) {
 		die("attempting to allocate %" PRIuMAX " over limit %" PRIuMAX,
@@ -19,7 +19,7 @@ void memory_limit_check(size_t n)
 
 void *xrealloc(void *p, size_t n)
 {
-	memory_limit_check(n);
+	alloc_limit_check(n);
 
 	p = realloc(p, n);
 	if (!p)
@@ -29,7 +29,7 @@ void *xrealloc(void *p, size_t n)
 
 void *xmalloc(size_t n)
 {
-	memory_limit_check(n);
+	alloc_limit_check(n);
 
 	void *p = malloc(n);
 	if (!p)
@@ -45,7 +45,7 @@ char *xstrdup(const char *src)
 	return str;
 }
 
-void cap_grow(void **buf, size_t nl, size_t *cap)
+void cap_alloc(void **buf, size_t nl, size_t *cap)
 {
 	if (nl > *cap) {
 		*cap = fix_grow(*cap);

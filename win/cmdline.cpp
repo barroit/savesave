@@ -5,32 +5,38 @@
  * Contact: barroit@linux.com
  */
 
+#include "win/cmdline.hpp"
 #include "alloc.h"
 #include "list.h"
+#include "termsg.h"
 
-struct argarr {
-	char **buf;
-	size_t nr;
-	size_t cap;
-};
-
-int cmdline2argv(const char *cmdline, char ***argv)
+void uarg_parser::dump_cmdline(const char *cmdline)
 {
 	std::string line = std::string(APPNAME) + " " + std::string(cmdline);
 	std::istringstream stream(std::move(line));
-	std::string arg;
+	std::string val;
 
-	struct argarr args = { 0 };
-	while (stream >> std::quoted(arg)) {
-		char *buf = xstrdup(arg.c_str());
-
-		CAP_GROW(&args.buf, args.nr + 1, &args.cap);
-		args.buf[args.nr++] = buf;
+	while (stream >> std::quoted(val)) {
+		CAP_ALLOC(&argv, argc + 1, &cap);
+		argv[argc++] = xstrdup(val.c_str());
 	}
 
-	CAP_GROW(&args.buf, args.nr + 1, &args.cap);
-	args.buf[args.nr] = NULL;
+	CAP_ALLOC(&argv, argc + 1, &cap);
+	argv[argc] = NULL;
+}
 
-	*argv = args.buf;
-	return args.nr;
+void uarg_parser::parse_cmdline()
+{
+	int err;
+
+	err = parse_option(argc, argv, &args);
+	EXIT_ON(err);
+}
+
+void uarg_parser::parse_savconf()
+{
+	int err;
+
+	err = parse_savesave_config(args.config, &savconf);
+	EXIT_ON(err);
 }

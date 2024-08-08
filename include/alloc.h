@@ -14,7 +14,7 @@ extern "C" {
 
 #include "calc.h"
 
-void memory_limit_check(size_t n);
+void alloc_limit_check(size_t n);
 
 void *xrealloc(void *p, size_t n);
 
@@ -24,15 +24,15 @@ char *xstrdup(const char *src);
 
 #define REALLOC_ARRAY(p, n) xrealloc(p, st_mult(sizeof(*(p)), n))
 
-void cap_grow(void **buf, size_t nl, size_t *cap);
+void cap_alloc(void **buf, size_t nl, size_t *cap);
 
 /**
- * CAP_GROW - increase buf size
+ * CAP_ALLOC - increase buf size
  * @buf: pointer points to real buf
- * @tfm: minimum total size that this buffer should have (i.e., len + nl + 1)
+ * @nl:  minimum total size that this buffer should have (i.e., len + nl + 1)
  * @cap: pointer points to buf capacity
  */
-#define CAP_GROW(buf, nl, cap) cap_grow((void **)buf, nl, cap)
+#define CAP_ALLOC(buf, nl, cap) cap_alloc((void **)buf, nl, cap)
 
 #ifdef __cplusplus
 }

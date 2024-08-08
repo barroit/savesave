@@ -7,14 +7,30 @@
 
 #pragma once
 
-int cmdline2argv(const char *cmdline, char ***argv);
+class console {
+	FILE *dest;
+	HWND handle;
+	bool is_live;
 
-void setup_console();
+public:
+	void setup_console();
 
-void hide_console();
+	inline void hide_console()
+	{
+		ShowWindow(handle, SW_HIDE);
+	}
 
-void show_console();
+	inline void show_console()
+	{
+		ShowWindow(handle, SW_SHOW);
+	}
 
-void teardown_console();
+	bool update_stdio_on(const char *output);
 
-void waiting_user();
+	inline bool is_active()
+	{
+		return is_live;
+	}
+};
+
+class console *get_console();

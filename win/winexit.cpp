@@ -8,14 +8,20 @@
 #undef exit
 
 #include "win/termsg.hpp"
+#include "win/console.hpp"
 
-bool is_console_output();
+static void waiting_user()
+{
+	puts("Press any key to continue...");
+	_getch();
+}
 
 void winexit(int code)
 {
 	if (code) {
-		if (is_console_output())
-			show_console();
+		class console *con = get_console();
+		if (con->is_active())
+			con->show_console();
 		waiting_user();
 	}
 

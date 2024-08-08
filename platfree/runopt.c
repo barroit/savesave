@@ -28,20 +28,11 @@ static struct option options[] = {
 	OPT(0, 0, 0, 0),
 };
 
-
 static const char *aliases = "f:";
-
-static void get_optarg(const char **key)
-{
-	if (*optarg == 0)
-		die("empty string is not allowed");
-
-	*key = optarg;
-}
 
 static void report_positional_argument(int idx, int argc, char *const *argv)
 {
-	int n = argc - (idx + 1);
+	int n = argc - idx;
 	struct strbuf sb = STRBUF_INIT;
 
 	for_each_idx_from(idx, argc) {
@@ -58,6 +49,14 @@ static void report_positional_argument(int idx, int argc, char *const *argv)
 	strbuf_destory(&sb);
 }
 
+static void get_optarg(const char **key)
+{
+	if (*optarg == 0)
+		die("empty string is not allowed");
+
+	*key = optarg;
+}
+
 int parse_option(int argc, char *const *argv, struct cmdarg *args)
 {
 	enum optid opt;
@@ -67,7 +66,7 @@ int parse_option(int argc, char *const *argv, struct cmdarg *args)
 		opt = getopt_long(argc, argv, aliases, options, NULL);
 		switch (opt) {
 		case OPT_CONFIG:
-			get_optarg(&args->confpath);
+			get_optarg(&args->config);
 			break;
 		case OPT_OUTPUT:
 			get_optarg(&args->output);

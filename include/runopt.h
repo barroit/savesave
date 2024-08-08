@@ -23,7 +23,7 @@ enum optid {
 };
 
 struct cmdarg {
-	const char *confpath;
+	const char *config;
 	const char *output;
 };
 

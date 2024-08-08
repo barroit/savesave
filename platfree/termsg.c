@@ -67,7 +67,7 @@ static void record_cntrl_char(char *str, size_t nr, struct cntrl_char *cntrl)
 	size_t i;
 	for_each_idx(i, nr) {
 		if (iscntrl(str[i]) && str[i] != '\t' && str[i] != '\n') {
-			CAP_GROW(&cntrl->pos, 1, &cntrl->cap);
+			CAP_ALLOC(&cntrl->pos, 1, &cntrl->cap);
 			cntrl->pos[cntrl->nr++] = i;
 		}
 	}
@@ -119,7 +119,7 @@ void vreport_format_cntrl_char(char *str, size_t len, size_t *avail)
 {
 	struct cntrl_char cntrl = { 0 };
 
-	CAP_GROW(&cntrl.pos, 4, &cntrl.cap);
+	CAP_ALLOC(&cntrl.pos, 4, &cntrl.cap);
 	record_cntrl_char(str, len, &cntrl);
 
 	if (!cntrl.nr)
@@ -215,7 +215,7 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 	exit(128);
 }
 
-int redirect_output(const char *filename)
+int redirect_stdio(const char *filename)
 {
 	int fd = open(filename, O_RDWR);
 	if (fd == -1) {

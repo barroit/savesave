@@ -9,16 +9,6 @@
 
 #include "termsg.h"
 
-void setup_console();
-
-void hide_console();
-
-void show_console();
-
-void teardown_console();
-
-void waiting_user();
-
 const char *strwinerror();
 
 #define error_winerr(...) \
