@@ -133,4 +133,12 @@ config ZIP_THRESHOLD_SIZE_KB
 	int "size threshold for compression (in KB)"
 	default 30720
 
+config DEFAULT_SAVCONF_BASENAME
+	string "basename of savconf"
+	default ".savesave"
+
+config DEFAULT_SAVCONF_ENVNAME
+	string "getenv name of savconf"
+	default "SAVESAVE"
+
 endmenu # "Features"

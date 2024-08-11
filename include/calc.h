@@ -16,7 +16,7 @@ extern "C" {
 
 #define fix_grow(x) (((x) + 16) * 3 / 2)
 
-#define bitsizeof(x)    (CHAR_BIT * sizeof(x))
+#define bitsizeof(x) (CHAR_BIT * sizeof(x))
 
 #define max_uint_val(x) (UINTMAX_MAX >> (bitsizeof(uintmax_t) - bitsizeof(x)))
 
@@ -29,9 +29,9 @@ extern NORETURN __die_routine(const char *, const char *, const char *, ...);
 		if (uint_mult_overflows(a, b)) {			\
 			__die_routine("fatal: ", NULL, "size overflow: "\
 				      "%" PRIuMAX " * %" PRIuMAX ,	\
-				      (uintmax_t)a, (uintmax_t)b);	\
+				      (uintmax_t)(a), (uintmax_t)(b));	\
 		}							\
-		a * b;							\
+		(a) * (b);						\
 	})
 
 #ifdef __cplusplus

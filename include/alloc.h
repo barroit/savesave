@@ -24,15 +24,22 @@ char *xstrdup(const char *src);
 
 #define REALLOC_ARRAY(p, n) xrealloc(p, st_mult(sizeof(*(p)), n))
 
-void cap_alloc(void **buf, size_t nl, size_t *cap);
-
 /**
  * CAP_ALLOC - increase buf size
  * @buf: pointer points to real buf
- * @nl:  minimum total size that this buffer should have (i.e., len + nl + 1)
+ * @nl:  minimum total size that this buffer should have
+ * 	 (i.e., strlen + nl + 1)
  * @cap: pointer points to buf capacity
  */
-#define CAP_ALLOC(buf, nl, cap) cap_alloc((void **)buf, nl, cap)
+#define CAP_ALLOC(p, nl, cap)						\
+	do {								\
+		if ((nl) > *(cap)) {					\
+			*(cap) = fix_grow(*cap);			\
+			if (*(cap) < (nl))				\
+				*(cap) = nl;				\
+			*(p) = REALLOC_ARRAY(*(p), *(cap));		\
+		}							\
+	} while (0)
 
 #ifdef __cplusplus
 }

@@ -44,13 +44,3 @@ char *xstrdup(const char *src)
 		die_errno("failed to duplicate string");
 	return str;
 }
-
-void cap_alloc(void **buf, size_t nl, size_t *cap)
-{
-	if (nl > *cap) {
-		*cap = fix_grow(*cap);
-		if (*cap < nl)
-			*cap = nl;
-		*buf = REALLOC_ARRAY(*buf, *cap);
-	}
-}

@@ -39,6 +39,7 @@ extern "C" {
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 #ifdef HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>

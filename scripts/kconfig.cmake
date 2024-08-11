@@ -9,7 +9,6 @@ function (set_choiced_value prefix)
 
 endfunction()
 
-
 if (NOT EXISTS "$ENV{DOTCONFIG}" OR IS_DIRECTORY $ENV{DOTCONFIG})
 message(FATAL_ERROR "${DOTCONFIG} does not exist, run ‘make menuconfig’ first")
 endif()

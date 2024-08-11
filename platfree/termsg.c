@@ -190,7 +190,7 @@ int __error_routine(const char *pref, const char *extr, const char *fmt, ...)
 	vreportf(stderr, pref, fmt, ap, extr);
 	va_end(ap);
 
-	return 1;
+	return -1;
 }
 
 void __die_routine(const char *pref, const char *extr, const char *fmt, ...)
