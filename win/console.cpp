@@ -31,21 +31,22 @@ void console::setup_console()
 
 bool console::update_stdio_on(const char *output)
 {
-	if (output) {
-		int err;
+	if (!output)
+		return false;
 
-		handle = NULL;
-		is_live = false;
+	int err;
 
-		/*
-		 * dup2() closes stdout and stderr
-		 */
-		err = redirect_stdio(output);
-		EXIT_ON(err);
+	handle = NULL;
+	is_live = false;
 
-		dest = NULL;
-		FreeConsole();
-	}
+	/*
+	 * dup2() closes stdout and stderr
+	 */
+	err = redirect_stdio(output);
+	EXIT_ON(err);
 
-	return !!output;
+	dest = NULL;
+	FreeConsole();
+
+	return true;
 }

@@ -13,6 +13,8 @@ class console {
 	bool is_live;
 
 public:
+	console() : dest(NULL), handle(NULL), is_live(1) {}
+
 	void setup_console();
 
 	inline void hide_console()

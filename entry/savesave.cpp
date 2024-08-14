@@ -45,18 +45,19 @@ static void loop_ui_message()
 
 int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 {
-	class console con;
+	console con;
 	con.setup_console();
 	console_reference = &con;
 
 	check_os_version();
 
-	static class uarg_parser parser;
+	static uarg_parser parser;
 	parser.dump_cmdline(cmdline);
 
 	parser.parse_cmdline();
-	if (!con.update_stdio_on(parser.args.output))
+	if (!con.update_stdio_on(parser.args.output)) {
 		con.hide_console();
+	}
 
 	parser.parse_savconf();
 

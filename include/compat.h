@@ -39,7 +39,6 @@ extern "C" {
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <dirent.h>
 
 #ifdef HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>
@@ -65,6 +64,7 @@ extern "C" {
 # include <sys/socket.h>
 # include <sys/time.h>
 # include <libgen.h>
+# include <dirent.h>
 # ifndef NO_SYS_SELECT_H
 #  include <sys/select.h>
 # endif

@@ -102,7 +102,7 @@ static int parse_save(void *__save, struct savesave *conf)
 	return 0;
 }
 
-static int prepare_backup(void *__backup, struct savesave *)
+static int prepare_backup(void *__backup, struct savesave *_)
 {
 	const char *backup = *(const char **)__backup;
 
@@ -129,7 +129,7 @@ static int prepare_backup(void *__backup, struct savesave *)
 	return 0;
 }
 
-static int check_stack(void *__stack, struct savesave *)
+static int check_stack(void *__stack, struct savesave *_)
 {
 	u8 stack = *(u8 *)__stack;
 	if (stack == 0)
@@ -137,7 +137,7 @@ static int check_stack(void *__stack, struct savesave *)
 	return 0;
 }
 
-static int check_interval(void *__interval, struct savesave *)
+static int check_interval(void *__interval, struct savesave *_)
 {
 	u32 interval = *(u32 *)__interval;
 	if (interval == 0) {
