@@ -173,13 +173,15 @@ static void vreportf(FILE *stream, const char *lead,
 	robwrite(fd, msg, len);
 }
 
-void __warn_routine(const char *pref, const char *extr, const char *fmt, ...)
+int __warn_routine(const char *pref, const char *extr, const char *fmt, ...)
 {
 	va_list ap;
 
 	va_start(ap, fmt);
 	vreportf(stderr, pref, fmt, ap, extr);
 	va_end(ap);
+
+	return -1;
 }
 
 int __error_routine(const char *pref, const char *extr, const char *fmt, ...)

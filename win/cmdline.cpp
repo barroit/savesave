@@ -37,6 +37,6 @@ void uarg_parser::parse_savconf()
 {
 	int err;
 
-	err = parse_savesave_config(args.config, &savconf);
+	err = parse_savesave_config(args.savconf, &savconf);
 	EXIT_ON(err);
 }

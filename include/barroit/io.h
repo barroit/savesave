@@ -53,6 +53,8 @@ char *readfile(const char *name);
  */
 int mk_file_dir(const char *name);
 
+int is_abs_path(const char *path);
+
 #ifdef __cplusplus
 }
 #endif

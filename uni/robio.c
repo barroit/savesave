@@ -30,3 +30,8 @@ int mk_file_dir(const char *name)
 	free(cp);
 	return !!err;
 }
+
+int is_abs_path(const char *path)
+{
+	return *path == '/';
+}

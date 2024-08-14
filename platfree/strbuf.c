@@ -9,7 +9,7 @@
 #include "alloc.h"
 #include "termsg.h"
 
-void strbuf_alloc(struct strbuf *sb, size_t nl)
+void strbuf_grow(struct strbuf *sb, size_t nl)
 {
 	BUG_ON(nl == 0);
 
@@ -20,7 +20,7 @@ size_t strbuf_append(struct strbuf *sb, const char *str)
 {
 	size_t nl = strlen(str);
 
-	strbuf_alloc(sb, nl + 1);
+	strbuf_grow(sb, nl + 1);
 
 	memcpy(sb->str + sb->len, str, nl + 1);
 	sb->len += nl;
@@ -39,7 +39,7 @@ size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...)
 		goto err_printf;
 
 	va_end(cp);
-	strbuf_alloc(sb, nr + 1);
+	strbuf_grow(sb, nr + 1);
 
 	nr = vsnprintf(sb->str + sb->len, nr + 1, fmt, ap);
 	if (unlikely(nr < 0))

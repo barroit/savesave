@@ -8,28 +8,24 @@
 #include "runopt.h"
 #include "barroit/io.h"
 #include "termsg.h"
-#include "getconf.h"
+#include "savconf.h"
 
 static struct cmdarg args;
-static struct savesave savconf;
 
-static void handle_option(int argc, char *const *argv)
-{
-	int err;
-
-	err = parse_option(argc, argv, &args);
-	EXIT_ON(err);
-}
+static struct savesave *savesave_list;
+static size_t savesave_nr;
 
 int main(int argc, char *const *argv)
 {
-	int err;
-
 	if (argc > 1)
-		handle_option(argc, argv);
+		parse_option(argc, argv, &args);
 
-	err = parse_savesave_config(args.config, &savconf);
-	EXIT_ON(err);
+	if (!args.savconf)
+		args.savconf = get_default_savconf_path();
+	if (!args.savconf)
+		die("no savconf was provided");
+
+	savesave_nr = parse_savconf(args.savconf, &savesave_list);
 
 	return 0;
 }

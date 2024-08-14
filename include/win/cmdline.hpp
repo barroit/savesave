@@ -8,7 +8,7 @@
 #pragma once
 
 #include "runopt.h"
-#include "getconf.h"
+#include "savconf.h"
 
 class uarg_parser {
 	char **argv;

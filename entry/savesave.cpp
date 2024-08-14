@@ -10,7 +10,7 @@
 #include "win/termsg.hpp"
 #include "barroit/io.h"
 #include "win/cmdline.hpp"
-#include "getconf.h"
+#include "savconf.h"
 
 static class console *console_reference;
 

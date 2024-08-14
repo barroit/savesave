@@ -5,9 +5,14 @@
  * Contact: barroit@linux.com
  */
 
-#include "getconf.h"
-
 const char *get_home_dir()
 {
 	return getenv("USERPROFILE");
+}
+
+char *strchrnul(const char *s, int c)
+{
+	while(*s && *s != c)
+		s++;
+	return (char *)s;
 }

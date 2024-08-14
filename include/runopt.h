@@ -23,13 +23,13 @@ enum optid {
 };
 
 struct cmdarg {
-	const char *config;
+	const char *savconf;
 	const char *output;
 };
 
 extern char *optarg;
 
-int parse_option(int argc, char *const *argv, struct cmdarg *args);
+void parse_option(int argc, char *const *argv, struct cmdarg *args);
 
 #ifdef __cplusplus
 }

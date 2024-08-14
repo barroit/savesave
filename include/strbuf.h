@@ -20,7 +20,7 @@ struct strbuf {
 
 #define STRBUF_INIT { 0 }
 
-void strbuf_alloc(struct strbuf *sb, size_t nl);
+void strbuf_grow(struct strbuf *sb, size_t nl);
 
 size_t strbuf_append(struct strbuf *sb, const char *str);
 

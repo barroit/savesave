@@ -57,7 +57,7 @@ static void get_optarg(const char **key)
 	*key = optarg;
 }
 
-int parse_option(int argc, char *const *argv, struct cmdarg *args)
+void parse_option(int argc, char *const *argv, struct cmdarg *args)
 {
 	enum optid opt;
 	memset(args, 0, sizeof(*args));
@@ -66,20 +66,20 @@ int parse_option(int argc, char *const *argv, struct cmdarg *args)
 		opt = getopt_long(argc, argv, aliases, options, NULL);
 		switch (opt) {
 		case OPT_CONFIG:
-			get_optarg(&args->config);
+			get_optarg(&args->savconf);
 			break;
 		case OPT_OUTPUT:
 			get_optarg(&args->output);
 			break;
 		case OPT_UNKNOWN:
 			/* error message already printed out */
-			return 1;
+			exit(128);
 		case OPT_VERSION:
 			puts(APPNAME "-" SAVESAVE_VERSION);
-			return 1;
+			exit(0);
 		case OPT_HELP:
 			puts(HELP_MESSAGE);
-			return 1;
+			exit(0);
 		case -1:
 			goto finish;
 		case OPT_FLAG:
@@ -90,8 +90,6 @@ int parse_option(int argc, char *const *argv, struct cmdarg *args)
 finish:
 	if (optind < argc) {
 		report_positional_argument(optind, argc, argv);
-		return 1;
+		exit(128);
 	}
-
-	return 0;
 }
