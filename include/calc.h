@@ -18,9 +18,14 @@ extern "C" {
 
 #define bitsizeof(x) (CHAR_BIT * sizeof(x))
 
-#define max_uint_val(x) (UINTMAX_MAX >> (bitsizeof(uintmax_t) - bitsizeof(x)))
+#define max_uint_val_of_type(x) \
+	(UINTMAX_MAX >> (bitsizeof(uintmax_t) - bitsizeof(x)))
 
-#define uint_mult_overflows(a, b) ((a) && ((b) > (max_uint_val(a) / (a))))
+#define max_int_val_of_type(x) \
+	(INTMAX_MAX >> (bitsizeof(intmax_t) - bitsizeof(x)))
+
+#define uint_mult_overflows(a, b) \
+	((a) && ((b) > (max_uint_val_of_type(a) / (a))))
 
 extern NORETURN __die_routine(const char *, const char *, const char *, ...);
 

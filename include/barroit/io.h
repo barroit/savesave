@@ -60,9 +60,7 @@ const char *get_home_dir(void);
 /**
  * calc_dir_size - calculate total file size in directory
  */
-int calc_dir_size(const char *path, off_t *sz);
-
-int make_user_dir(const char *path);
+int calc_dir_size(const char *dir, off_t *size);
 
 #ifdef __cplusplus
 }

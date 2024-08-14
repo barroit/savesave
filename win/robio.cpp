@@ -10,12 +10,11 @@
 
 int mk_file_dir(const char *name)
 {
-	std::filesystem::path abs;
-	std::filesystem::path dir;
+	std::filesystem::path abs = name;
+	std::filesystem::path dir = abs.parent_path();
 	std::string tmp;
 	const char *str;
 	try {
-		abs = name;
 		dir = abs.parent_path();
 		tmp = dir.string();
 		str = tmp.c_str();
@@ -36,4 +35,10 @@ int mk_file_dir(const char *name)
 		return mkdir(str);
 	else
 		return 0;
+}
+
+int is_abs_path(const char *path)
+{
+	std::filesystem::path p = path;
+	return p.is_absolute();
 }

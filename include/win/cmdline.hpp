@@ -13,16 +13,14 @@
 class uarg_parser {
 	char **argv;
 	size_t argc;
-	size_t cap;
 
 public:
 	struct cmdarg args;
-	struct savesave savconf;
+	struct savesave *savconf;
 
-	uarg_parser() : argv(NULL), argc(0), cap(0)
+	uarg_parser() : argv(NULL), argc(0), savconf(NULL)
 	{
 		args = { 0 };
-		savconf = { 0 };
 	}
 
 	void dump_cmdline(const char *cmdline);

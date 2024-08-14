@@ -38,6 +38,8 @@ static inline void strlist_destroy_buf(struct strlist *sl)
 	free(sl->list);
 }
 
+void strlist_terminate(struct strlist *sl);
+
 #ifdef __cplusplus
 }
 #endif

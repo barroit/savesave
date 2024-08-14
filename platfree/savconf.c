@@ -93,10 +93,8 @@ static int parse_save(void *__save, struct savesave *conf)
 		conf->save_size = st.st_size;
 		conf->is_dir_save = 0;
 	} else if (S_ISDIR(st.st_mode)) {
-		err = calc_dir_size(save, &conf->save_size);
-		if (err)
-			return 1;
 		conf->is_dir_save = 1;
+		return calc_dir_size(save, &conf->save_size);
 	} else {
 		return error("unsupported save file mode ‘%d’", st.st_mode);
 	}
@@ -110,7 +108,7 @@ static int prepare_backup(void *__backup, struct savesave *)
 
 	int err;
 
-	err = make_user_dir(backup);
+	err = my_mkdir(backup);
 	if (err && errno != EEXIST)
 		return error_errno("failed to create backup directory ‘%s’",
 				   backup);
@@ -155,7 +153,7 @@ static int check_interval(void *__interval, struct savesave *)
 enum entval {
 	STRING,
 	TIMESPAN,
-	UINT8,
+	U8,
 	FLAG,
 };
 
@@ -187,7 +185,7 @@ static int assign_entry(const char *line, char **rest,
 		SETENT(ent, "interval", &conf->interval,
 		       check_interval, TIMESPAN);
 	else if (is_entry(line, "stack", rest))
-		SETENT(ent, "stack", &conf->stack, check_stack, UINT8);
+		SETENT(ent, "stack", &conf->stack, check_stack, U8);
 	else if (is_entry(line, "snapshot", rest))
 		SETENT(ent, "snapshot", &conf->use_snapshot, NULL, FLAG);
 	else if (is_entry(line, "zip", rest))
@@ -214,7 +212,7 @@ static int parse_entry_value(const char *rest, struct savesave *conf,
 	case TIMESPAN:
 		res = str2interval(rest, (u32 *)entry->val);
 		break;
-	case UINT8:
+	case U8:
 		res = str2u8(rest, (u8 *)entry->val);
 		break;
 	case FLAG:
@@ -264,10 +262,6 @@ static int parse_savconf_line(struct savesave_context *ctx)
 		return error("encountered an unknown line");
 	}
 }
-
-#ifdef WINDOWS_NATIVE
-char *strchrnul(const char *s, int c);
-#endif
 
 static void do_parse_savconf(struct savesave_context *ctx)
 {

@@ -109,6 +109,16 @@ typedef SSIZE_T ssize_t;
  */
 #define PLATSPEC
 
+#ifdef _WIN32
+char *strchrnul(const char *s, int c);
+#endif
+
+#ifdef _WIN32
+# define my_mkdir    mkdir
+#else
+# define my_mkdir(p) mkdir(p, 0775)
+#endif
+
 #ifdef __cplusplus
 }
 #endif

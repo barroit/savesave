@@ -5,11 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-const char *get_home_dir()
-{
-	return getenv("USERPROFILE");
-}
-
 char *strchrnul(const char *s, int c)
 {
 	while(*s && *s != c)

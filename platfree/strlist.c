@@ -41,3 +41,9 @@ void strlist_destroy(struct strlist *sl)
 
 	strlist_destroy_buf(sl);
 }
+
+void strlist_terminate(struct strlist *sl)
+{
+	strlist_grow1(sl);
+	sl->list[sl->size] = NULL;
+}

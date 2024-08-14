@@ -25,8 +25,7 @@ int str2ulong(const char *str, size_t len,
 	else if (tail - str != len)
 		return error("invalid char found in ‘%s’", str);
 	else if (*val > max)
-		return error("‘%s’ is too big (up to %" PRIu64 ")",
-			     str, max);
+		return error("‘%s’ is too big (up to %lu)", str, max);
 
 	return 0;
 }

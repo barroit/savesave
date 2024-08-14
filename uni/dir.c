@@ -7,7 +7,6 @@
 
 #include "termsg.h"
 #include "strlist.h"
-#include "list.h"
 #include "alloc.h"
 
 static char *get_user_home(const char *user)
@@ -60,17 +59,17 @@ static int dirent_sizeof(const char *dir, off_t *size,
 	BUG_ON(nr < 0);
 
 	switch (ent->d_type) {
+	case DT_REG:
+		return file_sizeof(buf, size);
+	case DT_DIR:
+		strlist_push(sl, buf);
+		break;
 	case DT_LNK:
 		/*
 		 * we don’t handle symbolic links; a constant is given that is
 		 * large enough for most symbolic link files
 		 */
 		*size += 64;
-		break;
-	case DT_REG:
-		return file_sizeof(buf, size);
-	case DT_DIR:
-		strlist_push(sl, buf);
 		break;
 	case DT_UNKNOWN:
 		return error("can’t determine file type of ‘%s’", buf);
@@ -114,19 +113,12 @@ int calc_dir_size(const char *dir, off_t *size)
 	do {
 		err = do_calc_dir_size(path, size, &sl);
 		free(path);
-		if (err)
-			goto err_get_size;
+		if (err) {
+			strlist_destroy(&sl);
+			return 1;
+		}
 	} while ((path = strlist_pop(&sl)) != NULL);
 
 	strlist_destroy_buf(&sl);
 	return 0;
-
-err_get_size:
-	strlist_destroy(&sl);
-	return 1;
-}
-
-int make_user_dir(const char *path)
-{
-	return mkdir(path, 0775);
 }
