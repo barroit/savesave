@@ -48,8 +48,8 @@ static void check_unique_last_elem(const struct savesave *conf, size_t nr)
 	for_each_idx(i, nr - 1) {
 		if (likely(strcmp(conf[i].name, name)))
 			continue;
-		warn("configuration name ‘%s’ conflicts at config indexes "
-		     "%" PRIuMAX " and %" PRIuMAX, name, i, nr - 1);
+		warn("configuration name ‘%s’ conflicts at config indexes %" PRIuMAX " and %" PRIuMAX,
+		     name, i, nr - 1);
 	}
 }
 
@@ -75,11 +75,6 @@ static inline int is_entry(const char *line, const char *prefix, char **ret)
 	return skip_prefix(line, prefix, ret) == 0 && isspace(**ret);
 }
 
-/**
- * calc_dir_size - calculate total file size in directory
- */
-int calc_dir_size(const char *path, off_t *sz);
-
 static int parse_save(void *__save, struct savesave *conf)
 {
 	const char *save = *(const char **)__save;
@@ -99,7 +94,6 @@ static int parse_save(void *__save, struct savesave *conf)
 		conf->is_dir_save = 0;
 	} else if (S_ISDIR(st.st_mode)) {
 		err = calc_dir_size(save, &conf->save_size);
-		printf("%s: %liM\n", save, conf->save_size / 1024 / 1024);
 		if (err)
 			return 1;
 		conf->is_dir_save = 1;
@@ -113,6 +107,27 @@ static int parse_save(void *__save, struct savesave *conf)
 static int prepare_backup(void *__backup, struct savesave *)
 {
 	const char *backup = *(const char **)__backup;
+
+	int err;
+
+	err = make_user_dir(backup);
+	if (err && errno != EEXIST)
+		return error_errno("failed to create backup directory ‘%s’",
+				   backup);
+
+	struct stat st;
+	err = stat(backup, &st);
+	if (err)
+		return error_errno("unable to get metadata for backup directory ‘%s’",
+			     backup);
+	if (!S_ISDIR(st.st_mode))
+		return error("file ‘%s’ is not a directory", backup);
+
+	err = access(backup, W_OK | X_OK);
+	if (err)
+		return error_errno("unable to access backup directory ‘%s’",
+				   backup);
+
 	return 0;
 }
 
@@ -130,8 +145,8 @@ static int check_interval(void *__interval, struct savesave *)
 	if (interval == 0) {
 		return error("interval cannot be 0");
 	} else if (interval > 2592000) {
-		return error("interval ‘%" PRIu32
-			     "’ is too long (up to 30 days)", interval);
+		return error("interval ‘%" PRIu32 "’ is too long (up to 30 days)",
+			     interval);
 	} else {
 		return 0;
 	}
@@ -153,34 +168,32 @@ struct confent {
 	enum entval type;
 };
 
-#define SETENT(e, n, p, c, t)		\
+#define SETENT(e, n, p, c, t)			\
 	do {					\
 		(e)->name = (n);		\
-		(e)->val = (intptr_t)(p);	\
-		(e)->cb = (c);			\
+		(e)->val  = (intptr_t)(p);	\
+		(e)->cb   = (c);		\
 		(e)->type = (t);		\
 	} while (0)
 
-static int find_entry(const char *line, char **rest,
-		      const struct savesave *conf, struct confent *entry)
+static int assign_entry(const char *line, char **rest,
+			const struct savesave *conf, struct confent *ent)
 {
-	if (is_entry(line, "save", rest)) {
-		SETENT(entry, "save", &conf->save, parse_save, STRING);
-	} else if (is_entry(line, "backup", rest)) {
-		SETENT(entry, "backup",
-			  &conf->backup, prepare_backup, STRING);
-	} else if (is_entry(line, "interval", rest)) {
-		SETENT(entry, "interval",
-			  &conf->interval, check_interval, TIMESPAN);
-	} else if (is_entry(line, "stack", rest)) {
-		SETENT(entry, "stack", &conf->stack, check_stack, UINT8);
-	} else if (is_entry(line, "snapshot", rest)) {
-		SETENT(entry, "snapshot", &conf->use_snapshot, NULL, FLAG);
-	} else if (is_entry(line, "zip", rest)) {
-		SETENT(entry, "zip", &conf->use_zip, NULL, FLAG);
-	} else {
+	if (is_entry(line, "save", rest))
+		SETENT(ent, "save", &conf->save, parse_save, STRING);
+	else if (is_entry(line, "backup", rest))
+		SETENT(ent, "backup", &conf->backup, prepare_backup, STRING);
+	else if (is_entry(line, "interval", rest))
+		SETENT(ent, "interval", &conf->interval,
+		       check_interval, TIMESPAN);
+	else if (is_entry(line, "stack", rest))
+		SETENT(ent, "stack", &conf->stack, check_stack, UINT8);
+	else if (is_entry(line, "snapshot", rest))
+		SETENT(ent, "snapshot", &conf->use_snapshot, NULL, FLAG);
+	else if (is_entry(line, "zip", rest))
+		SETENT(ent, "zip", &conf->use_zip, NULL, FLAG);
+	else
 		return 1;
-	}
 
 	return 0;
 }
@@ -189,10 +202,9 @@ static int parse_entry_value(const char *rest, struct savesave *conf,
 			     const struct confent *entry)
 {
 	rest = skip_space(rest);
-	if (!*rest) {
+	if (!*rest)
 		return error("name ‘%s’ must be defined with a value",
 			     entry->name);
-	}
 
 	int res = 0;
 	switch (entry->type) {
@@ -222,7 +234,7 @@ static int parse_entry_line(const char *line, struct savesave *conf)
 	char *rest;
 	struct confent entry;
 
-	err = find_entry(line, &rest, conf, &entry);
+	err = assign_entry(line, &rest, conf, &entry);
 	if (err)
 		return error("unrecognized name found in ‘%s’", line);
 
@@ -270,10 +282,9 @@ static void do_parse_savconf(struct savesave_context *ctx)
 			is_final = 1;
 
 		err = parse_savconf_line(ctx);
-		if (err) {
+		if (err)
 			die("failed to parse savesave configuration\n"
 			    "%7" PRIuMAX ":%s", cnt, ctx->line);
-		}
 
 		if (is_final)
 			break;
@@ -303,8 +314,6 @@ size_t parse_savconf(const char *path, struct savesave **conf)
 	*conf = ctx.conf;
 	return ctx.nr;
 }
-
-extern const char *get_home_dir(void);
 
 char *get_default_savconf_path(void)
 {

@@ -125,3 +125,8 @@ err_get_size:
 	strlist_destroy(&sl);
 	return 1;
 }
+
+int make_user_dir(const char *path)
+{
+	return mkdir(path, 0775);
+}
