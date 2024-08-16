@@ -48,7 +48,7 @@ static int char2mult(char c, u16 *mult)
 	return 1;
 }
 
-int str2interval(const char *str, u32 *val)
+int str2period(const char *str, u32 *val)
 {
 	int err;
 
@@ -71,12 +71,19 @@ int str2interval(const char *str, u32 *val)
 	return 0;
 }
 
-int str2bool(const char *str)
+int str2bool(const char *str, int *val)
 {
-	size_t len = strlen(str);
-	if (len == 1)
-		return *str != '0';
-	else if (strcmp(str, "false") == 0)
-		return 0;
-	return 1;
+	if (str[1] != 0)
+		goto err_unknown_value;
+	else if (*str == 'y')
+		*val = 1;
+	else if (*str == 'n')
+		*val = 0;
+	else
+		goto err_unknown_value;
+
+	return 0;
+
+err_unknown_value:
+		return error("unknown bool value ‘%s’", str);
 }

@@ -8,6 +8,7 @@
 #include "win/cmdline.hpp"
 #include "termsg.h"
 #include "strlist.h"
+#include "list.h"
 
 void uarg_parser::dump_cmdline(const char *cmdline)
 {
@@ -32,9 +33,4 @@ void uarg_parser::parse_cmdline()
 		args.savconf = get_default_savconf_path();
 	if (!args.savconf)
 		die("no savconf was provided");
-}
-
-void uarg_parser::parse_savconf()
-{
-	::parse_savconf(args.savconf, &savconf);
 }

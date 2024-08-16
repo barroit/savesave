@@ -23,10 +23,10 @@ struct savesave {
 
 	const char *backup;
 
-	int use_snapshot;
 	int use_zip;
+	int use_snapshot;
 
-	u32 interval;
+	u32 period;
 	u8 stack;
 };
 

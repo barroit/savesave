@@ -17,8 +17,9 @@ class uarg_parser {
 public:
 	struct cmdarg args;
 	struct savesave *savconf;
+	size_t nconf;
 
-	uarg_parser() : argv(NULL), argc(0), savconf(NULL)
+	uarg_parser() : argv(NULL), argc(0), savconf(NULL), nconf(0)
 	{
 		args = { 0 };
 	}
@@ -27,5 +28,8 @@ public:
 
 	void parse_cmdline();
 
-	void parse_savconf();
+	inline void parse_savconf()
+	{
+		nconf = ::parse_savconf(args.savconf, &savconf);
+	}
 };

@@ -11,6 +11,9 @@
 
 const char *strwinerror();
 
+#define warn_winerr(...) \
+	__warn_routine("warning: ", strwinerror(), __VA_ARGS__)
+
 #define error_winerr(...) \
 	__error_routine("error: ", strwinerror(), __VA_ARGS__)
 

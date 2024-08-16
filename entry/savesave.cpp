@@ -10,6 +10,7 @@
 #include "win/termsg.hpp"
 #include "barroit/io.h"
 #include "win/cmdline.hpp"
+#include "win/backup.hpp"
 #include "savconf.h"
 
 static class console *console_reference;
@@ -51,15 +52,17 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 
 	check_os_version();
 
-	static uarg_parser parser;
+	uarg_parser parser;
 	parser.dump_cmdline(cmdline);
 
 	parser.parse_cmdline();
-	if (!con.update_stdio_on(parser.args.output)) {
+	if (!con.update_stdio_on(parser.args.output))
 		con.hide_console();
-	}
 
 	parser.parse_savconf();
+
+	backup bu{ parser.nconf };
+	bu.create_backup_task(parser.savconf);
 
 	init_ui_component(app);
 	loop_ui_message();

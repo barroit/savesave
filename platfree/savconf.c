@@ -18,7 +18,7 @@ struct savesave_context {
 	char *stop;
 
 	struct savesave *conf;
-	size_t nr;
+	size_t nl;
 	size_t cap;
 };
 
@@ -117,7 +117,7 @@ static int prepare_backup(void *__backup, struct savesave *_)
 	err = stat(backup, &st);
 	if (err)
 		return error_errno("unable to get metadata for backup directory ‘%s’",
-			     backup);
+				   backup);
 	if (!S_ISDIR(st.st_mode))
 		return error("file ‘%s’ is not a directory", backup);
 
@@ -137,17 +137,12 @@ static int check_stack(void *__stack, struct savesave *_)
 	return 0;
 }
 
-static int check_interval(void *__interval, struct savesave *_)
+static int check_period(void *__period, struct savesave *_)
 {
-	u32 interval = *(u32 *)__interval;
-	if (interval == 0) {
-		return error("interval cannot be 0");
-	} else if (interval > 2592000) {
-		return error("interval ‘%" PRIu32 "’ is too long (up to 30 days)",
-			     interval);
-	} else {
-		return 0;
-	}
+	u32 period = *(u32 *)__period;
+	if (period == 0)
+		return error("period cannot be 0");
+	return 0;
 }
 
 enum entval {
@@ -181,9 +176,8 @@ static int assign_entry(const char *line, char **rest,
 		SETENT(ent, "save", &conf->save, parse_save, STRING);
 	else if (is_entry(line, "backup", rest))
 		SETENT(ent, "backup", &conf->backup, prepare_backup, STRING);
-	else if (is_entry(line, "interval", rest))
-		SETENT(ent, "interval", &conf->interval,
-		       check_interval, TIMESPAN);
+	else if (is_entry(line, "period", rest))
+		SETENT(ent, "period", &conf->period, check_period, TIMESPAN);
 	else if (is_entry(line, "stack", rest))
 		SETENT(ent, "stack", &conf->stack, check_stack, U8);
 	else if (is_entry(line, "snapshot", rest))
@@ -210,14 +204,13 @@ static int parse_entry_value(const char *rest, struct savesave *conf,
 		*(const char **)entry->val = xstrdup(rest);
 		break;
 	case TIMESPAN:
-		res = str2interval(rest, (u32 *)entry->val);
+		res = str2period(rest, (u32 *)entry->val);
 		break;
 	case U8:
 		res = str2u8(rest, (u8 *)entry->val);
 		break;
 	case FLAG:
-		*((int *)entry->val) = str2bool(rest);
-		break;
+		res = str2bool(rest, (int *)entry->val);
 	}
 
 	if (res == 0 && entry->cb)
@@ -253,13 +246,31 @@ static int parse_savconf_line(struct savesave_context *ctx)
 		return 0;
 
 	if (skip_prefix(line, "config ", &str) == 0) {
-		if (ctx->nr > 0)
-			check_unique_last_elem(ctx->conf, ctx->nr);
-		return init_entry(str, &ctx->conf, &ctx->nr, &ctx->cap);
+		if (ctx->nl > 0)
+			check_unique_last_elem(ctx->conf, ctx->nl);
+		return init_entry(str, &ctx->conf, &ctx->nl, &ctx->cap);
 	} else if (skip_prefix(line, "\t", &str) == 0 && isalpha(*str)) {
-		return parse_entry_line(str, &ctx->conf[ctx->nr - 1]);
+		return parse_entry_line(str, &ctx->conf[ctx->nl - 1]);
 	} else {
 		return error("encountered an unknown line");
+	}
+}
+
+static void post_parse_saveconf(struct savesave *conf, size_t nl)
+{
+	size_t i;
+	struct savesave *c;
+	for_each_idx(i, nl) {
+		c = &conf[i];
+
+		if (c->use_zip == -1 &&
+		    c->is_dir_save &&
+		    c->save_size > CONFIG_DO_ZIP_THRESHOLD)
+			c->use_zip = 1;
+
+		if (c->use_snapshot == -1 &&
+		    c->save_size > CONFIG_DO_SNAPSHOT_THRESHOLD)
+			c->use_snapshot = 1;
 	}
 }
 
@@ -286,8 +297,10 @@ static void do_parse_savconf(struct savesave_context *ctx)
 		ctx->line = ctx->stop + 1;
 	} while (39);
 
-	CAP_ALLOC(&ctx->conf, ctx->nr + 1, &ctx->cap);
-	memset(&ctx->conf[ctx->nr], 0, sizeof(*ctx->conf));
+	post_parse_saveconf(ctx->conf, ctx->nl);
+
+	CAP_ALLOC(&ctx->conf, ctx->nl + 1, &ctx->cap);
+	memset(&ctx->conf[ctx->nl], 0, sizeof(*ctx->conf));
 }
 
 size_t parse_savconf(const char *path, struct savesave **conf)
@@ -306,7 +319,7 @@ size_t parse_savconf(const char *path, struct savesave **conf)
 	free(str);
 
 	*conf = ctx.conf;
-	return ctx.nr;
+	return ctx.nl;
 }
 
 char *get_default_savconf_path(void)
