@@ -3,6 +3,7 @@
 /.config
 /.config.old
 /.savesave
+/.winbuild
 /savesave.manifest
 
 /build

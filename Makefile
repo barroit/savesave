@@ -12,9 +12,9 @@ DOTCONFIG := $(abs_root)/.config
 AUTOCONF  := $(abs_gen)/autoconf.h
 export DOTCONFIG AUTOCONF
 
-HOST := linux
+BUILD := linux
 ARCH := $(shell uname -m)
-export HOST ARCH
+export BUILD ARCH
 
 all_targets := cmake_config cmake_build menuconfig clean distclean
 

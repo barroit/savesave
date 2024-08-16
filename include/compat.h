@@ -35,7 +35,7 @@ extern "C" {
 #include <assert.h>
 #include <stdarg.h>
 #include <time.h>
-
+#include <zip.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -103,11 +103,6 @@ typedef SSIZE_T ssize_t;
 # define dup2	_dup2
 # define mkdir  _mkdir
 #endif
-
-/*
- * function marked as this needs to be implemented on both linux and windows
- */
-#define PLATSPEC
 
 #ifdef _WIN32
 char *strchrnul(const char *s, int c);

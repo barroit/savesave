@@ -1,2 +1,37 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Lines starting with ‘#’ are comments.
+
+# Each configuration starts with a ‘config’; there is no limit to the number of
+# configurations as long as each name is unique (though this is not necessary)
+config Overworld
+
+# Indentation is important; lines can include any number of blank lines and
+# comments.
+
+	# save is the path you are backing up from
+	save	 C:\Users\barroit\paper-server\world
+
+	# backup is the path you are backing up to
+	backup	 C:\Users\barroit\backup
+
+	# period is the time interval between each backup; the last character
+	# may be a time unit specifier: s/S, m/M, h/H; default is seconds
+	period	 1H
+
+	# stack is the maximum number of backups that can be stored
+	stack	 10
+
+	# snapshot indicates whether to use the snapshot mechanism for
+	# consistent backups (y for yes and n for no)
+	snapshot y
+
+	# zip indicates whether to compress the backup into a zip file
+	zip	 n
+
+config Eether
+	save	 C:\Users\barroit\paper-server\world_nether
+	backup	 C:\Users\barroit\backup
+	period	 2H
+	stack	 5
+	snapshot n
+	zip	 y

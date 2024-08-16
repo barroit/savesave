@@ -1,16 +1,14 @@
 # SPDX-License-Identifier: GPL-3.0-only
 function (set_choiced_value prefix)
-
   foreach(var ${DOTCONFIG_VARIABLES})
     if (var MATCHES "^${prefix}_(.*)")
       set(${prefix} ${CMAKE_MATCH_1} PARENT_SCOPE)
     endif()
   endforeach()
-
 endfunction()
 
 if (NOT EXISTS "$ENV{DOTCONFIG}" OR IS_DIRECTORY $ENV{DOTCONFIG})
-message(FATAL_ERROR "${DOTCONFIG} does not exist, run ‘make menuconfig’ first")
+  message(FATAL_ERROR "${DOTCONFIG} does not exist, run ‘make menuconfig’ first")
 endif()
 
 file(STRINGS $ENV{DOTCONFIG} lines ENCODING UTF-8)

@@ -3,34 +3,24 @@ mainmenu "SaveSave $(SSVERSION) Configuration"
 
 menu "Compiler"
 
-config CROSS_COMPILING
-	bool "Cross compiling"
-	depends on $(HOST) = "linux"
-
 choice
 	prompt "CC"
 
 config CC_IS_GCC
 	bool "gcc"
-	depends on $(HOST) = "linux"
+	depends on $(BUILD) = "linux"
 
 config CC_IS_CLANG
 	bool "clang"
-	depends on !CROSS_COMPILING
 
 endchoice
 
 choice
 	prompt "CXX"
-	depends on $(HOST) != "linux" || CROSS_COMPILING
-
-config CXX_IS_GCC
-	bool "g++"
-	depends on $(HOST) = "linux"
+	depends on $(BUILD) != "linux"
 
 config CXX_IS_CLANG
 	bool "clang++"
-	depends on !CROSS_COMPILING
 
 endchoice
 
@@ -43,13 +33,6 @@ config CXX_NAME
 	string
 	default "g++" if CXX_IS_GCC
 	default "clang++" if CXX_IS_CLANG
-
-config COMPILER_PREFIX
-	string "Compiler prefix"
-	depends on CROSS_COMPILING
-	default "x86_64-w64-mingw32-" if $(ARCH) = "x86_64"
-	default "aarch64-w64-mingw32-" if $(ARCH) = "aarch64"
-	default "arch-xxx-xxx-"
 
 endmenu # "Compiler"
 
@@ -125,13 +108,13 @@ config CNTRL_CHAR_REPLACEMENT
 	string "control char replacement"
 	default "�"
 
-config SNAPSHOT_THRESHOLD_SIZE_KB
-	int "size threshold for creating snapshot (in KB)"
-	default 10240
-
-config ZIP_THRESHOLD_SIZE_KB
+config DO_ZIP_THRESHOLD
 	int "size threshold for compression (in KB)"
 	default 30720
+
+config DO_SNAPSHOT_THRESHOLD
+	int "size threshold for creating snapshot (in MB)"
+	default 102400
 
 config DEFAULT_SAVCONF_BASENAME
 	string "basename of savconf"
