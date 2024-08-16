@@ -46,13 +46,6 @@ ssize_t robwrite(int fd, const void *buf, size_t n);
 
 char *readfile(const char *name);
 
-/**
- * mk_file_dir - make file directory
- * @name: file path
- * @note: this function success if the directory already exists
- */
-int mk_file_dir(const char *name);
-
 int is_abs_path(const char *path);
 
 const char *get_home_dir(void);

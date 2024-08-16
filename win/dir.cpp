@@ -13,6 +13,8 @@ extern "C"{
 const char *get_home_dir(void);
 
 int calc_dir_size(const char *dir, off_t *size);
+
+char *dirname(char *path);
 }
 
 const char *get_home_dir()
@@ -106,4 +108,13 @@ int calc_dir_size(const char *dir, off_t *size)
 		return error("an exception occurred while calculating directory size for ‘%s’\n%s",
 			     dir, e.what());
 	}
+}
+
+char *dirname(char *path)
+{
+	std::filesystem::path p = path;
+	const std::filesystem::path &dir = p.parent_path();
+	const std::string &tmp = dir.string();
+	memcpy(path, tmp.c_str(), tmp.length() + 1);
+	return path;
 }

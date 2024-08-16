@@ -114,6 +114,10 @@ char *strchrnul(const char *s, int c);
 # define my_mkdir(p) mkdir(p, 0775)
 #endif
 
+#ifdef _WIN32
+char *dirname(char *path);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

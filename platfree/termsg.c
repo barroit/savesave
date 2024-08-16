@@ -221,9 +221,13 @@ int redirect_stdio(const char *name)
 {
 	int err;
 
-	err = mk_file_dir(name);
-	if (err)
-		return error_errno("failed to mkdir for log file ‘%s’", name);
+	char *str = xstrdup(name);
+	const char *dir = dirname(str);
+	err = my_mkdir(dir);
+	free(str);
+	if (err && errno != EEXIST)
+		return error_errno("failed to create directory for log file ‘%s’",
+				   name);
 
 	int fd = open(name, O_WRONLY | O_CREAT, 0664);
 	if (fd == -1) {
