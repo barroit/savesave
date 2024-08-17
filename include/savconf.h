@@ -34,6 +34,8 @@ char *get_default_savconf_path(void);
 
 size_t parse_savconf(const char *path, struct savesave **conf);
 
+void print_savconf(const struct savesave *conf, size_t nl);
+
 #ifdef __cplusplus
 }
 #endif

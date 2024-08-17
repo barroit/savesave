@@ -8,6 +8,7 @@
 #include "strlist.h"
 #include "alloc.h"
 #include "termsg.h"
+#include "debug.h"
 
 extern "C"{
 const char *get_home_dir(void);

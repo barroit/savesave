@@ -8,6 +8,7 @@
 #include "termsg.h"
 #include "strlist.h"
 #include "alloc.h"
+#include "debug.h"
 
 static char *get_user_home(const char *user)
 {

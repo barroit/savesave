@@ -41,14 +41,6 @@ NORETURN bug_routine(const char *file, int line,
 
 #define bug(...) bug_routine(__FILE__, __LINE__, __VA_ARGS__)
 
-#ifdef NDEBUG
-# define BUG_ON(cond) do { if (cond) {} } while (0)
-#else
-# define BUG_ON(cond) assert(!(cond))
-#endif
-
-#define EXIT_ON(cond) do { if (cond) exit(128); } while (0)
-
 int redirect_stdio(const char *filename);
 
 #ifdef __cplusplus

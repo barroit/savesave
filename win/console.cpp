@@ -7,6 +7,7 @@
 
 #include "win/console.hpp"
 #include "termsg.h"
+#include "debug.h"
 
 void console::setup_console()
 {
@@ -43,7 +44,8 @@ bool console::update_stdio_on(const char *output)
 	 * dup2() closes stdout and stderr
 	 */
 	err = redirect_stdio(output);
-	EXIT_ON(err);
+	if (err)
+		exit(128);
 
 	dest = NULL;
 	FreeConsole();

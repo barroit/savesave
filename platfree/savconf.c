@@ -322,6 +322,33 @@ size_t parse_savconf(const char *path, struct savesave **conf)
 	return ctx.nl;
 }
 
+void print_savconf(const struct savesave *conf, size_t nl)
+{
+	size_t i;
+	const struct savesave *c;
+
+	/*
+	 * for consistency, we can’t use off_t, because there is no length
+	 * modifier dedicated to this type
+	 */
+	ssize_t size;
+	for_each_idx(i, nl) {
+		c = &conf[i];
+		size = c->save_size / 1000 / 1000;
+		printf("%s: \n"
+		       "\tsave\t %s\n"
+		       "\tsize\t %" PRIiMAX "M\n"
+		       "\tdir\t %d\n"
+		       "\tbackup\t %s\n"
+		       "\tperiod\t %" PRIu32 "\n"
+		       "\tstack\t %" PRIu8 "\n"
+		       "\tsnapshot %d\n"
+		       "\tzip\t %d\n\n",
+		       c->name, c->save, size, c->is_dir_save, c->backup,
+		       c->period, c->stack, c->use_snapshot, c->use_zip);
+	}
+}
+
 char *get_default_savconf_path(void)
 {
 	struct strbuf sb = STRBUF_INIT;

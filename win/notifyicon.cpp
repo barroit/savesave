@@ -9,6 +9,7 @@
 #include "win/resid.hpp"
 #include "calc.h"
 #include "termsg.h"
+#include "debug.h"
 
 static void load_icon_resource(HINSTANCE app, HICON *icon)
 {

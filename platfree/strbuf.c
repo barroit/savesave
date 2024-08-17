@@ -8,6 +8,7 @@
 #include "strbuf.h"
 #include "alloc.h"
 #include "termsg.h"
+#include "debug.h"
 
 void strbuf_grow(struct strbuf *sb, size_t nl)
 {

@@ -12,6 +12,7 @@
 #include "win/cmdline.hpp"
 #include "win/backup.hpp"
 #include "savconf.h"
+#include "debug.h"
 
 static class console *console_reference;
 
@@ -27,7 +28,8 @@ static void init_ui_component(HINSTANCE app)
 
 	HWND window;
 	err = create_app_window(app, &window);
-	EXIT_ON(err);
+	if (err)
+		exit(128);
 
 	NOTIFYICONDATA icon;
 	setup_notifyicon(app, window, &icon);
@@ -60,6 +62,7 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 		con.hide_console();
 
 	parser.parse_savconf();
+	DEBUG_RUN(print_savconf, parser.savconf, parser.nconf);
 
 	backup bu{ parser.nconf };
 	bu.create_backup_task(parser.savconf);
