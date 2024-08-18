@@ -14,13 +14,13 @@ extern "C" {
 
 #ifdef NDEBUG
 
-# define DEBUG_RUN(fn, ...) do {} while (0)
+# define DEBUG_RUN() if (0)
 
 # define BUG_ON(cond) do { if (cond) {} } while (0)
 
 #else /* debugging */
 
-# define DEBUG_RUN(fn, ...) fn(__VA_ARGS__)
+# define DEBUG_RUN() if (1)
 
 # define BUG_ON(cond) assert(!(cond))
 

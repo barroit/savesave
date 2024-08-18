@@ -12,6 +12,7 @@
 #include "alloc.h"
 #include "list.h"
 #include "text2num.h"
+#include "barroit/limits.h"
 
 struct savesave_context {
 	char *line;
@@ -41,23 +42,27 @@ static int skip_prefix(const char *str, const char *prefix, char **ret)
 	return 1;
 }
 
-static void check_unique_last_elem(const struct savesave *conf, size_t nr)
+static int check_unique_savconf(const struct savesave *conf, size_t nr)
 {
 	const char *name = conf[nr - 1].name;
 	size_t i;
 	for_each_idx(i, nr - 1) {
 		if (likely(strcmp(conf[i].name, name)))
 			continue;
-		warn("configuration name ‘%s’ conflicts at config indexes %" PRIuMAX " and %" PRIuMAX,
-		     name, i, nr - 1);
+		return error("configuration name ‘%s’ conflicts at config indexes %zd and %zd",
+			     name, i, nr - 1);
 	}
+
+	return 0;
 }
 
-static int init_entry(const char *name,
-		      struct savesave **conf, size_t *nr, size_t *cap)
+static int create_new_entry(const char *name,
+			    struct savesave **conf, size_t *nr, size_t *cap)
 {
 	if (!*name)
-		return error("empty config name is not allowed");
+		return error("empty configuration name is not allowed");
+	else if (strchr(name, ' ') != NULL)
+		return error("space in configuration name is not allowed");
 
 	CAP_ALLOC(conf, *nr + 1, cap);
 
@@ -201,7 +206,7 @@ static int parse_entry_value(const char *rest, struct savesave *conf,
 	int res = 0;
 	switch (entry->type) {
 	case STRING:
-		*(const char **)entry->val = xstrdup(rest);
+		*(char **)entry->val = xstrdup(rest);
 		break;
 	case TIMESPAN:
 		res = str2period(rest, (u32 *)entry->val);
@@ -246,9 +251,9 @@ static int parse_savconf_line(struct savesave_context *ctx)
 		return 0;
 
 	if (skip_prefix(line, "config ", &str) == 0) {
-		if (ctx->nl > 0)
-			check_unique_last_elem(ctx->conf, ctx->nl);
-		return init_entry(str, &ctx->conf, &ctx->nl, &ctx->cap);
+		if (ctx->nl && check_unique_savconf(ctx->conf, ctx->nl) != 0)
+			return 1;
+		return create_new_entry(str, &ctx->conf, &ctx->nl, &ctx->cap);
 	} else if (skip_prefix(line, "\t", &str) == 0 && isalpha(*str)) {
 		return parse_entry_line(str, &ctx->conf[ctx->nl - 1]);
 	} else {
@@ -256,12 +261,65 @@ static int parse_savconf_line(struct savesave_context *ctx)
 	}
 }
 
-static void post_parse_saveconf(struct savesave *conf, size_t nl)
+static void validate_savconf(const struct savesave *c)
+{
+	struct strbuf sb = STRBUF_INIT;
+
+	if (!c->save)
+		strbuf_append(&sb, "\tsave\n");
+	if (!c->backup)
+		strbuf_append(&sb, "\tbackup\n");
+	if (!c->period)
+		strbuf_append(&sb, "\tperiod\n");
+	if (!c->stack)
+		strbuf_append(&sb, "\tstack\n");
+
+	if (!sb.cap)
+		return;
+
+	size_t lines = strbuf_strchr(&sb, '\n');
+	die("configuration ‘%s’ missing the following field%s\n\n%s",
+	    c->name, lines > 1 ? "s" : "", sb.str);
+}
+
+static void update_backup_path(struct savesave *c)
+{
+	char *old = c->backup;
+	char *buf = xmalloc(PATH_MAX);
+	int n = xsnprintf(buf, PATH_MAX, "%s/%s.", c->backup, c->name);
+
+	if (c->use_zip) {
+		size_t len = sizeof("zip.");
+		if (n + len > PATH_MAX)
+			goto err_overflow;
+
+		memcpy(buf + n, "zip.", len);
+		n += len - 1;
+	}
+
+	/*
+	 * STRU8_MAX contains null terminator length
+	 */
+	if (n + STRU8_MAX > PATH_MAX)
+		goto err_overflow;
+
+	c->backup_len = n;
+	free(old);
+	c->backup = buf;
+	return;
+
+err_overflow:
+	die("backup path ‘%s’ of configuration ‘%s’ is too long",
+	    c->backup, c->name);
+}
+
+static void post_parse_savconf(struct savesave *conf, size_t nl)
 {
 	size_t i;
 	struct savesave *c;
 	for_each_idx(i, nl) {
 		c = &conf[i];
+		validate_savconf(c);
 
 		if (c->use_zip == -1 &&
 		    c->is_dir_save &&
@@ -271,6 +329,8 @@ static void post_parse_saveconf(struct savesave *conf, size_t nl)
 		if (c->use_snapshot == -1 &&
 		    c->save_size > CONFIG_DO_SNAPSHOT_THRESHOLD)
 			c->use_snapshot = 1;
+
+		update_backup_path(c);
 	}
 }
 
@@ -297,7 +357,7 @@ static void do_parse_savconf(struct savesave_context *ctx)
 		ctx->line = ctx->stop + 1;
 	} while (39);
 
-	post_parse_saveconf(ctx->conf, ctx->nl);
+	post_parse_savconf(ctx->conf, ctx->nl);
 
 	CAP_ALLOC(&ctx->conf, ctx->nl + 1, &ctx->cap);
 	memset(&ctx->conf[ctx->nl], 0, sizeof(*ctx->conf));
@@ -365,6 +425,6 @@ char *get_default_savconf_path(void)
 	if (access(sb.str, R_OK) == 0)
 		return sb.str;
 
-	strbuf_destory(&sb);
+	strbuf_destroy(&sb);
 	return NULL;
 }

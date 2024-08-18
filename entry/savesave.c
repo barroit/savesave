@@ -10,6 +10,7 @@
 #include "termsg.h"
 #include "savconf.h"
 #include "debug.h"
+#include "backup.h"
 
 static struct cmdarg args;
 
@@ -27,7 +28,10 @@ int main(int argc, char *const *argv)
 		die("no savconf was provided");
 
 	savesave_nr = parse_savconf(args.savconf, &savesave_list);
-	DEBUG_RUN(print_savconf, savesave_list, savesave_nr);
+	DEBUG_RUN()
+		print_savconf(savesave_list, savesave_nr);
+
+	backup_routine(savesave_list);
 
 	return 0;
 }

@@ -77,45 +77,48 @@ extern "C" {
 #include "generated/apphelp.h"
 
 #ifdef _WIN32
-NORETURN winexit(int code);
-# define exit winexit
-#endif
+#include <BaseTsd.h>
+#include <stdint.h>
 
-#if (defined __clang__ && defined _WIN32)
-# define WINDOWS_NATIVE
-#endif
+#define read	_read
+#define write	_write
+#define open	_open
+#define close	_close
+#define strdup	_strdup
+#define access	_access
+#define fileno	_fileno
+#define dup2	_dup2
+#define mkdir  _mkdir
 
-#ifdef WINDOWS_NATIVE
-# include <BaseTsd.h>
-# include <stdint.h>
-# define SSIZE_MAX INT64_MAX
+#define F_OK 00
+#define W_OK 02
+#define R_OK 04
+/*
+ * Microsoft documentation does not specify executable mode value, we better
+ * define this to 00 instead of posix defined value 01
+ */
+#define X_OK 00
+
+#define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
+#define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
+
+#define PATH_MAX MAX_PATH
+
+#define SSIZE_MAX INT64_MAX
 typedef SSIZE_T ssize_t;
-#endif
 
-#ifdef WINDOWS_NATIVE
-# define read	_read
-# define write	_write
-# define open	_open
-# define close	_close
-# define strdup	_strdup
-# define access	_access
-# define fileno	_fileno
-# define dup2	_dup2
-# define mkdir  _mkdir
-#endif
-
-#ifdef _WIN32
 char *strchrnul(const char *s, int c);
-#endif
-
-#ifdef _WIN32
-# define my_mkdir    mkdir
-#else
-# define my_mkdir(p) mkdir(p, 0775)
-#endif
-
-#ifdef _WIN32
 char *dirname(char *path);
+
+NORETURN winexit(int code);
+#define exit winexit
+
+#define my_mkdir mkdir
+
+#else /* linux */
+
+#define my_mkdir(p) mkdir(p, 0775)
+
 #endif
 
 #ifdef __cplusplus

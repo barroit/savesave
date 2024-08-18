@@ -9,6 +9,7 @@
 #include "termsg.h"
 #include "strlist.h"
 #include "list.h"
+#include "strbuf.h"
 
 void uarg_parser::dump_cmdline(const char *cmdline)
 {
@@ -33,4 +34,16 @@ void uarg_parser::parse_cmdline()
 		args.savconf = get_default_savconf_path();
 	if (!args.savconf)
 		die("no savconf was provided");
+}
+
+void uarg_parser::parse_savconf()
+{
+	nconf = ::parse_savconf(args.savconf, &savconf);
+
+	size_t i;
+	for_each_idx(i, nconf) {
+		struct savesave *c = &savconf[i];
+		str_replace(c->save, '\\', '/');
+		str_replace(c->backup, '\\', '/');
+	}
 }

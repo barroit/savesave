@@ -9,6 +9,7 @@
 #include "strlist.h"
 #include "alloc.h"
 #include "debug.h"
+#include "strbuf.h"
 
 static char *get_user_home(const char *user)
 {
@@ -56,8 +57,7 @@ static int dirent_sizeof(const char *dir, off_t *size,
 		dir = "";
 
 	static char buf[PATH_MAX];
-	int nr = snprintf(buf, sizeof(buf), "%s/%s", dir, ent->d_name);
-	BUG_ON(nr < 0);
+	xsnprintf(buf, sizeof(buf), "%s/%s", dir, ent->d_name);
 
 	switch (ent->d_type) {
 	case DT_REG:

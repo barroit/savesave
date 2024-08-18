@@ -19,6 +19,8 @@ extern "C" {
 #define likely(x)   __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
 
+#define CONSTRUCTOR static void __attribute__((constructor))
+
 #ifdef __cplusplus
 }
 #endif

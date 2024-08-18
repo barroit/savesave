@@ -46,7 +46,7 @@ static void report_positional_argument(int idx, int argc, char *const *argv)
 	error("positional argument%s %s %s not allowd",
 	      n > 1 ? "s" : "", sb.str, n > 1 ? "are" : "is");
 
-	strbuf_destory(&sb);
+	strbuf_destroy(&sb);
 }
 
 static void get_optarg(const char **key)

@@ -6,10 +6,9 @@
  */
 
 #include "win/backup.hpp"
-#include "alloc.h"
 #include "savconf.h"
 #include "win/termsg.hpp"
-#include "list.h"
+#include "backup.h"
 
 backup::backup(size_t nl)
 {
@@ -29,13 +28,15 @@ backup::~backup()
 		DeleteTimerQueue(queue);
 }
 
-static void CALLBACK do_backup(void *conf, unsigned char)
+static void do_backup(void *conf, unsigned char)
 {
+	int err;
 	const struct savesave *c = (struct savesave *)conf;
-	if (c->use_snapshot); /* create a snapshot here */
 
-	if (c->use_zip)
-		;
+	err = backup_routine(c);
+	if (err)
+		error("an error occurred while making backup for configuration ‘%s’",
+		      c->name);
 }
 
 void backup::create_backup_task(const struct savesave *conf)

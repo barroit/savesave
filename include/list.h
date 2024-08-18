@@ -12,13 +12,19 @@
 extern "C" {
 #endif
 
+#include "calc.h"
+
 #define for_each_idx(i, n) for (i = 0; i < n; i++)
 
 /*
- * the n that this for loop macro can handle is up to SIZE_MAX - 1
+ * for_each_idx_back - for each index backward
+ * i: the index variable
+ * n: the value assigned to i
+ * 
+ * note: this for loop can handle index up to max_uint_val_of_type(i)
  */
 #define for_each_idx_back(i, n) \
-	for (i = n; i != SIZE_MAX; i--)
+	for (i = n; i != max_uint_val_of_type(i); i--)
 
 #define for_each_idx_from(i, n) for (; i < n; i++)
 

@@ -19,6 +19,9 @@ public:
 
 	inline void hide_console()
 	{
+#ifndef NDEBUG
+		return;
+#endif
 		ShowWindow(handle, SW_HIDE);
 	}
 

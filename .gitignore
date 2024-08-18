@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: GPL-3.0-only
 /.gdbinit
+/.savesave
+
 /.config
 /.config.old
-/.savesave
-/.winbuild
 /savesave.manifest
-
-/build
-/sandbox
-
 /include/generated
+/build
+
+/sandbox
+/DRAFT

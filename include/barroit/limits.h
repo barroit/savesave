@@ -30,6 +30,8 @@ extern "C" {
 # define MAX_ALLOC_SIZE MAX_ALLOC_SIZE_DEFAULT
 #endif
 
+#define STRU8_MAX 4
+
 #ifdef __cplusplus
 }
 #endif

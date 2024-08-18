@@ -28,10 +28,22 @@ size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...);
 
 void strbuf_truncate(struct strbuf *sb, size_t n);
 
-static inline void strbuf_destory(struct strbuf *sb)
+static inline void strbuf_destroy(struct strbuf *sb)
 {
 	free(sb->str);
 }
+
+size_t strbuf_strchr(struct strbuf *sb, int c);
+
+void str_replace(char *s, int c, int v);
+
+#define xsnprintf(...)					\
+	({						\
+		int ____n = snprintf(__VA_ARGS__);	\
+		if (____n < 0)				\
+			die("snprintf() failure");	\
+		____n;					\
+	})
 
 #ifdef __cplusplus
 }

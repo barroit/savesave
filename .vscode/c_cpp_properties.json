@@ -13,10 +13,7 @@
 			"compilerPath": "${env:HOME}/.local/bin/gcc",
 			"forcedInclude": [
 				"${workspaceFolder}/include/compat.h",
-				"${workspaceFolder}/include/generated/autoconf.h",
-				"${workspaceFolder}/include/generated/apphelp.h",
-				"${workspaceFolder}/include/generated/appname.h",
-				"${workspaceFolder}/include/generated/version.h"
+				"${workspaceFolder}/include/generated/*.h"
 			]
 		},
 		{
@@ -33,10 +30,7 @@
 			],
 			"forcedInclude": [
 				"${workspaceFolder}/include/compat.h",
-				"${workspaceFolder}/include/generated/autoconf.h",
-				"${workspaceFolder}/include/generated/apphelp.h",
-				"${workspaceFolder}/include/generated/appname.h",
-				"${workspaceFolder}/include/generated/version.h"
+				"${workspaceFolder}/include/generated/*.h"
 			],
 			"compilerPath": "/usr/bin/x86_64-w64-mingw32-gcc"
 		}

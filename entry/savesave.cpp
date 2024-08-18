@@ -62,7 +62,8 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 		con.hide_console();
 
 	parser.parse_savconf();
-	DEBUG_RUN(print_savconf, parser.savconf, parser.nconf);
+	DEBUG_RUN()
+		print_savconf(parser.savconf, parser.nconf);
 
 	backup bu{ parser.nconf };
 	bu.create_backup_task(parser.savconf);

@@ -9,6 +9,7 @@
 #include "barroit/io.h"
 #include "list.h"
 #include "alloc.h"
+#include "strbuf.h"
 
 #define UPDATE_BUF(buf, n, len)		\
 	do {				\
@@ -211,7 +212,7 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 	char lead[256];
 
 	va_start(ap, fmt);
-	snprintf(lead, sizeof(lead), "BUG: %s:%d: ", file, line);
+	xsnprintf(lead, sizeof(lead), "BUG: %s:%d: ", file, line);
 	vreportf(stderr, lead, fmt, ap, NULL);
 
 	exit(128);

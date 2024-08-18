@@ -9,6 +9,7 @@
 #include "alloc.h"
 #include "termsg.h"
 #include "debug.h"
+#include "list.h"
 
 void strbuf_grow(struct strbuf *sb, size_t nl)
 {
@@ -60,4 +61,24 @@ void strbuf_truncate(struct strbuf *sb, size_t n)
 
 	sb->len -= n;
 	sb->str[sb->len] = 0;
+}
+
+size_t strbuf_strchr(struct strbuf *sb, int c)
+{
+	BUG_ON(!sb->str);
+
+	size_t cnt = 0;
+	const char *p = sb->str;
+
+	while (*p)
+		if (*p++ == c)
+			cnt++;
+
+	return cnt;
+}
+
+void str_replace(char *s, int c, int v)
+{
+	while ((s = strchr(s, c)) != NULL)
+		*s++ = v;
 }

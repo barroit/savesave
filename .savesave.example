@@ -2,7 +2,7 @@
 # Lines starting with ‘#’ are comments.
 
 # Each configuration starts with a ‘config’; there is no limit to the number of
-# configurations as long as each name is unique (though this is not necessary)
+# configurations as long as each name is unique
 config Overworld
 
 # Indentation is important; lines can include any number of blank lines and

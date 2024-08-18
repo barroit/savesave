@@ -15,13 +15,14 @@ extern "C" {
 #include "barroit/types.h"
 
 struct savesave {
-	const char *name;
+	char *name;
 
-	const char *save;
+	char *save;
 	off_t save_size;
 	int is_dir_save;
 
-	const char *backup;
+	char *backup;
+	size_t backup_len;
 
 	int use_zip;
 	int use_snapshot;

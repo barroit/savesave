@@ -28,8 +28,5 @@ public:
 
 	void parse_cmdline();
 
-	inline void parse_savconf()
-	{
-		nconf = ::parse_savconf(args.savconf, &savconf);
-	}
+	void parse_savconf();
 };
