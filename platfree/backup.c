@@ -69,15 +69,36 @@ static int sort_backup(char *src, char *srcend, u8 stack, int *has_room)
 	return 0;
 }
 
-static int drop_deprecated_backup(char *src, char *srcend, u8 stack)
+static int drop_deprecated_backup(char *str, char *strend, u8 stack)
 {
 	int err;
 
-	strcpy(srcend, "0");
-	err = remove(src);
+	strcpy(strend, "0");
+	err = remove(str);
 	if (err)
-		return warn_errno("failed to remove ‘%s’", src);
+		return warn_errno("failed to remove ‘%s’", str);
 	return 0;
+}
+
+static int find_next_room(char *str, char *strend, u8 stack)
+{
+	int err;
+	u8 i;
+	for_each_idx_back(i, stack - 1) {
+		memcpy(strend, stru8_map[i], sizeof(*stru8_map));
+
+		err = access(str, F_OK);
+		if (!err) {
+			BUG_ON(i == stack - 1);
+
+			memcpy(strend, stru8_map[i + 1], sizeof(*stru8_map));
+			return 0;
+		} else if (errno != ENOENT) {
+			return warn_errno("failed to access ‘%s’", str);
+		}
+	}
+
+	BUG_ON(1);
 }
 
 int backup_routine(const struct savesave *c)
@@ -88,26 +109,36 @@ int backup_routine(const struct savesave *c)
 		/* create snapshot here */
 	}
 
-	char buf[PATH_MAX];
-	char *bufend = buf + c->backup_len;
-	memcpy(buf, c->backup, c->backup_len);
+	char path[PATH_MAX];
+	char *pathend = path + c->backup_len;
+	memcpy(path, c->backup, c->backup_len);
 
 	int has_room;
-	err = sort_backup(buf, bufend, c->stack, &has_room);
+	err = sort_backup(path, pathend, c->stack, &has_room);
 	if (err)
 		goto err_sort_backup;
 
 	if (!has_room) {
-		err = drop_deprecated_backup(buf, bufend, c->stack);
+		err = drop_deprecated_backup(path, pathend, c->stack);
 		if (err)
-			return error("unable to drop deprecated backup");
-		err = sort_backup(buf, bufend, c->stack, NULL);
+			return error("unable to drop deprecated backup for configuration ‘%s’",
+				     c->name);
+		err = sort_backup(path, pathend, c->stack, NULL);
 		if (err)
 			goto err_sort_backup;
 	}
 
+	err = find_next_room(path, pathend, c->stack);
+	if (err)
+		return error("unable to find next backup file name for configuration ‘%s’",
+			     c->name);
+	DEBUG_RUN() {
+		printf("next backup name\n\t%s\n", path);
+		fflush(stdout);
+	}
+
 	if (c->use_zip) {
-		/* create zip here */
+		//
 	} else {
 		//
 	}
@@ -115,7 +146,7 @@ int backup_routine(const struct savesave *c)
 	return 0;
 
 err_sort_backup:
-	*bufend = '*';
+	*pathend = '*';
 	return error("unable to sort backup ‘%s’ for configuration ‘%s’",
-		     buf, c->name);
+		     path, c->name);
 }

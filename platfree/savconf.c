@@ -395,7 +395,7 @@ void print_savconf(const struct savesave *conf, size_t nl)
 	for_each_idx(i, nl) {
 		c = &conf[i];
 		size = c->save_size / 1000 / 1000;
-		printf("%s: \n"
+		printf("%s\n"
 		       "\tsave\t %s\n"
 		       "\tsize\t %" PRIiMAX "M\n"
 		       "\tdir\t %d\n"
