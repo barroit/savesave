@@ -10,7 +10,7 @@ include($ENV{ROOT}/scripts/kconfig.cmake)
 
 # follow the gcc concepts:
 #   build is the machine you are building on
-#   host  is the machine that you are building for
+#   host  is the machine you are building for
 set(BUILD $ENV{BUILD})
 if(BUILD STREQUAL linux)
   set(HOST linux)
@@ -64,15 +64,20 @@ endif()
 
 project(savesave VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
 
-find_package(libzip REQUIRED CONFIG)
-get_target_property(LIBZIP_INCLUDE_DIRS libzip::zip
-		    INTERFACE_INCLUDE_DIRECTORIES)
+find_package(zstd CONFIG REQUIRED)
+if(BUILD STREQUAL windows)
+  get_target_property(LIBZSTD_INCLUDE_DIRS zstd::libzstd
+		      INTERFACE_INCLUDE_DIRECTORIES)
+endif()
 
 include($ENV{ROOT}/scripts/genheader.cmake)
 
 configure_file($ENV{ROOT}/savesave.manifest.in $ENV{ROOT}/savesave.manifest)
 
-include_directories($ENV{ROOT}/include ${LIBZIP_INCLUDE_DIRS})
+include_directories($ENV{ROOT}/include)
+if(BUILD STREQUAL windows)
+  include_directories(${LIBZSTD_INCLUDE_DIRS})
+endif()
 
 if(HOST STREQUAL linux)
   file(GLOB platspec_src LIST_DIRECTORIES false uni/*.c)
@@ -91,7 +96,13 @@ if(HOST STREQUAL linux)
 else()
   add_executable(savesave WIN32 ${mainfile} $ENV{ROOT}/savesave.rc)
 endif()
-target_link_libraries(savesave platfree platspec libzip::zip)
+target_link_libraries(savesave platfree platspec)
+
+if(CONFIG_LINK_LIBZSTD_STATIC)
+  target_link_libraries(savesave zstd::libzstd_static)
+else()
+  target_link_libraries(savesave zstd::libzstd_shared)
+endif()
 
 if(HOST STREQUAL windows)
   target_link_libraries(savesave ws2_32 comctl32)

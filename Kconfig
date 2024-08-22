@@ -34,10 +34,6 @@ config CXX_NAME
 	default "g++" if CXX_IS_GCC
 	default "clang++" if CXX_IS_CLANG
 
-endmenu # "Compiler"
-
-menu "Compiler flags"
-
 choice
 	prompt "Debug level"
 	default COMPILER_DEBUG_3
@@ -100,7 +96,7 @@ config COMPILER_WARNING_ALL
 config COMPILER_WARNING_EXTRA
 	bool "use -Wextra"
 
-endmenu # "Compiler flags"
+endmenu # "Compiler"
 
 menu "Features"
 
@@ -125,3 +121,10 @@ config DEFAULT_SAVCONF_ENVNAME
 	default "SAVESAVE"
 
 endmenu # "Features"
+
+menu "Zstandard"
+
+config LINK_LIBZSTD_STATIC
+	bool "link against libzstd static library"
+
+endmenu # "Zstandard"

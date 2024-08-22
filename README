@@ -4,3 +4,6 @@ Savesave
 Savesave is a straightforward tool designed to duplicate save files,
 offering a quick and easy way to rollback to previous saves. Perfect for
 ensuring your progress is safeguarded.
+
+To build the executable, refer to INSTALL.uni or INSTALL.win, depending on
+your platform. All required dependencies are list in these files.

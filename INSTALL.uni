@@ -3,9 +3,15 @@
 
 Before install SaveSave, the following requirements need to be met
 
-	kconfiglib (install via pip, tested with version 14.1)
+	Kconfiglib (install via pip, tested with version 14.1)
 
-	cmake => 3.21
+	CMake => 3.21
+
+	GCC/Clang
+
+	Gmake/Ninja/...
+
+	libzstd (tested with version 1.5.5)
 
 Normally you can just do ‘make’, and that will build the program under build/
 directory. If you want to do a config, you can do

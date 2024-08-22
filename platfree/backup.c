@@ -121,7 +121,7 @@ int backup_routine(const struct savesave *c)
 	if (!has_room) {
 		err = drop_deprecated_backup(path, pathend, c->stack);
 		if (err)
-			return error("unable to drop deprecated backup for configuration ‘%s’",
+			return error("unable to drop deprecated backup of configuration ‘%s’",
 				     c->name);
 		err = sort_backup(path, pathend, c->stack, NULL);
 		if (err)
@@ -130,16 +130,19 @@ int backup_routine(const struct savesave *c)
 
 	err = find_next_room(path, pathend, c->stack);
 	if (err)
-		return error("unable to find next backup file name for configuration ‘%s’",
+		return error("unable to find next backup file name of configuration ‘%s’",
 			     c->name);
+
 	DEBUG_RUN() {
 		printf("next backup name\n\t%s\n", path);
 		fflush(stdout);
 	}
 
+	/*
+	 * we treat zip as a regular file, so there are two types of file
+	 * (1) regular file and (2) directory
+	 */
 	if (c->use_zip) {
-		//
-	} else {
 		//
 	}
 
@@ -147,6 +150,6 @@ int backup_routine(const struct savesave *c)
 
 err_sort_backup:
 	*pathend = '*';
-	return error("unable to sort backup ‘%s’ for configuration ‘%s’",
+	return error("unable to sort backup ‘%s’ of configuration ‘%s’",
 		     path, c->name);
 }

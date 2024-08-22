@@ -35,7 +35,7 @@ extern "C" {
 #include <assert.h>
 #include <stdarg.h>
 #include <time.h>
-#include <zip.h>
+#include <zstd.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
