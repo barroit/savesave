@@ -48,4 +48,3 @@ int redirect_stdio(const char *filename);
 #endif
 
 #endif /* TERMSG_H */
-

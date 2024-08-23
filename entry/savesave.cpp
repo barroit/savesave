@@ -13,14 +13,9 @@
 #include "win/backup.hpp"
 #include "savconf.h"
 #include "debug.h"
+#include "win/atenter.hpp"
 
 static class console *console_reference;
-
-static void check_os_version()
-{
-	if (!IsWindows7OrGreater())
-		die("unsupported windows version (at least win7)");
-}
 
 static void init_ui_component(HINSTANCE app)
 {
@@ -48,11 +43,17 @@ static void loop_ui_message()
 
 int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 {
+	/*
+	 * class constructor is guaranteed to run before main function, use
+	 * that for constructor function leak support on windows
+	 */
+	static class atenter constructor;
+
 	console con;
 	con.setup_console();
 	console_reference = &con;
 
-	check_os_version();
+	constructor.precheck();
 
 	uarg_parser parser;
 	parser.dump_cmdline(cmdline);

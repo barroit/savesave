@@ -19,7 +19,15 @@ extern "C" {
 #define likely(x)   __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
 
-#define CONSTRUCTOR static void __attribute__((constructor))
+
+#ifdef _WIN32
+/*
+ * __attribute__((constructor)) just does not work on windows
+ */
+# define CONSTRUCTOR void
+#else
+# define CONSTRUCTOR static void __attribute__((constructor))
+#endif
 
 #ifdef __cplusplus
 }
