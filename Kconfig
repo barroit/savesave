@@ -85,9 +85,8 @@ config COMPILER_OPTIMIZE_Z
 
 endchoice
 
-config CONFIG_COMPILER_NDEBUG
+config SOURCE_NDEBUG
 	bool "define NDEBUG"
-	default n
 
 config COMPILER_WARNING_ALL
 	bool "use -Wall"

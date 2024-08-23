@@ -110,6 +110,10 @@ endif()
 
 add_compile_definitions(_GNU_SOURCE)
 
+if(CONFIG_SOURCE_NDEBUG)
+  add_compile_definitions(NDEBUG)
+endif()
+
 if(HOST STREQUAL windows)
   add_compile_definitions(NTDDI_WIN7
 			  WINVER=_WIN32_WINNT_WIN7
