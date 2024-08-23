@@ -59,10 +59,15 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	parser.dump_cmdline(cmdline);
 
 	parser.parse_cmdline();
-	if (!con.update_stdio_on(parser.args.output))
+	if (parser.args.output)
+		con.redirect_stdio(parser.args.output);
+	else
 		con.hide_console();
 
 	parser.parse_savconf();
+	if (!parser.nconf)
+		die("‘%s’ must have at least one configuration",
+		    parser.args.savconf);
 	DEBUG_RUN()
 		print_savconf(parser.savconf, parser.nconf);
 

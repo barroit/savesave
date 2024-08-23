@@ -16,11 +16,11 @@ void console::setup_console()
 	err = !AllocConsole();
 	BUG_ON(err);
 
-	dest = freopen("CONOUT$", "w", stdout);
-	BUG_ON(!dest);
+	stream = freopen("CONOUT$", "w", stdout);
+	BUG_ON(!stream);
 
-	dest = freopen("CONOUT$", "w", stderr);
-	BUG_ON(!dest);
+	stream = freopen("CONOUT$", "w", stderr);
+	BUG_ON(!stream);
 
 	err = !SetConsoleOutputCP(CP_UTF8);
 	if (err)
@@ -30,11 +30,8 @@ void console::setup_console()
 	BUG_ON(!handle);
 }
 
-bool console::update_stdio_on(const char *output)
+void console::redirect_stdio(const char *output)
 {
-	if (!output)
-		return false;
-
 	int err;
 
 	handle = NULL;
@@ -43,12 +40,10 @@ bool console::update_stdio_on(const char *output)
 	/*
 	 * dup2() closes stdout and stderr
 	 */
-	err = redirect_stdio(output);
+	err = ::redirect_stdio(output);
 	if (err)
-		exit(128);
+		die("unable to redirect standard io");
 
-	dest = NULL;
+	stream = NULL;
 	FreeConsole();
-
-	return true;
 }

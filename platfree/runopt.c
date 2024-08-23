@@ -6,7 +6,6 @@
  */
 
 #include "runopt.h"
-#include "compat/getopt.h"
 #include "termsg.h"
 #include "list.h"
 #include "strbuf.h"
@@ -57,6 +56,14 @@ static void get_optarg(const char **key)
 	*key = optarg;
 }
 
+static void print_version(void)
+{
+	printf("%s version %s\n"
+	       "   %s-%s\n",
+	       APPNAME, SAVESAVE_VERSION,
+	       "libzstd", ZSTD_versionString());
+}
+
 void parse_option(int argc, char *const *argv, struct cmdarg *args)
 {
 	enum optid opt;
@@ -75,7 +82,7 @@ void parse_option(int argc, char *const *argv, struct cmdarg *args)
 			/* error message already printed out */
 			exit(128);
 		case OPT_VERSION:
-			puts(APPNAME "-" SAVESAVE_VERSION);
+			print_version();
 			exit(0);
 		case OPT_HELP:
 			puts(HELP_MESSAGE);

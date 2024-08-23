@@ -28,10 +28,13 @@ int main(int argc, char *const *argv)
 		die("no savconf was provided");
 
 	savesave_nr = parse_savconf(args.savconf, &savesave_list);
+	if (!savesave_nr)
+		die("‘%s’ must contain at least one configuration",
+		    args.savconf);
 	DEBUG_RUN()
 		print_savconf(savesave_list, savesave_nr);
 
-	backup_routine(savesave_list);
+	// backup_routine(savesave_list);
 
 	return 0;
 }

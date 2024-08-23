@@ -16,11 +16,11 @@ BUILD := linux
 ARCH := $(shell uname -m)
 export BUILD ARCH
 
-all_targets := cmake_config cmake_build menuconfig clean distclean
+all_targets := build cmake_config cmake_prepare menuconfig clean distclean
 
 .PHONY: $(all_targets)
 
-cmake_build: cmake_config
+build: cmake_config
 	@cmake --build $(abs_build) --parallel
 
 cmake_config: cmake_prepare

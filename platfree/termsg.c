@@ -237,15 +237,16 @@ int redirect_stdio(const char *name)
 	}
 
 	if (dup2(fd, fileno(stdout)) == -1) {
-		error_errno("cannot redirect stdout");
+		error_errno("cannot redirect stdout to ‘%s’", name);
 		goto close_file;
 	}
 
 	if (dup2(fd, fileno(stderr)) == -1) {
-		error_errno("cannot redirect stderr");
+		error_errno("cannot redirect stderr to ‘%s’", name);
 		goto close_file;
 	}
 
+	close(fd);
 	return 0;
 
 close_file:
