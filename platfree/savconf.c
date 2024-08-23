@@ -277,7 +277,7 @@ static void validate_savconf(const struct savesave *c)
 	if (!sb.cap)
 		return;
 
-	size_t lines = strbuf_strchr(&sb, '\n');
+	size_t lines = strbuf_cntchr(&sb, '\n');
 	die("configuration ‘%s’ missing the following field%s\n\n%s",
 	    c->name, lines > 1 ? "s" : "", sb.str);
 }

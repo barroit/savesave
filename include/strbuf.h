@@ -33,7 +33,7 @@ static inline void strbuf_destroy(struct strbuf *sb)
 	free(sb->str);
 }
 
-size_t strbuf_strchr(struct strbuf *sb, int c);
+size_t strbuf_cntchr(struct strbuf *sb, int c);
 
 void str_replace(char *s, int c, int v);
 

@@ -63,7 +63,7 @@ void strbuf_truncate(struct strbuf *sb, size_t n)
 	sb->str[sb->len] = 0;
 }
 
-size_t strbuf_strchr(struct strbuf *sb, int c)
+size_t strbuf_cntchr(struct strbuf *sb, int c)
 {
 	BUG_ON(!sb->str);
 
