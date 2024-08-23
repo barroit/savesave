@@ -76,6 +76,10 @@ extern "C" {
 #include "generated/version.h"
 #include "generated/apphelp.h"
 
+#include "compat/ansidecl.h"
+#include "compat/poll.h"
+#include "compat/getopt.h"
+
 #ifdef _WIN32
 #include <BaseTsd.h>
 #include <stdint.h>

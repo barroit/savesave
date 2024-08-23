@@ -7,7 +7,6 @@
 
 #include "barroit/io.h"
 #include "barroit/limits.h"
-#include "compat/poll.h"
 
 static void handle_nonblock(int fd, short events)
 {

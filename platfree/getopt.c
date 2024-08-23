@@ -23,8 +23,6 @@
    Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301,
    USA.  */
 
-#include "compat/ansidecl.h"
-
 /* Comment out all this code if we are using the GNU C Library, and are not
    actually compiling the library itself.  This code is part of the GNU C
    Library, but also included in many other GNU distributions.  Compiling
@@ -60,8 +58,6 @@
 
    GNU application programs can use a third alternative mode in which
    they can distinguish the relative order of options and other arguments.  */
-
-#include "compat/getopt.h"
 
 /* For communication from `getopt' to the caller.
    When `getopt' finds an option that takes an argument,

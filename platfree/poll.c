@@ -29,8 +29,6 @@
 #endif
 
 /* Specification.  */
-#include "compat/poll.h"
-
 #ifndef INFTIM
 # define INFTIM (-1)
 #endif

@@ -68,21 +68,6 @@ config COMPILER_OPTIMIZE_2
 config COMPILER_OPTIMIZE_3
 	bool "3 - optimize yet more"
 
-config COMPILER_OPTIMIZE_S
-	bool "s - optimize for size"
-
-config COMPILER_OPTIMIZE_FAST
-	bool "fast - optimize to oblivion"
-	help
-	  Disregard strict standards compliance. Use as many optimizations as
-	  possible.
-
-config COMPILER_OPTIMIZE_G
-	bool "g - optimize debugging experience"
-
-config COMPILER_OPTIMIZE_Z
-	bool "z - optimize aggressively for size rather than speed"
-
 endchoice
 
 config SOURCE_NDEBUG
