@@ -5,8 +5,8 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef BR_LIMIT_H
-#define BR_LIMIT_H
+#ifndef BRT_LIMIT_H
+#define BRT_LIMIT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,4 +36,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BR_LIMIT_H */
+#endif /* BRT_LIMIT_H */

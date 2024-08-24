@@ -1,0 +1,22 @@
+/* SPDX-License-Identifier: GPL-3.0-only */
+/*
+ * Copyright 2024 Jiamu Sun
+ *
+ * Contact: barroit@linux.com
+ */
+
+#ifndef APPNAME
+# define APPNAME "@SAVESAVE_NAME@"
+#endif
+
+#ifndef APPVERSION
+# define APPVERSION "@SAVESAVE_VERSION@"
+#endif
+
+#ifndef APPARCH
+# define APPARCH "@ARCH@"
+#endif
+
+#ifndef APPHOST
+# define APPHOST "@HOST@"
+#endif

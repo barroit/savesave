@@ -5,8 +5,8 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef BR_IO_H
-#define BR_IO_H
+#ifndef BRT_IO_H
+#define BRT_IO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,4 +31,4 @@ int calc_dir_size(const char *dir, off_t *size);
 }
 #endif
 
-#endif /* BR_IO_H */
+#endif /* BRT_IO_H */

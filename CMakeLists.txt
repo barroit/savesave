@@ -1,22 +1,28 @@
 # SPDX-License-Identifier: GPL-3.0-only
 cmake_minimum_required(VERSION 3.21)
 
-set(MAJOR_VERSION  0)
-set(PATCH_VERSION  1)
-set(TWEAK_VERSION  0)
-set(SAVESAVE_VERSION ${MAJOR_VERSION}.${PATCH_VERSION}.${TWEAK_VERSION})
+set(BUILD $ENV{BUILD})
+set(ARCH  $ENV{ARCH})
 
-include($ENV{ROOT}/scripts/kconfig.cmake)
+set(SAVESAVE_NAME savesave)
+set(SAVESAVE_VERSION $ENV{SAVESAVE_VERSION})
 
 # follow the gcc concepts:
 #   build is the machine you are building on
 #   host  is the machine you are building for
-set(BUILD $ENV{BUILD})
 if(BUILD STREQUAL linux)
   set(HOST linux)
 else()
   set(HOST windows)
 endif()
+
+set(ROOT ${CMAKE_SOURCE_DIR})
+
+set(GENERATED ${ROOT}/include/generated)
+file(MAKE_DIRECTORY ${GENERATED})
+
+include(${ROOT}/scripts/kconfig.cmake)
+include(${ROOT}/scripts/genheader.cmake)
 
 if(BUILD STREQUAL linux)
   set(CMAKE_C_COMPILER ${CONFIG_CC_NAME})
@@ -53,8 +59,8 @@ add_compile_options(-O${CONFIG_COMPILER_OPTIMIZE})
 
 # By specifying a SHELL and quoting our options, we can disable Option
 # De-duplication
-add_compile_options("SHELL:-include $ENV{AUTOCONF}")
-add_compile_options("SHELL:-include $ENV{ROOT}/include/compat.h")
+add_compile_options("SHELL:-include ${GENERATED}/autoconf.h")
+add_compile_options("SHELL:-include ${ROOT}/include/compat.h")
 
 list(APPEND languages C)
 
@@ -62,7 +68,7 @@ if(HOST STREQUAL windows)
   list(APPEND languages CXX)
 endif()
 
-project(savesave VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
+project(${SAVESAVE_NAME} VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
 
 find_package(zstd CONFIG REQUIRED)
 if(BUILD STREQUAL windows)
@@ -70,21 +76,20 @@ if(BUILD STREQUAL windows)
 		      INTERFACE_INCLUDE_DIRECTORIES)
 endif()
 
-include($ENV{ROOT}/scripts/genheader.cmake)
+configure_file(${ROOT}/savesave.manifest.in
+	       ${ROOT}/savesave.manifest)
 
-configure_file($ENV{ROOT}/savesave.manifest.in $ENV{ROOT}/savesave.manifest)
-
-include_directories($ENV{ROOT}/include)
+include_directories(${ROOT}/include)
 if(BUILD STREQUAL windows)
   include_directories(${LIBZSTD_INCLUDE_DIRS})
 endif()
 
 if(HOST STREQUAL linux)
   file(GLOB platspec_src LIST_DIRECTORIES false uni/*.c)
-  set(mainfile $ENV{ROOT}/entry/savesave.c)
+  set(mainfile ${ROOT}/entry/savesave.c)
 else()
   file(GLOB platspec_src LIST_DIRECTORIES false win/*.cpp)
-  set(mainfile $ENV{ROOT}/entry/savesave.cpp)
+  set(mainfile ${ROOT}/entry/savesave.cpp)
 endif()
 add_library(platspec OBJECT ${platspec_src})
 
@@ -94,7 +99,7 @@ add_library(platfree OBJECT ${platfree_src})
 if(HOST STREQUAL linux)
   add_executable(savesave ${mainfile})
 else()
-  add_executable(savesave WIN32 ${mainfile} $ENV{ROOT}/savesave.rc)
+  add_executable(savesave WIN32 ${mainfile} ${ROOT}/savesave.rc)
 endif()
 target_link_libraries(savesave platfree platspec)
 

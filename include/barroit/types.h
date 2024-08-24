@@ -5,8 +5,8 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef BR_TYPES_H
-#define BR_TYPES_H
+#ifndef BRT_TYPES_H
+#define BRT_TYPES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,4 +21,4 @@ typedef uint64_t u64;
 }
 #endif
 
-#endif /* BR_TYPES_H */
+#endif /* BRT_TYPES_H */

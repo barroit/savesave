@@ -31,7 +31,7 @@ void setup_notifyicon(HINSTANCE app, HWND window, NOTIFYICONDATA *icon)
 	icon->uVersion = NOTIFYICON_VERSION_4;
 	icon->uCallbackMessage = SS_NOTIFYICON;
 
-	strncpy(icon->szTip, APPNAME " - " SAVESAVE_VERSION,
+	strncpy(icon->szTip, APPNAME " - " APPVERSION,
 		ARRAY_SIZEOF(icon->szTip));
 
 	load_icon_resource(app, &icon->hIcon);

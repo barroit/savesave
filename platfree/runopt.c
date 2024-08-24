@@ -58,9 +58,9 @@ static void get_optarg(const char **key)
 
 static void print_version(void)
 {
-	printf("%s version %s\n"
+	printf("%s/%s-%s %s\n"
 	       "   %s-%s\n",
-	       APPNAME, SAVESAVE_VERSION,
+	       APPNAME, APPHOST, APPARCH, APPVERSION,
 	       "libzstd", ZSTD_versionString());
 }
 
@@ -83,7 +83,7 @@ void parse_option(int argc, char *const *argv, struct cmdarg *args)
 			exit(128);
 		case OPT_VERSION:
 			print_version();
-			exit(0);
+			exit(128);
 		case OPT_HELP:
 			puts(HELP_MESSAGE);
 			exit(0);

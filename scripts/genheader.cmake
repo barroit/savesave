@@ -1,6 +1,10 @@
-file(GLOB files $ENV{ROOT}/include/*.in)
+file(GLOB __files ${ROOT}/include/*.in)
 
-foreach(conf ${files})
-  cmake_path(GET conf STEM LAST_ONLY name)
-  configure_file(${conf} $ENV{ROOT}/include/generated/${name})
+foreach(__conf ${__files})
+  cmake_path(GET __conf STEM LAST_ONLY __name)
+  configure_file(${__conf} ${GENERATED}/${__name})
 endforeach()
+
+unset(__files)
+unset(__conf)
+unset(__name)

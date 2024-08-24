@@ -72,8 +72,7 @@ extern "C" {
 
 #include "compiler.h"
 
-#include "generated/appname.h"
-#include "generated/version.h"
+#include "generated/appinfo.h"
 #include "generated/apphelp.h"
 
 #include "compat/ansidecl.h"

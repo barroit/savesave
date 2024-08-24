@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-
+int make_zip(const char *dest, const char *src, int is_dir);
 
 #ifdef __cplusplus
 }

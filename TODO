@@ -1,0 +1,5 @@
+                                  TODO LIST
+
+----
+reduce malloc and better efficiency
+   Make strlist use strbuf array as its internal buffer

@@ -7,19 +7,22 @@ function (set_choiced_value prefix)
   endforeach()
 endfunction()
 
-if (NOT EXISTS "$ENV{DOTCONFIG}" OR IS_DIRECTORY $ENV{DOTCONFIG})
-  message(FATAL_ERROR "${DOTCONFIG} does not exist, run ‘make menuconfig’ first")
-endif()
+execute_process(COMMAND genconfig --header-path ${GENERATED}/autoconf.h
+		--config-out ${ROOT}/.config)
 
-file(STRINGS $ENV{DOTCONFIG} lines ENCODING UTF-8)
+file(STRINGS ${ROOT}/.config __lines ENCODING UTF-8)
 
-foreach(line ${lines})
-  if (line MATCHES "^#")
+foreach(__line ${__lines})
+  if (__line MATCHES "^#")
     continue()
   endif()
 
-  string(REGEX MATCH "^(CONFIG_[^=]+)=(\"?)([^\"]*)(\"?)$" _ ${line})
+  string(REGEX MATCH "^(CONFIG_[^=]+)=(\"?)([^\"]*)(\"?)$" __unused ${__line})
 
   set(${CMAKE_MATCH_1} ${CMAKE_MATCH_3})
   list(APPEND DOTCONFIG_VARIABLES "${CMAKE_MATCH_1}")
 endforeach()
+
+unset(__lines)
+unset(__line)
+unset(__unused)
