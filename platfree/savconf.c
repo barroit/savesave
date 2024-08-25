@@ -71,7 +71,7 @@ static int create_new_entry(const char *name,
 
 	c->name = xstrdup(name);
 	c->use_snapshot = -1;
-	c->use_zip = -1;
+	c->use_compress = -1;
 	return 0;
 }
 
@@ -188,7 +188,7 @@ static int assign_entry(const char *line, char **rest,
 	else if (is_entry(line, "snapshot", rest))
 		SETENT(ent, "snapshot", &conf->use_snapshot, NULL, FLAG);
 	else if (is_entry(line, "zip", rest))
-		SETENT(ent, "zip", &conf->use_zip, NULL, FLAG);
+		SETENT(ent, "zip", &conf->use_compress, NULL, FLAG);
 	else
 		return 1;
 
@@ -284,33 +284,26 @@ static void validate_savconf(const struct savesave *c)
 
 static void update_backup_path(struct savesave *c)
 {
-	char *old = c->backup;
-	char *buf = xmalloc(PATH_MAX);
-	int n = xsnprintf(buf, PATH_MAX, "%s/%s.", c->backup, c->name);
+	char *path = c->backup;
+	size_t extlen = sizeof(CONFIG_ARCHIVE_EXTENTION) - 1;
+	size_t dotlen = 1;
+	size_t size = strlen(c->backup) + strlen(c->name) + dotlen +
+		      extlen + dotlen + STRU8_MAX;
 
-	if (c->use_zip) {
-		size_t len = sizeof("zip.");
-		if (n + len > PATH_MAX)
-			goto err_overflow;
+	if (size > PATH_MAX ||
+	    (!c->use_compress && size - extlen - dotlen > PATH_MAX))
+		die("backup path ‘%s’ of configuration ‘%s’ is too long",
+		    c->backup, c->name);
 
-		memcpy(buf + n, "zip.", len);
-		n += len - 1;
-	}
+	c->backup = xmalloc(size);
+	int n = xsnprintf(c->backup, size, "%s/%s.", path, c->name);
 
-	/*
-	 * STRU8_MAX contains null terminator length
-	 */
-	if (n + STRU8_MAX > PATH_MAX)
-		goto err_overflow;
+	if (c->use_compress)
+		n += xsnprintf(&c->backup[n], extlen + dotlen + 1,
+			       "%s.", CONFIG_ARCHIVE_EXTENTION);
 
 	c->backup_len = n;
-	free(old);
-	c->backup = buf;
-	return;
-
-err_overflow:
-	die("backup path ‘%s’ of configuration ‘%s’ is too long",
-	    c->backup, c->name);
+	free(path);
 }
 
 static void post_parse_savconf(struct savesave *conf, size_t nl)
@@ -321,10 +314,10 @@ static void post_parse_savconf(struct savesave *conf, size_t nl)
 		c = &conf[i];
 		validate_savconf(c);
 
-		if (c->use_zip == -1 &&
+		if (c->use_compress == -1 &&
 		    c->is_dir_save &&
-		    c->save_size > CONFIG_DO_ZIP_THRESHOLD)
-			c->use_zip = 1;
+		    c->save_size > CONFIG_DO_COMPRESS_THRESHOLD)
+			c->use_compress = 1;
 
 		if (c->use_snapshot == -1 &&
 		    c->save_size > CONFIG_DO_SNAPSHOT_THRESHOLD)
@@ -405,7 +398,7 @@ void print_savconf(const struct savesave *conf, size_t nl)
 		       "\tsnapshot %d\n"
 		       "\tzip\t %d\n\n",
 		       c->name, c->save, size, c->is_dir_save, c->backup,
-		       c->period, c->stack, c->use_snapshot, c->use_zip);
+		       c->period, c->stack, c->use_snapshot, c->use_compress);
 	}
 }
 

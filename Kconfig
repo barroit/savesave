@@ -88,7 +88,7 @@ config CNTRL_CHAR_REPLACEMENT
 	string "control char replacement"
 	default "�"
 
-config DO_ZIP_THRESHOLD
+config DO_COMPRESS_THRESHOLD
 	int "size threshold for compression (in KB)"
 	default 30720
 
@@ -103,6 +103,10 @@ config DEFAULT_SAVCONF_BASENAME
 config DEFAULT_SAVCONF_ENVNAME
 	string "getenv name of savconf"
 	default "SAVESAVE"
+
+config ARCHIVE_EXTENTION
+	string "file extension of archive file (no dot)"
+	default "zst"
 
 endmenu # "Features"
 

@@ -30,6 +30,9 @@ extern "C" {
 # define MAX_ALLOC_SIZE MAX_ALLOC_SIZE_DEFAULT
 #endif
 
+/*
+ * chars in a string uint8 number including nul
+ */
 #define STRU8_MAX 4
 
 #ifdef __cplusplus

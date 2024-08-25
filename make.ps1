@@ -30,6 +30,7 @@ if ($command -eq 'distclean') {
 	rm -Force "$abs_root/include/generated/*"
 	rm -Recurse -Force "$abs_build/*"
 	rm -Force "$abs_root/.config*"
+	rm -Force "$abs_root/savesave.manifest"
 	exit 0
 } elseif ($command -eq 'menuconfig') {
 	$env:MENUCONFIG_STYLE = 'aquatic'

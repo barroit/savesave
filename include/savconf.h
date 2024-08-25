@@ -24,7 +24,7 @@ struct savesave {
 	char *backup;
 	size_t backup_len;
 
-	int use_zip;
+	int use_compress;
 	int use_snapshot;
 
 	u32 period;

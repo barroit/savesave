@@ -142,7 +142,7 @@ int backup_routine(const struct savesave *c)
 	 * we treat zip as a regular file, so there are two types of file
 	 * (1) regular file and (2) directory
 	 */
-	if (c->use_zip) {
+	if (c->use_compress) {
 		//
 	}
 
