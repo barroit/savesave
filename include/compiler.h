@@ -29,6 +29,23 @@ extern "C" {
 # define CONSTRUCTOR static void __attribute__((constructor))
 #endif
 
+#define __CONCAT2(a, b)	a##b
+#define CONCAT2(a, b)	__CONCAT2(a, b)
+
+#define UNIQUE_ID(n) CONCAT2(CONCAT2(__local_, n), __COUNTER__)
+
+#define __SELECT_FUNCTION3(a, b, c, n, ...)	n
+
+/*
+ * Call function by arguments count; tailing number indicates the max arguments
+ * it can handle
+ */
+#define FLEXCALL_FUNCTION3(prefix, ...)				\
+	__SELECT_FUNCTION3(__VA_ARGS__,				\
+			   CONCAT2(prefix, 3),			\
+			   CONCAT2(prefix, 2),			\
+			   CONCAT2(prefix, 1))(__VA_ARGS__)
+
 #ifdef __cplusplus
 }
 #endif

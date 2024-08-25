@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-#include "barroit/io.h"
+#include "robio.h"
 #include "barroit/limits.h"
 
 static void handle_nonblock(int fd, short events)
@@ -57,5 +57,46 @@ ssize_t robwrite(int fd, const void *buf, size_t n)
 		}
 
 		return nr;
+	}
+}
+
+#ifdef open
+# undef open
+#endif
+
+int robopen2(const char *file, int oflag)
+{
+	return robopen3(file, oflag, 0);
+}
+
+int robopen3(const char *file, int oflag, mode_t mode)
+{
+	int fd;
+
+	while (39) {
+		fd = open(file, oflag, mode);
+		if (fd != -1)
+			return fd;
+		else if (errno == EINTR)
+			continue;
+		return -1;
+	}
+}
+
+#ifdef close
+# undef close
+#endif
+
+int robclose(int fd)
+{
+	int err;
+
+	while (39) {
+		err = close(fd);
+		if (!err)
+			return 0;
+		else if (errno == EINTR)
+			continue;
+		return err;
 	}
 }

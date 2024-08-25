@@ -30,14 +30,14 @@ extern "C" {
 extern NORETURN __die_routine(const char *, const char *, const char *, ...);
 
 #define st_mult(a, b)							\
-	({								\
-		if (uint_mult_overflows(a, b)) {			\
-			__die_routine("fatal: ", NULL, "size overflow: "\
-				      "%" PRIuMAX " * %" PRIuMAX ,	\
-				      (uintmax_t)(a), (uintmax_t)(b));	\
-		}							\
-		(a) * (b);						\
-	})
+({									\
+	if (unlikely(uint_mult_overflows(a, b))) {			\
+		__die_routine("fatal: ", NULL, "size overflow: "	\
+			      "%" PRIuMAX " * %" PRIuMAX ,		\
+			      (uintmax_t)(a), (uintmax_t)(b));		\
+	}								\
+	(a) * (b);							\
+})
 
 #ifdef __cplusplus
 }

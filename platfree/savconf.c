@@ -6,7 +6,7 @@
  */
 
 #include "savconf.h"
-#include "barroit/io.h"
+#include "robio.h"
 #include "termsg.h"
 #include "strbuf.h"
 #include "alloc.h"
@@ -166,13 +166,13 @@ struct confent {
 	enum entval type;
 };
 
-#define SETENT(e, n, p, c, t)			\
-	do {					\
-		(e)->name = (n);		\
-		(e)->val  = (intptr_t)(p);	\
-		(e)->cb   = (c);		\
-		(e)->type = (t);		\
-	} while (0)
+#define SETENT(e, n, p, c, t)		\
+do {					\
+	(e)->name = (n);		\
+	(e)->val  = (intptr_t)(p);	\
+	(e)->cb   = (c);		\
+	(e)->type = (t);		\
+} while (0)
 
 static int assign_entry(const char *line, char **rest,
 			const struct savesave *conf, struct confent *ent)

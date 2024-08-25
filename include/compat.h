@@ -39,13 +39,7 @@ extern "C" {
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
-#ifdef HAVE_SYS_IOCTL_H
-# include <sys/ioctl.h>
-#endif
-#ifdef HAVE_SYS_FILIO_H
-# include <sys/filio.h>
-#endif
+#include <stdatomic.h>
 
 #ifdef _WIN32
 # include <sdkddkver.h>
@@ -118,11 +112,13 @@ NORETURN winexit(int code);
 
 #define my_mkdir mkdir
 
-#else /* linux */
+#else /* ---- linux ----- */
 
 #define my_mkdir(p) mkdir(p, 0775)
 
-#endif
+#endif /* ---- _WIN32 ----- */
+
+#include "cntio.h"
 
 #ifdef __cplusplus
 }

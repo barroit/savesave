@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-#include "barroit/io.h"
+#include "robio.h"
 #include "alloc.h"
 
 char *readfile(const char *name)
@@ -29,7 +29,7 @@ char *readfile(const char *name)
 
 err_read_file:
 	free(buf);
-err_stat_fd:
+err_stat_fd:;
 	int errnum = errno;
 	close(fd);
 	errno = errnum;

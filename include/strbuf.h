@@ -37,13 +37,13 @@ size_t strbuf_cntchr(struct strbuf *sb, int c);
 
 void str_replace(char *s, int c, int v);
 
-#define xsnprintf(...)					\
-	({						\
-		int ____n = snprintf(__VA_ARGS__);	\
-		if (____n < 0)				\
-			die("snprintf() failure");	\
-		____n;					\
-	})
+#define xsnprintf(...)				\
+({						\
+	int ____n = snprintf(__VA_ARGS__);	\
+	if (unlikely(____n < 0))		\
+		die("snprintf() failure");	\
+	____n;					\
+})
 
 #ifdef __cplusplus
 }

@@ -6,17 +6,17 @@
  */
 
 #include "termsg.h"
-#include "barroit/io.h"
+#include "robio.h"
 #include "list.h"
 #include "alloc.h"
 #include "strbuf.h"
 
-#define UPDATE_BUF(buf, n, len)		\
-	do {				\
-		size_t __len = len;	\
-		*(n) -= __len;		\
-		*(buf) += __len;	\
-	} while (0)
+#define UPDATE_BUF(buf, n, len)	\
+do {				\
+	size_t __len = len;	\
+	*(n) -= __len;		\
+	*(buf) += __len;	\
+} while (0)
 
 static void vreport_prefix(char **buf, size_t *avail, const char *lead)
 {

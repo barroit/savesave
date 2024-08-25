@@ -31,15 +31,15 @@ char *xstrdup(const char *src);
  * 	 (i.e., strlen + nl + 1)
  * @cap: pointer points to buf capacity
  */
-#define CAP_ALLOC(p, nl, cap)						\
-	do {								\
-		if ((nl) > *(cap)) {					\
-			*(cap) = fix_grow(*cap);			\
-			if (*(cap) < (nl))				\
-				*(cap) = nl;				\
-			*(p) = REALLOC_ARRAY(*(p), *(cap));		\
-		}							\
-	} while (0)
+#define CAP_ALLOC(p, nl, cap)					\
+do {								\
+	if ((nl) > *(cap)) {					\
+		*(cap) = fix_grow(*cap);			\
+		if (*(cap) < (nl))				\
+			*(cap) = nl;				\
+		*(p) = REALLOC_ARRAY(*(p), *(cap));		\
+	}							\
+} while (0)
 
 #ifdef __cplusplus
 }
