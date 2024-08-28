@@ -69,6 +69,30 @@ void strbuf_truncate(struct strbuf *sb, size_t n)
 	sb->str[sb->len] = 0;
 }
 
+void strbuf_trim(struct strbuf *sb)
+{
+	char *h = sb->str;
+	while (*h == ' ')
+		h++;
+
+	if (*h == 0) {
+		sb->str[0] = 0;
+		sb->len = 0;
+		return;
+	}
+
+	char *t = &sb->str[sb->len];
+	while (*(t - 1) == ' ')
+		t--;
+
+	if (h == sb->str && t == &sb->str[sb->len])
+		return;
+
+	sb->len = t - h;
+	memmove(sb->str, h, sb->len);
+	sb->str[sb->len] = 0;
+}
+
 size_t strbuf_cntchr(struct strbuf *sb, int c)
 {
 	BUG_ON(!sb->str);

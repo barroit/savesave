@@ -35,6 +35,8 @@ size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...);
 
 void strbuf_truncate(struct strbuf *sb, size_t n);
 
+void strbuf_trim(struct strbuf *sb);
+
 size_t strbuf_cntchr(struct strbuf *sb, int c);
 
 void str_replace(char *s, int c, int v);
