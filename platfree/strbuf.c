@@ -7,9 +7,7 @@
 
 #include "strbuf.h"
 #include "alloc.h"
-#include "termsg.h"
 #include "debug.h"
-#include "list.h"
 
 void strbuf_init(struct strbuf *sb, flag_t flags)
 {

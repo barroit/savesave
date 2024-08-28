@@ -120,6 +120,8 @@ NORETURN winexit(int code);
 
 #include "cntio.h"
 
+#include "barroit/types.h"
+
 #ifdef __cplusplus
 }
 #endif

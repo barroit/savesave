@@ -7,13 +7,12 @@
 
 #include "strlist.h"
 #include "alloc.h"
-#include "termsg.h"
 
 void strlist_init(struct strlist *sl, flag_t flags)
 {
 	memset(sl, 0, sizeof(*sl));
 
-	if (flags | STRLIST_DUPSTR)
+	if (flags & STRLIST_DUPSTR)
 		sl->do_dup = 1;
 }
 

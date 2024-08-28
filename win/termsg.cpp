@@ -6,7 +6,6 @@
  */
 
 #include "win/termsg.hpp"
-#include "calc.h"
 
 static char errbuf[256];
 
@@ -18,7 +17,7 @@ const char *strwinerror()
 	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
 			FORMAT_MESSAGE_IGNORE_INSERTS,
 		      NULL, errnum, langid, errbuf,
-		      ARRAY_SIZEOF(errbuf), NULL);
+		      sizeof_array(errbuf), NULL);
 
 	errno = errnum;
 	return errbuf;

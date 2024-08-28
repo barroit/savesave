@@ -12,8 +12,6 @@
 extern "C" {
 #endif
 
-#include "barroit/types.h"
-
 struct savesave {
 	char *name;
 

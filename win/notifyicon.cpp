@@ -7,7 +7,6 @@
 
 #include "win/ui.hpp"
 #include "win/resid.hpp"
-#include "calc.h"
 #include "termsg.h"
 #include "debug.h"
 
@@ -32,7 +31,7 @@ void setup_notifyicon(HINSTANCE app, HWND window, NOTIFYICONDATA *icon)
 	icon->uCallbackMessage = SS_NOTIFYICON;
 
 	strncpy(icon->szTip, APPNAME " - " APPVERSION,
-		ARRAY_SIZEOF(icon->szTip));
+		sizeof_array(icon->szTip));
 
 	load_icon_resource(app, &icon->hIcon);
 }

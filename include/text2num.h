@@ -12,8 +12,6 @@
 extern "C" {
 #endif
 
-#include "barroit/types.h"
-
 int str2ulong(const char *str, size_t len,
 	      unsigned long max, unsigned long *val);
 

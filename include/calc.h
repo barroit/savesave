@@ -12,8 +12,6 @@
 extern "C" {
 #endif
 
-#define ARRAY_SIZEOF(arr) (sizeof(arr) / sizeof((arr)[0]))
-
 #define fix_grow(x) (((x) + 16) * 3 / 2)
 
 #define bitsizeof(x) (CHAR_BIT * sizeof(x))

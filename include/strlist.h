@@ -12,8 +12,6 @@
 extern "C" {
 #endif
 
-#include "barroit/types.h"
-
 struct strlist {
 	char **list;
 	size_t size;

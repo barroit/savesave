@@ -14,6 +14,11 @@ extern "C" {
 
 #include "calc.h"
 
+struct list_head {
+	struct list_head *prev;
+	struct list_head *next;
+};
+
 #define for_each_idx(i, n) for (i = 0; i < n; i++)
 
 /*
