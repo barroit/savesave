@@ -34,7 +34,7 @@ int main(int argc, char *const *argv)
 	DEBUG_RUN()
 		print_savconf(savesave_list, savesave_nr);
 
-	// backup_routine(savesave_list);
+	backup_routine(savesave_list);
 
 	return 0;
 }

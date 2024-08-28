@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#include "barroit/types.h"
+
 struct strbuf {
 	char *str;
 	size_t len;
@@ -20,30 +22,22 @@ struct strbuf {
 
 #define STRBUF_INIT { 0 }
 
-void strbuf_grow(struct strbuf *sb, size_t nl);
+void strbuf_init(struct strbuf *sb, flag_t flags);
 
-size_t strbuf_append(struct strbuf *sb, const char *str);
+/*
+ * A destroyed strbuf object can be re-initialised using strbuf_init();
+ */
+void strbuf_destroy(struct strbuf *sb);
+
+size_t strbuf_concat(struct strbuf *sb, const char *str);
 
 size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...);
 
 void strbuf_truncate(struct strbuf *sb, size_t n);
 
-static inline void strbuf_destroy(struct strbuf *sb)
-{
-	free(sb->str);
-}
-
 size_t strbuf_cntchr(struct strbuf *sb, int c);
 
 void str_replace(char *s, int c, int v);
-
-#define xsnprintf(...)				\
-({						\
-	int ____n = snprintf(__VA_ARGS__);	\
-	if (unlikely(____n < 0))		\
-		die("snprintf() failure");	\
-	____n;					\
-})
 
 #ifdef __cplusplus
 }

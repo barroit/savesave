@@ -57,7 +57,8 @@ static int dirent_sizeof(const char *dir, off_t *size,
 		dir = "";
 
 	static char buf[PATH_MAX];
-	xsnprintf(buf, sizeof(buf), "%s/%s", dir, ent->d_name);
+	int n = snprintf(buf, sizeof(buf), "%s/%s", dir, ent->d_name);
+	BUG_ON(n < 0);
 
 	switch (ent->d_type) {
 	case DT_REG:
@@ -108,9 +109,10 @@ static int do_calc_dir_size(const char *dir, off_t *size, struct strlist *sl)
 int calc_dir_size(const char *dir, off_t *size)
 {
 	int err;
-	struct strlist sl = STRLIST_INIT_DUPE;
-
+	struct strlist sl;
 	char *path = xstrdup(dir);
+
+	strlist_init(&sl, STRLIST_DUPSTR);
 	do {
 		err = do_calc_dir_size(path, size, &sl);
 		free(path);
@@ -120,6 +122,6 @@ int calc_dir_size(const char *dir, off_t *size)
 		}
 	} while ((path = strlist_pop(&sl)) != NULL);
 
-	strlist_destroy_buf(&sl);
+	strlist_destroy(&sl);
 	return 0;
 }

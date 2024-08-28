@@ -97,7 +97,7 @@ static int my_calc_dir_size(const char *dir, off_t *size)
 		sz = max_int_val_of_type(off_t);
 	*size = sz;
 
-	strlist_destroy_buf(&sl);
+	strlist_destroy(&sl);
 	return 0;
 }
 

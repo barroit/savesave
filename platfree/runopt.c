@@ -36,7 +36,7 @@ static void report_positional_argument(int idx, int argc, char *const *argv)
 
 	for_each_idx_from(idx, argc) {
 		if (!argv[idx])
-			strbuf_append(&sb, "‘none’, ");
+			strbuf_concat(&sb, "‘none’, ");
 		else
 			strbuf_printf(&sb, "‘%s’, ", argv[idx]);
 	}

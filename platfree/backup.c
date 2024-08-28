@@ -17,8 +17,13 @@ static char stru8_map[UINT8_MAX + 1][STRU8_MAX];
 CONSTRUCTOR init_u8tstr_table(void)
 {
 	size_t i;
-	for_each_idx(i, UINT8_MAX + 1)
-		xsnprintf(stru8_map[i], sizeof(*stru8_map), "%u", (u8)i);
+	int n;
+
+	for_each_idx(i, UINT8_MAX + 1) {
+		n = snprintf(stru8_map[i], sizeof(*stru8_map), "%u", (u8)i);
+		BUG_ON(n < 0);
+	}
+		
 }
 
 static int move_backup(const char *src, const char *dest)
@@ -138,10 +143,6 @@ int backup_routine(const struct savesave *c)
 		fflush(stdout);
 	}
 
-	/*
-	 * we treat zip as a regular file, so there are two types of file
-	 * (1) regular file and (2) directory
-	 */
 	if (c->use_compress) {
 		//
 	}

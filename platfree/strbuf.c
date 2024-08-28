@@ -11,19 +11,30 @@
 #include "debug.h"
 #include "list.h"
 
-void strbuf_grow(struct strbuf *sb, size_t nl)
+void strbuf_init(struct strbuf *sb, flag_t flags)
 {
-	BUG_ON(nl == 0);
-
-	CAP_ALLOC(&sb->str, sb->len + nl, &sb->cap);
+	memset(sb, 0, sizeof(*sb));
 }
 
-size_t strbuf_append(struct strbuf *sb, const char *str)
+void strbuf_destroy(struct strbuf *sb)
+{
+	free(sb->str);
+}
+
+/*
+ * Grow strbuf capacity by n (exclude null terminator)
+ */
+static void strbuf_growlen(struct strbuf *sb, size_t n)
+{
+	BUG_ON(n == 0);
+	CAP_ALLOC(&sb->str, sb->len + n + 1, &sb->cap);
+}
+
+size_t strbuf_concat(struct strbuf *sb, const char *str)
 {
 	size_t nl = strlen(str);
 
-	strbuf_grow(sb, nl + 1);
-
+	strbuf_growlen(sb, nl);
 	memcpy(sb->str + sb->len, str, nl + 1);
 	sb->len += nl;
 
@@ -37,22 +48,17 @@ size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...)
 	va_copy(cp, ap);
 
 	int nr = vsnprintf(NULL, 0, fmt, cp);
-	if (unlikely(nr < 0))
-		goto err_printf;
+	BUG_ON(nr < 0);
 
 	va_end(cp);
-	strbuf_grow(sb, nr + 1);
+	strbuf_growlen(sb, nr);
 
 	nr = vsnprintf(sb->str + sb->len, nr + 1, fmt, ap);
-	if (unlikely(nr < 0))
-		goto err_printf;
+	BUG_ON(nr < 0);
 
 	va_end(ap);
 	sb->len += nr;
 	return nr;
-
-err_printf:
-		bug("vsnprintf() is broken");
 }
 
 void strbuf_truncate(struct strbuf *sb, size_t n)

@@ -13,6 +13,7 @@
 #include "list.h"
 #include "text2num.h"
 #include "barroit/limits.h"
+#include "debug.h"
 
 struct savesave_context {
 	char *line;
@@ -266,13 +267,13 @@ static void validate_savconf(const struct savesave *c)
 	struct strbuf sb = STRBUF_INIT;
 
 	if (!c->save)
-		strbuf_append(&sb, "\tsave\n");
+		strbuf_concat(&sb, "\tsave\n");
 	if (!c->backup)
-		strbuf_append(&sb, "\tbackup\n");
+		strbuf_concat(&sb, "\tbackup\n");
 	if (!c->period)
-		strbuf_append(&sb, "\tperiod\n");
+		strbuf_concat(&sb, "\tperiod\n");
 	if (!c->stack)
-		strbuf_append(&sb, "\tstack\n");
+		strbuf_concat(&sb, "\tstack\n");
 
 	if (!sb.cap)
 		return;
@@ -296,11 +297,15 @@ static void update_backup_path(struct savesave *c)
 		    c->backup, c->name);
 
 	c->backup = xmalloc(size);
-	int n = xsnprintf(c->backup, size, "%s/%s.", path, c->name);
+	int n = snprintf(c->backup, size, "%s/%s.", path, c->name);
+	BUG_ON(n < 0);
 
-	if (c->use_compress)
-		n += xsnprintf(&c->backup[n], extlen + dotlen + 1,
-			       "%s.", CONFIG_ARCHIVE_EXTENTION);
+	if (c->use_compress) {
+		int nn = snprintf(&c->backup[n], extlen + dotlen + 1,
+				  "%s.", CONFIG_ARCHIVE_EXTENTION);
+		BUG_ON(nn < 0);
+		n += nn;
+	}
 
 	c->backup_len = n;
 	free(path);
@@ -408,7 +413,7 @@ char *get_default_savconf_path(void)
 	char *path = getenv(CONFIG_DEFAULT_SAVCONF_ENVNAME);
 
 	if (path) {
-		strbuf_append(&sb, path);
+		strbuf_concat(&sb, path);
 	} else {
 		const char *home = get_home_dir();
 		strbuf_printf(&sb, "%s/%s", home,
