@@ -7,7 +7,7 @@
  * Strategy inspired by btrfs/zstd.c
  */
 
-#include "zip.h"
+#include "compress.h"
 #include "barroit/zstd.h"
 #include "termsg.h"
 #include "debug.h"

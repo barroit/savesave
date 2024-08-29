@@ -23,7 +23,7 @@ void uarg_parser::dump_cmdline(const char *cmdline)
 	strlist_terminate(&sl);
 
 	argv = sl.list;
-	argc = sl.size;
+	argc = sl.nl;
 }
 
 void uarg_parser::parse_cmdline()

@@ -12,10 +12,14 @@
 extern "C" {
 #endif
 
+struct strbuf;
+
 struct strlist {
-	char **list;
-	size_t size;
+	struct strbuf *list;
+	size_t uninit;
+	size_t nl;
 	size_t cap;
+
 	int do_dup;
 };
 
@@ -30,9 +34,19 @@ void strlist_init(struct strlist *sl, flag_t flags);
  */
 void strlist_destroy(struct strlist *sl);
 
-void strlist_push(struct strlist *sl, const char *str);
+size_t strlist_push(struct strlist *sl, const char *str);
 
-char *strlist_pop(struct strlist *sl);
+size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc);
+
+/*
+ * return value shall be freed by caller
+ */
+#define strlist_pop(sl) strlist_pop2(sl, 1)
+
+/*
+ * if dup is 0, the return value is valid until the next call to strlist_push()
+ */
+char *strlist_pop2(struct strlist *sl, int dup);
 
 /*
  * Make strlist more ‘argv-like’

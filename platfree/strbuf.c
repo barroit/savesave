@@ -12,6 +12,9 @@
 void strbuf_init(struct strbuf *sb, flag_t flags)
 {
 	memset(sb, 0, sizeof(*sb));
+
+	if (flags & STRBUF_CONSTANT)
+		sb->is_const = 1;
 }
 
 void strbuf_destroy(struct strbuf *sb)
@@ -24,15 +27,32 @@ void strbuf_destroy(struct strbuf *sb)
  */
 static void strbuf_growlen(struct strbuf *sb, size_t n)
 {
-	BUG_ON(n == 0);
 	CAP_ALLOC(&sb->str, sb->len + n + 1, &sb->cap);
+}
+
+size_t strbuf_move(struct strbuf *sb, const char *str)
+{
+	BUG_ON(!sb->is_const);
+
+	size_t len = strlen(str);
+
+	sb->str = (char *)str;
+	sb->len = len;
+	sb->cap = len;
+
+	return len;
 }
 
 size_t strbuf_concat(struct strbuf *sb, const char *str)
 {
+	return strbuf_concat2(sb, str, 0);
+}
+
+size_t strbuf_concat2(struct strbuf *sb, const char *str, size_t extalloc)
+{
 	size_t nl = strlen(str);
 
-	strbuf_growlen(sb, nl);
+	strbuf_growlen(sb, nl + extalloc);
 	memcpy(sb->str + sb->len, str, nl + 1);
 	sb->len += nl;
 
@@ -61,8 +81,6 @@ size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...)
 
 void strbuf_truncate(struct strbuf *sb, size_t n)
 {
-	BUG_ON(n > sb->len);
-
 	sb->len -= n;
 	sb->str[sb->len] = 0;
 }

@@ -48,23 +48,22 @@ static int file_sizeof(const char *f, off_t *size)
 	return 0;
 }
 
-static int dirent_sizeof(const char *dir, off_t *size,
+static int dirent_sizeof(struct strbuf *sb, off_t *size,
 			 struct dirent *ent, struct strlist *sl)
 {
 	if (strcmp(ent->d_name, "..") == 0 ||  strcmp(ent->d_name, ".") == 0)
 		return 0;
-	if (strcmp(dir, "/") == 0)
-		dir = "";
+	if (strcmp(sb->str, "/") == 0)
+		strbuf_zerolen(sb);
 
-	static char buf[PATH_MAX];
-	int n = snprintf(buf, sizeof(buf), "%s/%s", dir, ent->d_name);
-	BUG_ON(n < 0);
+	strbuf_concat(sb, "/");
+	strbuf_concat(sb, ent->d_name);
 
 	switch (ent->d_type) {
 	case DT_REG:
-		return file_sizeof(buf, size);
+		return file_sizeof(sb->str, size);
 	case DT_DIR:
-		strlist_push(sl, buf);
+		strlist_push2(sl, sb->str, 32);
 		break;
 	case DT_LNK:
 		/*
@@ -74,31 +73,34 @@ static int dirent_sizeof(const char *dir, off_t *size,
 		*size += 64;
 		break;
 	case DT_UNKNOWN:
-		return error("can’t determine file type of ‘%s’", buf);
+		return error("can’t determine file type of ‘%s’", sb->str);
 	default:
 		warn("‘%s’ has unsupported file type ‘%d’; file size retrieval for this file is skipped",
-		     buf, ent->d_type);
+		     sb->str, ent->d_type);
 	}
 
 	return 0;
 }
 
-static int do_calc_dir_size(const char *dir, off_t *size, struct strlist *sl)
+static int do_calc_dir_size(struct strbuf *sb, off_t *size, struct strlist *sl)
 {
-	int err;
-
-	DIR *d = opendir(dir);
+	DIR *d = opendir(sb->str);
 	if (!d)
-		return error_errno("failed to open dir ‘%s’", dir);
+		return error_errno("failed to open dir ‘%s’", sb->str);
 
+	int err;
 	struct dirent *ent;
+	size_t len = sb->len;
+
 	errno = 0;
 	while ((ent = readdir(d)) != NULL) {
-		err = dirent_sizeof(dir, size, ent, sl);
+		err = dirent_sizeof(sb, size, ent, sl);
 		if (err) {
 			closedir(d);
 			return 1;
 		}
+
+		strbuf_truncate(sb, sb->len - len);
 	}
 	BUG_ON(errno != 0);
 	closedir(d);
@@ -108,20 +110,23 @@ static int do_calc_dir_size(const char *dir, off_t *size, struct strlist *sl)
 
 int calc_dir_size(const char *dir, off_t *size)
 {
-	int err;
+	int ret;
 	struct strlist sl;
-	char *path = xstrdup(dir);
+	struct strbuf sb = STRBUF_INIT;
+	const char *path = dir;
 
 	strlist_init(&sl, STRLIST_DUPSTR);
 	do {
-		err = do_calc_dir_size(path, size, &sl);
-		free(path);
-		if (err) {
-			strlist_destroy(&sl);
-			return 1;
-		}
-	} while ((path = strlist_pop(&sl)) != NULL);
+		strbuf_concat(&sb, path);
+
+		ret = do_calc_dir_size(&sb, size, &sl);
+		if (ret)
+			break;
+
+		strbuf_zerolen(&sb);
+	} while ((path = strlist_pop2(&sl, 0)) != NULL);
 
 	strlist_destroy(&sl);
-	return 0;
+	strbuf_destroy(&sb);
+	return ret;
 }
