@@ -18,9 +18,6 @@ int __warn_routine(const char *pref, const char *extr,
 int __error_routine(const char *pref, const char *extr,
 		    const char *fmt, ...) FORMAT(3, 4);
 
-int __error_routine(const char *pref, const char *extr,
-		    const char *fmt, ...) FORMAT(3, 4);
-
 NORETURN __die_routine(const char *pref, const char *extr,
 		       const char *fmt, ...) FORMAT(3, 4);
 

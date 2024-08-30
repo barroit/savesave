@@ -28,7 +28,32 @@ int is_abs_path(const char *path);
 
 const char *get_home_dir(void);
 
-int calc_dir_size(const char *dir, off_t *size);
+/*
+ * file_iter - iterate files from given path
+ *
+ * head - first file to iterate
+ * cb	- callback of file iterator, if the processing file is a symlink, fd is
+ *	  set to -1 and st is set to NULL
+ * data	- data passed to callback function
+ */
+struct file_iter {
+	const char *head;
+
+	struct strbuf *sb;
+	struct strlist *sl;
+
+	int (*cb)(const char *name, int fd, struct stat *st, void *data);
+	void *data;
+};
+
+typedef typeof_member(struct file_iter, cb) file_iterator_cb_t;
+
+void file_iter_init(struct file_iter *ctx, const char *head,
+			file_iterator_cb_t cb, void *data);
+
+void file_iter_destroy(struct file_iter *ctx);
+
+int file_iter_exec(struct file_iter *ctx);
 
 #ifdef __cplusplus
 }

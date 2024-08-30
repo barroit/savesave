@@ -19,7 +19,6 @@ extern "C" {
 #define likely(x)   __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
 
-
 #ifdef _WIN32
 /*
  * __attribute__((constructor)) just does not work on windows
@@ -46,6 +45,8 @@ extern "C" {
 			   CONCAT2(prefix, 2),			\
 			   CONCAT2(prefix, 1))(__VA_ARGS__)
 
+#define typeof_member(type, member) typeof(((type *)0)->member)
+
 #define sizeof_array(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 #define same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
@@ -54,12 +55,12 @@ extern "C" {
 # define static_assert(expr, message) _Static_assert(expr, message)
 #endif
 
-#define containerof(ptr, type, member)				\
-({								\
-	static_assert(same_type(*(ptr), ((type *)0)->member) ||	\
-		      same_type(*(ptr), void),			\
-		      "pointer type mismatch in containerof()");\
-	((type *)(((void *)ptr) - offsetof(type, member)));	\
+#define containerof(ptr, type, member)					\
+({									\
+	static_assert(same_type(*(ptr), typeof_member(type, member)) ||	\
+		      same_type(*(ptr), void),				\
+		      "pointer type mismatch in containerof()");	\
+	((type *)(((void *)ptr) - offsetof(type, member)));		\
 })
 
 #ifdef __cplusplus

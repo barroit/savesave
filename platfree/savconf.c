@@ -81,6 +81,40 @@ static inline int is_entry(const char *line, const char *prefix, char **ret)
 	return skip_prefix(line, prefix, ret) == 0 && isspace(**ret);
 }
 
+static int sizeof_file(const char *name, int fd, struct stat *st, void *data)
+{
+	off64_t size;
+
+	if (!st)
+		/*
+		 * we don’t handle symbolic links; a constant is given that is
+		 * large enough for most symbolic link files
+		 */
+		size = 64;
+	else
+		size = st->st_size;
+
+	*((off64_t *)data) += size;
+	return 0;
+}
+
+int calc_dir_size(const char *base, off64_t *size)
+{
+	int ret;
+	struct file_iter ctx;
+
+	file_iter_init(&ctx, base, sizeof_file, size);
+
+	ret = file_iter_exec(&ctx);
+	file_iter_destroy(&ctx);
+
+	if (ret)
+		return error("unable to calculate directory size for ‘%s’",
+			     base);
+
+	return 0;
+}
+
 static int parse_save(void *__save, struct savesave *conf)
 {
 	const char *save = *(const char **)__save;

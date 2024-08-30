@@ -10,6 +10,7 @@
 #include "alloc.h"
 #include "debug.h"
 #include "strbuf.h"
+#include "robio.h"
 
 static char *get_user_home(const char *user)
 {
@@ -35,98 +36,126 @@ const char *get_home_dir(void)
 	return home;
 }
 
-static int file_sizeof(const char *f, off_t *size)
+void file_iter_init(struct file_iter *ctx, const char *head,
+			file_iterator_cb_t cb, void *data)
 {
-	int err;
-	struct stat st;
+	memset(ctx, 0, sizeof(*ctx));
 
-	err = stat(f, &st);
-	if (err)
-		return error_errno("unable to get metadata for file ‘%s’", f);
+	ctx->head = head;
 
-	*size += st.st_size;
-	return 0;
+	ctx->sb = xmalloc(sizeof(*ctx->sb));
+	strbuf_init(ctx->sb, 0);
+
+	ctx->sl = xmalloc(sizeof(*ctx->sl));
+	strlist_init(ctx->sl, STRLIST_DUPSTR);
+
+	ctx->cb = cb;
+	ctx->data = data;
 }
 
-static int dirent_sizeof(struct strbuf *sb, off_t *size,
-			 struct dirent *ent, struct strlist *sl)
+void file_iter_destroy(struct file_iter *ctx)
 {
-	if (strcmp(ent->d_name, "..") == 0 ||  strcmp(ent->d_name, ".") == 0)
-		return 0;
-	if (strcmp(sb->str, "/") == 0)
-		strbuf_zerolen(sb);
+	strbuf_destroy(ctx->sb);
+	strlist_destroy(ctx->sl);
 
-	strbuf_concat(sb, "/");
-	strbuf_concat(sb, ent->d_name);
+	free(ctx->sb);
+	free(ctx->sl);
+}
+
+static int dispatch_file(struct file_iter *ctx, struct dirent *ent)
+{
+	int ret;
+	int fd;
+	struct stat *st = &(struct stat){ 0 };
+	const char *basename = ent->d_name;
+	const char *pathname;
+
+	if (strcmp(basename, "..") == 0 ||
+	    strcmp(basename, ".") == 0)
+		return 0;
+
+	if (strcmp(ctx->sb->str, "/") != 0)
+		strbuf_concat(ctx->sb, "/");
+	strbuf_concat(ctx->sb, basename);
+	pathname = ctx->sb->str;
 
 	switch (ent->d_type) {
 	case DT_REG:
-		return file_sizeof(sb->str, size);
-	case DT_DIR:
-		strlist_push2(sl, sb->str, 32);
+		fd = open(pathname, O_RDONLY);
+		if (fd == -1)
+			goto err_open_file;
+
+		ret = fstat(fd, st);
+		if (ret)
+			goto err_stat_file;
+
 		break;
+	case DT_DIR:
+		strlist_push2(ctx->sl, pathname, 32);
+		return 0;
 	case DT_LNK:
-		/*
-		 * we don’t handle symbolic links; a constant is given that is
-		 * large enough for most symbolic link files
-		 */
-		*size += 64;
+		fd = -1;
+		st = NULL;
 		break;
 	case DT_UNKNOWN:
-		return error("can’t determine file type of ‘%s’", sb->str);
+		return warn("can’t determine file type for ‘%s’", pathname);
 	default:
-		warn("‘%s’ has unsupported file type ‘%d’; file size retrieval for this file is skipped",
-		     sb->str, ent->d_type);
+		warn("‘%s’ has unsupported file type ‘%d’, skipped",
+		     pathname, ent->d_type);
+		return 0;
 	}
 
-	return 0;
+	ret = ctx->cb(pathname, fd, st, ctx->data);
+	close(fd);
+
+	return ret;
+
+err_stat_file:
+	close(fd);
+	return warn_errno("failed to retrieve information for file ‘%s’",
+			  pathname);
+err_open_file:
+	return warn_errno("failed to open file ‘%s’", pathname);
 }
 
-static int do_calc_dir_size(struct strbuf *sb, off_t *size, struct strlist *sl)
+static int do_iterate(struct file_iter *ctx)
 {
-	DIR *d = opendir(sb->str);
-	if (!d)
-		return error_errno("failed to open dir ‘%s’", sb->str);
+	const char *dirname = ctx->sb->str;
+	DIR *dir = opendir(dirname);
+	if (!dir)
+		return warn_errno("failed to open dir ‘%s’", dirname);
 
-	int err;
+	int ret;
 	struct dirent *ent;
-	size_t len = sb->len;
+	size_t dirlen = ctx->sb->len;
 
 	errno = 0;
-	while ((ent = readdir(d)) != NULL) {
-		err = dirent_sizeof(sb, size, ent, sl);
-		if (err) {
-			closedir(d);
-			return 1;
-		}
-
-		strbuf_truncate(sb, sb->len - len);
-	}
-	BUG_ON(errno != 0);
-	closedir(d);
-
-	return 0;
-}
-
-int calc_dir_size(const char *dir, off_t *size)
-{
-	int ret;
-	struct strlist sl;
-	struct strbuf sb = STRBUF_INIT;
-	const char *path = dir;
-
-	strlist_init(&sl, STRLIST_DUPSTR);
-	do {
-		strbuf_concat(&sb, path);
-
-		ret = do_calc_dir_size(&sb, size, &sl);
+	while ((ent = readdir(dir)) != NULL) {
+		ret = dispatch_file(ctx, ent);
 		if (ret)
 			break;
 
-		strbuf_zerolen(&sb);
-	} while ((path = strlist_pop2(&sl, 0)) != NULL);
+		strbuf_truncate(ctx->sb, ctx->sb->len - dirlen);
+	}
 
-	strlist_destroy(&sl);
-	strbuf_destroy(&sb);
+	closedir(dir);
 	return ret;
+}
+
+int file_iter_exec(struct file_iter *ctx)
+{
+	int ret;
+	const char *dir = ctx->head;
+
+	do {
+		strbuf_concat(ctx->sb, dir);
+
+		ret = do_iterate(ctx);
+		if (ret)
+			return 1;
+
+		strbuf_zerolen(ctx->sb);
+	} while ((dir = strlist_pop2(ctx->sl, 0)));
+
+	return 0;
 }

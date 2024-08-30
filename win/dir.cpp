@@ -13,7 +13,7 @@
 extern "C"{
 const char *get_home_dir(void);
 
-int calc_dir_size(const char *dir, off_t *size);
+int calc_dir_size(const char *dir, off64_t *size);
 
 char *dirname(char *path);
 }
@@ -70,7 +70,7 @@ static int do_calc_dir_size(const std::filesystem::path &dir,
 	return 0;
 }
 
-static int my_calc_dir_size(const char *dir, off_t *size)
+static int my_calc_dir_size(const char *dir, off64_t *size)
 {
 	int err;
 	char *path = xstrdup(dir);
@@ -93,15 +93,15 @@ static int my_calc_dir_size(const char *dir, off_t *size)
 		}
 	} while ((path = strlist_pop(&sl)) != NULL);
 
-	if (sz > max_int_val_of_type(off_t))
-		sz = max_int_val_of_type(off_t);
+	if (sz > max_int_val_of_type(off64_t))
+		sz = max_int_val_of_type(off64_t);
 	*size = sz;
 
 	strlist_destroy(&sl);
 	return 0;
 }
 
-int calc_dir_size(const char *dir, off_t *size)
+int calc_dir_size(const char *dir, off64_t *size)
 {
 	try {
 		return my_calc_dir_size(dir, size);

@@ -16,9 +16,11 @@ extern "C" {
 
 void alloc_limit_check(size_t n);
 
-void *xrealloc(void *p, size_t n);
+void *xrealloc(void *p, size_t size);
 
-void *xmalloc(size_t n);
+void *xmalloc(size_t size);
+
+void *xcalloc(size_t nmemb, size_t size);
 
 char *xstrdup(const char *src);
 

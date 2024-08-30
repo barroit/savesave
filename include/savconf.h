@@ -16,7 +16,7 @@ struct savesave {
 	char *name;
 
 	char *save;
-	off_t save_size;
+	off64_t save_size;
 	int is_dir_save;
 
 	char *backup;

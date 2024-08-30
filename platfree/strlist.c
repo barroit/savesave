@@ -73,6 +73,10 @@ size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc)
 	if (!sb->cap)
 		strlist_init_strbuf(sl, sb);
 
+	/*
+	 * keep track uninitialized strbuf position to avoid unexpacted
+	 * zore-cap in strlist_grow1()
+	 */
 	if (sl->uninit <= sl->nl)
 		sl->uninit = sl->nl;
 
