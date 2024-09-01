@@ -50,7 +50,7 @@ void strbuf_trim(struct strbuf *sb);
 
 size_t strbuf_cntchr(struct strbuf *sb, int c);
 
-void str_replace(char *s, int c, int v);
+void strrepl(char *s, int c, int v);
 
 #ifdef __cplusplus
 }

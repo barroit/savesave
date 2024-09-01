@@ -5,17 +5,18 @@
  * Contact: barroit@linux.com
  */
 
+#include "strbuf.h"
 #include "strlist.h"
-#include "alloc.h"
-#include "termsg.h"
+#include "robio.h"
+#include "win/termsg.hpp"
 #include "debug.h"
 
 extern "C"{
 const char *get_home_dir(void);
 
-int calc_dir_size(const char *dir, off64_t *size);
-
 char *dirname(char *path);
+
+int file_iter_do_exec(struct file_iter *ctx);
 }
 
 const char *get_home_dir()
@@ -23,99 +24,97 @@ const char *get_home_dir()
 	return getenv("USERPROFILE");
 }
 
-static int dirent_sizeof(uintmax_t *size,
-			 const std::filesystem::directory_entry &ent,
-			 struct strlist *sl)
-{
-	using std::filesystem::file_type;
-
-	const std::string &tmp = ent.path().string();
-	const char *path = tmp.c_str();
-	std::filesystem::file_type type = ent.status().type();
-
-	switch (type) {
-	case file_type::regular:
-		*size += ent.file_size();
-		break;
-	case file_type::directory:
-		strlist_push(sl, path);
-		break;
-	case file_type::symlink:
-		*size += 64;
-		break;
-	case file_type::unknown:
-		return error("can’t determine file type of ‘%s’", path);
-	default:
-		warn("‘%s’ has unsupported file type ‘%d’; file size retrieval for this file is skipped",
-		     path, static_cast<int>(type));
-	}
-
-	return 0;
-}
-
-static int do_calc_dir_size(const std::filesystem::path &dir,
-			    uintmax_t *size, struct strlist *sl)
-{
-	using std::filesystem::directory_entry;
-	using std::filesystem::directory_iterator;
-
-	int err;
-
-	for (const directory_entry &ent : directory_iterator(dir)) {
-		err = dirent_sizeof(size, ent, sl);
-		if (err)
-			return 1;
-	}
-
-	return 0;
-}
-
-static int my_calc_dir_size(const char *dir, off64_t *size)
-{
-	int err;
-	char *path = xstrdup(dir);
-	struct strlist sl = STRLIST_INIT_DUPE;
-	std::filesystem::path d = path;
-	/*
-	 * dir shall be an abs path, and if dir is abs path then, all
-	 * calls to the ent.path().c_str() will return abs path
-	 */
-	BUG_ON(d.is_relative());
-
-	uintmax_t sz = 0;
-	do {
-		d = path;
-		err = do_calc_dir_size(d, &sz, &sl);
-		free(path);
-		if (err) {
-			strlist_destroy(&sl);
-			return 1;
-		}
-	} while ((path = strlist_pop(&sl)) != NULL);
-
-	if (sz > max_int_val_of_type(off64_t))
-		sz = max_int_val_of_type(off64_t);
-	*size = sz;
-
-	strlist_destroy(&sl);
-	return 0;
-}
-
-int calc_dir_size(const char *dir, off64_t *size)
-{
-	try {
-		return my_calc_dir_size(dir, size);
-	} catch (const std::exception &e) {
-		return error("an exception occurred while calculating directory size for ‘%s’\n%s",
-			     dir, e.what());
-	}
-}
+/*
+ * we tried cpp17's file system, but the api is sucked, especially when coming
+ * with temporary object
+ */
 
 char *dirname(char *path)
 {
-	std::filesystem::path p = path;
-	const std::filesystem::path &dir = p.parent_path();
-	const std::string &tmp = dir.string();
-	memcpy(path, tmp.c_str(), tmp.length() + 1);
+	char drive[_MAX_DRIVE];
+	char dir[_MAX_DIR];
+
+	_splitpath(path, drive, dir, NULL, NULL);
+	memcpy(path, drive, 2);
+	memcpy(&path[2], dir, strlen(dir) + 1);
+
 	return path;
+}
+
+static int dispatch_file(struct file_iter *ctx, WIN32_FIND_DATA *ent)
+{
+	const char *basename = ent->cFileName;
+	const char *pathname;
+
+	if (strcmp(basename, "..") == 0 ||
+	    strcmp(basename, ".") == 0)
+		return 0;
+
+	if (ctx->sb->str[ctx->sb->len - 1] != '/')
+		strbuf_concat(ctx->sb, "/");
+	strbuf_concat(ctx->sb, basename);
+	pathname = ctx->sb->str;
+
+	/*
+	 * A reparse point could also have a FILE_ATTRIBUTE_DIRECTORY flag,
+	 * we need to figure out whether it is a symlink FIRST since we don't
+	 * want to open/traverse files/directories pointed by a symlink
+	 */
+	if (ent->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
+		return ctx->cb(pathname, -1, NULL, ctx->data);
+	} else if (ent->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+		strlist_push2(ctx->sl, pathname, 32);
+		return 0;
+	}
+
+	int ret;
+	struct stat st;
+
+	ret = stat(pathname, &st);
+	if (ret)
+		goto err_stat_file;
+
+	if (S_ISREG(st.st_mode)) {
+		int fd = open(pathname, O_RDONLY);
+		if (fd == -1)
+			goto err_open_file;
+
+		ret = ctx->cb(pathname, fd, &st, ctx->data);
+		close(fd);
+		return ret;
+	} else {
+		warn("‘%s’ has unsupported st_mode ‘%ud’, skipped",
+		     pathname, st.st_mode);
+		return 0;
+	}
+
+err_stat_file:
+	return warn_errno("failed to retrieve information for file ‘%s’",
+			  pathname);
+err_open_file:
+	return warn_errno("failed to open file ‘%s’", pathname);
+}
+
+int file_iter_do_exec(struct file_iter *ctx)
+{
+	int ret = 0;
+	WIN32_FIND_DATA ent;
+	const char *dirname = ctx->sb->str;
+	size_t dirlen = ctx->sb->len;
+
+	strbuf_concat(ctx->sb, "/*");
+	HANDLE dir = FindFirstFile(ctx->sb->str, &ent);
+	if (dir == INVALID_HANDLE_VALUE)
+		return warn_winerr("failed to open directory ‘%s’", dirname);
+
+	do {
+		ret = dispatch_file(ctx, &ent);
+		if (ret)
+			break;
+
+		strbuf_truncate(ctx->sb, ctx->sb->len - dirlen);
+	} while (FindNextFile(dir, &ent) != NULL);
+
+	FindClose(dir);
+	return ret;
 }

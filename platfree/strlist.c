@@ -31,6 +31,7 @@ void strlist_destroy(struct strlist *sl)
 	}
 
 	free(sl->list);
+	sl->cap = 0;
 }
 
 static int strlist_need_grow(struct strlist *sl)
@@ -55,11 +56,6 @@ static void strlist_init_strbuf(struct strlist *sl, struct strbuf *sb)
 		flag |= STRBUF_CONSTANT;
 
 	strbuf_init(sb, flag);
-}
-
-size_t strlist_push(struct strlist *sl, const char *str)
-{
-	return strlist_push2(sl, str, 0);
 }
 
 size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc)
@@ -100,8 +96,21 @@ char *strlist_pop2(struct strlist *sl, int dup)
 	return str;
 }
 
-void strlist_terminate(struct strlist *sl)
+char **strlist_dump2(struct strlist *sl, int destroy)
 {
-	strlist_grow1(sl);
-	memset(&sl->list[sl->nl], 0, sizeof(*sl->list));
+	size_t i;
+	size_t nl = sl->nl;
+	char **arr = xreallocarray(NULL, sizeof((*sl->list).str), sl->nl + 1);
+
+	for_each_idx(i, nl) {
+		arr[i] = xstrdup(sl->list[i].str);
+
+		if (destroy) {
+			strbuf_destroy(&sl->list[i]);
+			sl->nl--;
+		}
+	}
+
+	arr[nl] = NULL;
+	return arr;
 }

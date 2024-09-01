@@ -5,12 +5,11 @@
  * Contact: barroit@linux.com
  */
 
-#include "termsg.h"
-#include "strlist.h"
-#include "alloc.h"
-#include "debug.h"
-#include "strbuf.h"
 #include "robio.h"
+#include "strbuf.h"
+#include "strlist.h"
+#include "termsg.h"
+#include "debug.h"
 
 static char *get_user_home(const char *user)
 {
@@ -36,78 +35,22 @@ const char *get_home_dir(void)
 	return home;
 }
 
-void file_iter_init(struct file_iter *ctx, const char *head,
-			file_iterator_cb_t cb, void *data)
-{
-	memset(ctx, 0, sizeof(*ctx));
-
-	ctx->head = head;
-
-	ctx->sb = xmalloc(sizeof(*ctx->sb));
-	strbuf_init(ctx->sb, 0);
-
-	ctx->sl = xmalloc(sizeof(*ctx->sl));
-	strlist_init(ctx->sl, STRLIST_DUPSTR);
-
-	ctx->cb = cb;
-	ctx->data = data;
-}
-
-void file_iter_destroy(struct file_iter *ctx)
-{
-	strbuf_destroy(ctx->sb);
-	strlist_destroy(ctx->sl);
-
-	free(ctx->sb);
-	free(ctx->sl);
-}
-
-static int dispatch_file(struct file_iter *ctx, struct dirent *ent)
+static int dispatch_regfile(const char *name,
+			    file_iterator_cb_t cb, void *data)
 {
 	int ret;
-	int fd;
-	struct stat *st = &(struct stat){ 0 };
-	const char *basename = ent->d_name;
-	const char *pathname;
 
-	if (strcmp(basename, "..") == 0 ||
-	    strcmp(basename, ".") == 0)
-		return 0;
+	int fd = open(name, O_RDONLY);
+	if (fd == -1)
+		goto err_open_file;
 
-	if (strcmp(ctx->sb->str, "/") != 0)
-		strbuf_concat(ctx->sb, "/");
-	strbuf_concat(ctx->sb, basename);
-	pathname = ctx->sb->str;
+	struct stat st;
+	ret = fstat(fd, &st);
+	if (ret)
+		goto err_stat_file;
 
-	switch (ent->d_type) {
-	case DT_REG:
-		fd = open(pathname, O_RDONLY);
-		if (fd == -1)
-			goto err_open_file;
-
-		ret = fstat(fd, st);
-		if (ret)
-			goto err_stat_file;
-
-		break;
-	case DT_DIR:
-		strlist_push2(ctx->sl, pathname, 32);
-		return 0;
-	case DT_LNK:
-		fd = -1;
-		st = NULL;
-		break;
-	case DT_UNKNOWN:
-		return warn("can’t determine file type for ‘%s’", pathname);
-	default:
-		warn("‘%s’ has unsupported file type ‘%d’, skipped",
-		     pathname, ent->d_type);
-		return 0;
-	}
-
-	ret = ctx->cb(pathname, fd, st, ctx->data);
+	ret = cb(name, fd, &st, ctx->data);
 	close(fd);
-
 	return ret;
 
 err_stat_file:
@@ -118,7 +61,39 @@ err_open_file:
 	return warn_errno("failed to open file ‘%s’", pathname);
 }
 
-static int do_iterate(struct file_iter *ctx)
+static int dispatch_file(struct file_iter *ctx, struct dirent *ent)
+{
+	int ret;
+	const char *basename = ent->d_name;
+	const char *pathname;
+
+	if (strcmp(basename, "..") == 0 ||
+	    strcmp(basename, ".") == 0)
+		return 0;
+
+	if (ctx->sb->str[ctx->sb->len - 1] != '/')
+		strbuf_concat(ctx->sb, "/");
+	strbuf_concat(ctx->sb, basename);
+	pathname = ctx->sb->str;
+
+	switch (ent->d_type) {
+	case DT_REG:
+		return dispatch_regfile(pathname, ctx->cb, ctx->data);
+	case DT_DIR:
+		strlist_push2(ctx->sl, pathname, 32);
+		return 0;
+	case DT_LNK:
+		return ctx->cb(name, -1, NULL, ctx->data);
+	case DT_UNKNOWN:
+		return warn("can’t determine file type for ‘%s’", pathname);
+	default:
+		warn("‘%s’ has unsupported file type ‘%d’, skipped",
+		     pathname, ent->d_type);
+		return 0;
+	}
+}
+
+int file_iter_do_exec(struct file_iter *ctx)
 {
 	const char *dirname = ctx->sb->str;
 	DIR *dir = opendir(dirname);
@@ -140,22 +115,4 @@ static int do_iterate(struct file_iter *ctx)
 
 	closedir(dir);
 	return ret;
-}
-
-int file_iter_exec(struct file_iter *ctx)
-{
-	int ret;
-	const char *dir = ctx->head;
-
-	do {
-		strbuf_concat(ctx->sb, dir);
-
-		ret = do_iterate(ctx);
-		if (ret)
-			return 1;
-
-		strbuf_zerolen(ctx->sb);
-	} while ((dir = strlist_pop2(ctx->sl, 0)));
-
-	return 0;
 }

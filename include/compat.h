@@ -10,6 +10,19 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
+/*
+ * include MSVC's <atomic> with stdatomic.h provided by clang, will cause
+ * function signature conflicting
+ * 
+ * clang --- void atomic_thread_fence(memory_order)
+ * conflicts
+ * MSVC  --- _EXPORT_STD extern "C" inline void atomic_thread_fence(const
+ *           memory_order _Order) noexcept
+ */
+#ifdef _WIN32
+# define _ATOMIC_
+#endif
+
 #ifdef __cplusplus
 # include <new>
 # include <iomanip>
@@ -79,13 +92,11 @@ extern "C" {
 
 #define read	_read
 #define write	_write
-#define open	_open
-#define close	_close
 #define strdup	_strdup
 #define access	_access
 #define fileno	_fileno
 #define dup2	_dup2
-#define mkdir  _mkdir
+#define mkdir	_mkdir
 
 #define F_OK 00
 #define W_OK 02
@@ -103,6 +114,10 @@ extern "C" {
 
 #define SSIZE_MAX INT64_MAX
 typedef SSIZE_T ssize_t;
+
+typedef unsigned int mode_t;
+
+typedef off_t off64_t;
 
 char *strchrnul(const char *s, int c);
 char *dirname(char *path);

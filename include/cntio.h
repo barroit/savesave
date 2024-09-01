@@ -16,14 +16,18 @@ int cntopen2(const char *file, int oflag);
 int cntopen3(const char *file, int oflag, mode_t mode);
 #define open(...) FLEXCALL_FUNCTION3(cntopen, __VA_ARGS__)
 
-DIR *cntopendir(const char *name);
-#define opendir cntopendir
-
 int cntclose(int fd);
 #define close cntclose
 
+#ifdef __linux__
+
+DIR *cntopendir(const char *name);
+#define opendir cntopendir
+
 int cntclosedir(DIR *dirp);
 #define closedir cntclosedir
+
+#endif
 
 /* more over, dup, pipe... */
 

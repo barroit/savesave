@@ -20,6 +20,7 @@ void strbuf_init(struct strbuf *sb, flag_t flags)
 void strbuf_destroy(struct strbuf *sb)
 {
 	free(sb->str);
+	sb->cap = 0;
 }
 
 /*
@@ -123,7 +124,7 @@ size_t strbuf_cntchr(struct strbuf *sb, int c)
 	return cnt;
 }
 
-void str_replace(char *s, int c, int v)
+void strrepl(char *s, int c, int v)
 {
 	while ((s = strchr(s, c)) != NULL)
 		*s++ = v;

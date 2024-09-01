@@ -34,24 +34,26 @@ void strlist_init(struct strlist *sl, flag_t flags);
  */
 void strlist_destroy(struct strlist *sl);
 
-size_t strlist_push(struct strlist *sl, const char *str);
-
 size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc);
 
-/*
- * return value shall be freed by caller
- */
-#define strlist_pop(sl) strlist_pop2(sl, 1)
+static inline size_t strlist_push(struct strlist *sl, const char *str)
+{
+	return strlist_push2(sl, str, 0);
+}
 
-/*
- * if dup is 0, the return value is valid until the next call to strlist_push()
- */
 char *strlist_pop2(struct strlist *sl, int dup);
 
-/*
- * Make strlist more ‘argv-like’
- */
-void strlist_terminate(struct strlist *sl);
+static inline char *strlist_pop(struct strlist *sl)
+{
+	return strlist_pop2(sl, 1);
+}
+
+char **strlist_dump2(struct strlist *sl, int destroy);
+
+static inline char **strlist_dump(struct strlist *sl)
+{
+	return strlist_dump2(sl, 1);
+}
 
 #ifdef __cplusplus
 }

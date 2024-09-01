@@ -15,15 +15,17 @@ void uarg_parser::dump_cmdline(const char *cmdline)
 {
 	std::string line = std::string(APPNAME) + " " + std::string(cmdline);
 	std::istringstream stream(std::move(line));
-	std::string val;
-	struct strlist sl = STRLIST_INIT_DUPE;
+	std::string opt;
+	struct strlist sl;
 
-	while (stream >> std::quoted(val))
-		strlist_push(&sl, val.c_str());
-	strlist_terminate(&sl);
+	strlist_init(&sl, STRLIST_DUPSTR);
+	while (stream >> std::quoted(opt))
+		strlist_push(&sl, opt.c_str());
 
-	argv = sl.list;
 	argc = sl.nl;
+	argv = strlist_dump(&sl);
+
+	strlist_destroy(&sl);
 }
 
 void uarg_parser::parse_cmdline()
@@ -43,7 +45,7 @@ void uarg_parser::parse_savconf()
 	size_t i;
 	for_each_idx(i, nconf) {
 		struct savesave *c = &savconf[i];
-		str_replace(c->save, '\\', '/');
-		str_replace(c->backup, '\\', '/');
+		strrepl(c->save, '\\', '/');
+		strrepl(c->backup, '\\', '/');
 	}
 }

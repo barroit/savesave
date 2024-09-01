@@ -55,6 +55,17 @@ void *xcalloc(size_t nmemb, size_t size)
 	return ptr;
 }
 
+void *xreallocarray(void *ptr, size_t nmemb, size_t size)
+{
+	size_t tot = st_mult(nmemb, size);
+	alloc_limit_check(tot);
+
+	ptr = xrealloc(ptr, tot);
+	alloced_or_die(ptr, tot);
+
+	return ptr;
+}
+
 char *xstrdup(const char *src)
 {
 	char *str = strdup(src);

@@ -22,6 +22,8 @@ void *xmalloc(size_t size);
 
 void *xcalloc(size_t nmemb, size_t size);
 
+void *xreallocarray(void *ptr, size_t nmemb, size_t size);
+
 char *xstrdup(const char *src);
 
 #define REALLOC_ARRAY(p, n) xrealloc(p, st_mult(sizeof(*(p)), n))

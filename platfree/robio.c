@@ -62,6 +62,9 @@ ssize_t robwrite(int fd, const void *buf, size_t n)
 
 #ifdef open
 # undef open
+# ifdef _WIN32
+#  define open _open
+# endif
 #endif
 
 int robopen2(const char *file, int oflag)
@@ -85,6 +88,9 @@ int robopen3(const char *file, int oflag, mode_t mode)
 
 #ifdef close
 # undef close
+# ifdef _WIN32
+#  define close _close
+# endif
 #endif
 
 int robclose(int fd)

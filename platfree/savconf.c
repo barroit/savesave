@@ -118,7 +118,6 @@ int calc_dir_size(const char *base, off64_t *size)
 static int parse_save(void *__save, struct savesave *conf)
 {
 	const char *save = *(const char **)__save;
-
 	int err;
 	struct stat st;
 
@@ -145,7 +144,6 @@ static int parse_save(void *__save, struct savesave *conf)
 static int prepare_backup(void *__backup, struct savesave *_)
 {
 	const char *backup = *(const char **)__backup;
-
 	int err;
 
 	err = my_mkdir(backup);
