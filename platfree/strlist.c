@@ -96,21 +96,23 @@ char *strlist_pop2(struct strlist *sl, int dup)
 	return str;
 }
 
-char **strlist_dump2(struct strlist *sl, int destroy)
+char **strlist_dump(struct strlist *sl)
 {
 	size_t i;
 	size_t nl = sl->nl;
 	char **arr = xreallocarray(NULL, sizeof((*sl->list).str), sl->nl + 1);
 
-	for_each_idx(i, nl) {
+	for_each_idx(i, nl)
 		arr[i] = xstrdup(sl->list[i].str);
-
-		if (destroy) {
-			strbuf_destroy(&sl->list[i]);
-			sl->nl--;
-		}
-	}
 
 	arr[nl] = NULL;
 	return arr;
+}
+
+void destroy_dumped_strlist(char **arr)
+{
+	char **p = arr;
+	while (*p != NULL)
+		free(*p++);
+	free(arr);
 }

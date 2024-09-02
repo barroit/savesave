@@ -49,21 +49,20 @@ static int dispatch_regfile(const char *name,
 	if (ret)
 		goto err_stat_file;
 
-	ret = cb(name, fd, &st, ctx->data);
+	ret = cb(name, fd, &st, data);
 	close(fd);
 	return ret;
 
 err_stat_file:
 	close(fd);
 	return warn_errno("failed to retrieve information for file ‘%s’",
-			  pathname);
+			  name);
 err_open_file:
-	return warn_errno("failed to open file ‘%s’", pathname);
+	return warn_errno("failed to open file ‘%s’", name);
 }
 
 static int dispatch_file(struct file_iter *ctx, struct dirent *ent)
 {
-	int ret;
 	const char *basename = ent->d_name;
 	const char *pathname;
 
@@ -83,7 +82,7 @@ static int dispatch_file(struct file_iter *ctx, struct dirent *ent)
 		strlist_push2(ctx->sl, pathname, 32);
 		return 0;
 	case DT_LNK:
-		return ctx->cb(name, -1, NULL, ctx->data);
+		return ctx->cb(pathname, -1, NULL, ctx->data);
 	case DT_UNKNOWN:
 		return warn("can’t determine file type for ‘%s’", pathname);
 	default:

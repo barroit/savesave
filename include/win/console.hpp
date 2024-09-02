@@ -8,9 +8,6 @@
 #pragma once
 
 class console {
-	/*
-	 * console properties
-	 */
 	FILE *stream;
 	HWND handle;
 	bool is_live;
@@ -18,19 +15,23 @@ class console {
 public:
 	console() : stream(NULL), handle(NULL), is_live(1) {}
 
+#ifdef CONFIG_DISABLE_CONSOLE_OUTPUT
+	inline void setup_console() {}
+
+	inline void hide_console() {}
+	inline void show_console() {}
+
+	void redirect_stdio(const char *output) {}
+
+	inline bool is_active() { return false; }
+#else
 	void setup_console();
 
-	/**
-	 * hide_console - hide the console
-	 * 
-	 * note: by default, the console is not hidden when debugging
-	 */
 	inline void hide_console()
 	{
-#ifndef NDEBUG
-		return;
-#endif
+# ifndef NDEBUG
 		ShowWindow(handle, SW_HIDE);
+# endif
 	}
 
 	inline void show_console()
@@ -44,6 +45,7 @@ public:
 	{
 		return is_live;
 	}
+#endif
 };
 
 class console *get_console();

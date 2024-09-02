@@ -32,9 +32,6 @@ else()
   set(CMAKE_CXX_COMPILER ${CONFIG_CXX_NAME})
 endif()
 
-# Let us handle flags
-set(CMAKE_BUILD_TYPE "")
-
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_EXTENSIONS true)
 set(CMAKE_C_STANDARD_REQUIRED ON)

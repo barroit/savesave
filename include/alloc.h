@@ -16,6 +16,8 @@ extern "C" {
 
 void alloc_limit_check(size_t n);
 
+void alloced_or_die(void *ptr, size_t size);
+
 void *xrealloc(void *p, size_t size);
 
 void *xmalloc(size_t size);

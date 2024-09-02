@@ -5,7 +5,8 @@
  * Contact: barroit@linux.com
  */
 
-void count_add1(void);
+void cntio_cntadd1(void);
+void cntio_cntsub1(void);
 
 #ifdef opendir
 # undef opendir
@@ -21,7 +22,7 @@ DIR *cntopendir(const char *name)
 	if (dir == NULL)
 		return NULL;
 
-	count_add1();
+	cntio_cntadd1();
 	return dir;
 }
 
@@ -33,6 +34,6 @@ int cntclosedir(DIR *dirp)
 	if (err)
 		return -1;
 
-	count_sub1();
+	cntio_cntsub1();
 	return 0;
 }

@@ -56,9 +56,8 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	constructor.precheck();
 
 	uarg_parser parser;
-	parser.dump_cmdline(cmdline);
 
-	parser.parse_cmdline();
+	parser.parse_cmdline(cmdline);
 	if (parser.args.output)
 		con.redirect_stdio(parser.args.output);
 	else 
@@ -70,7 +69,6 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 		    parser.args.savconf);
 	DEBUG_RUN()
 		print_savconf(parser.savconf, parser.nconf);
-	exit(1);
 	// backup bu{ parser.nconf };
 	// bu.create_backup_task(parser.savconf);
 

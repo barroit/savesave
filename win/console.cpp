@@ -9,6 +9,8 @@
 #include "termsg.h"
 #include "debug.h"
 
+#ifndef CONFIG_DISABLE_CONSOLE_OUTPUT
+
 void console::setup_console()
 {
 	int err;
@@ -47,3 +49,5 @@ void console::redirect_stdio(const char *output)
 	stream = NULL;
 	FreeConsole();
 }
+
+#endif /* CONFIG_DISABLE_CONSOLE_OUTPUT */

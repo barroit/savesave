@@ -48,12 +48,9 @@ static inline char *strlist_pop(struct strlist *sl)
 	return strlist_pop2(sl, 1);
 }
 
-char **strlist_dump2(struct strlist *sl, int destroy);
+char **strlist_dump(struct strlist *sl);
 
-static inline char **strlist_dump(struct strlist *sl)
-{
-	return strlist_dump2(sl, 1);
-}
+void destroy_dumped_strlist(char **arr);
 
 #ifdef __cplusplus
 }

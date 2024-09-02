@@ -116,3 +116,14 @@ config LINK_LIBZSTD_STATIC
 	bool "link against libzstd static library"
 
 endmenu # "Zstandard"
+
+menu "Debugging"
+
+config DISABLE_CONSOLE_OUTPUT
+	bool "disable console output"
+	depends on $(BUILD) = "windows"
+
+config SUPPRESS_LEAK_REPORT
+	bool "keep reference to unreleased memory"
+
+endmenu # "Debugging"

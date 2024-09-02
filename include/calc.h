@@ -25,6 +25,9 @@ extern "C" {
 #define uint_mult_overflows(a, b) \
 	((a) && ((b) > (max_uint_val_of_type(a) / (a))))
 
+#define uint_add_overflows(a, b) \
+    ((b) > max_uint_val_of_type(a) - (a))
+
 extern NORETURN __die_routine(const char *, const char *, const char *, ...);
 
 #define st_mult(a, b)							\
@@ -34,7 +37,17 @@ extern NORETURN __die_routine(const char *, const char *, const char *, ...);
 			      "%" PRIuMAX " * %" PRIuMAX ,		\
 			      (uintmax_t)(a), (uintmax_t)(b));		\
 	}								\
-	(a) * (b);							\
+	((a) * (b));							\
+})
+
+#define st_add(a, b)							\
+({									\
+	if (unlikely(uint_add_overflows(a, b))) {			\
+		__die_routine("fatal: ", NULL, "size overflow: "	\
+			      "%" PRIuMAX " + %" PRIuMAX ,		\
+			      (uintmax_t)(a), (uintmax_t)(b));		\
+	}								\
+	((a) + (b));							\
 })
 
 #ifdef __cplusplus

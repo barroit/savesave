@@ -15,12 +15,12 @@
 
 static atomic_uint fd_count = 0;
 
-void count_add1(void)
+void cntio_cntadd1(void)
 {
 	atomic_fetch_add(&fd_count, 1);
 }
 
-void count_sub1(void)
+void cntio_cntsub1(void)
 {
 	atomic_fetch_sub(&fd_count, 1);
 	BUG_ON(atomic_load(&fd_count) == UINT_MAX);
@@ -37,7 +37,7 @@ int cntopen3(const char *file, int oflag, mode_t mode)
 	if (fd == -1)
 		return -1;
 
-	count_add1();
+	cntio_cntadd1();
 	return fd;
 }
 
@@ -49,6 +49,6 @@ int cntclose(int fd)
 	if (err)
 		return -1;
 
-	count_sub1();
+	cntio_cntsub1();
 	return 0;
 }

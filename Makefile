@@ -20,8 +20,8 @@ clean:
 	@make -C $(abs_build) clean
 
 distclean:
-	@rm -f $(abs_root)/include/generated/*
-	@rm -rf $(abs_build)/*
+	@rm -rf $(abs_root)/include/generated
+	@rm -rf $(abs_build)
 	@rm -f $(abs_root)/.config*
 
 .PHONY: menuconfig
