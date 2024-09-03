@@ -14,7 +14,9 @@ extern "C" {
 
 struct savesave;
 
-int backup_routine(const struct savesave *c);
+int backup_routine(struct savesave *c);
+
+int copy_file(const char *src, int fd1, struct stat *st, const char *dest);
 
 #ifdef __cplusplus
 }

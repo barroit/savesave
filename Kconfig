@@ -88,14 +88,6 @@ config CNTRL_CHAR_REPLACEMENT
 	string "control char replacement"
 	default "�"
 
-config DO_COMPRESS_THRESHOLD
-	int "size threshold for compression (in KB)"
-	default 30720
-
-config DO_SNAPSHOT_THRESHOLD
-	int "size threshold for creating snapshot (in MB)"
-	default 102400
-
 config DEFAULT_SAVCONF_BASENAME
 	string "basename of savconf"
 	default ".savesave"
@@ -105,10 +97,30 @@ config DEFAULT_SAVCONF_ENVNAME
 	default "SAVESAVE"
 
 config ARCHIVE_EXTENTION
-	string "file extension of archive file (no dot)"
+	string "file extension for archive file (no dot)"
 	default "zst"
 
+config TEMPORARY_EXTENTION
+	string "file extension for temporary directory (no dot)"
+	default "tmp"
+
 endmenu # "Features"
+
+menu "Threshold"
+
+config DO_COMPRESS_THRESHOLD
+	int "size threshold for compression (in KiB)"
+	default 30720
+
+config DO_SNAPSHOT_THRESHOLD
+	int "threshold for creating snapshot (in MiB)"
+	default 102400
+
+config DO_MMAP_THRESHOLD
+	int "threshold for using mmap (in MiB)"
+	default 102400
+
+endmenu # "Threshold"
 
 menu "Zstandard"
 

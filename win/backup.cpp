@@ -31,7 +31,7 @@ backup::~backup()
 static void do_backup(void *conf, unsigned char)
 {
 	int err;
-	const struct savesave *c = (struct savesave *)conf;
+	struct savesave *c = (struct savesave *)conf;
 
 	err = backup_routine(c);
 	if (err)

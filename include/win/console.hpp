@@ -7,6 +7,10 @@
 
 #pragma once
 
+#ifdef CONFIG_DISABLE_CONSOLE_OUTPUT
+# define _getch() do {} while (0)
+#endif
+
 class console {
 	FILE *stream;
 	HWND handle;
@@ -21,7 +25,7 @@ public:
 	inline void hide_console() {}
 	inline void show_console() {}
 
-	void redirect_stdio(const char *output) {}
+	inline void redirect_stdio(const char *output) {}
 
 	inline bool is_active() { return false; }
 #else

@@ -10,12 +10,12 @@
 #include "strbuf.h"
 #include "strlist.h"
 
-void file_iter_init(struct file_iter *ctx, const char *head,
-			file_iterator_cb_t cb, void *data)
+void file_iter_init(struct file_iter *ctx, const char *root,
+		    file_iterator_cb_t cb, void *data)
 {
 	memset(ctx, 0, sizeof(*ctx));
 
-	ctx->head = head;
+	ctx->root = root;
 
 	ctx->sb = xmalloc(sizeof(*ctx->sb));
 	strbuf_init(ctx->sb, 0);
@@ -41,7 +41,7 @@ int file_iter_do_exec(struct file_iter *ctx);
 int file_iter_exec(struct file_iter *ctx)
 {
 	int ret;
-	const char *dir = ctx->head;
+	const char *dir = ctx->root;
 
 	do {
 		strbuf_concat(ctx->sb, dir);

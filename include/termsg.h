@@ -40,6 +40,14 @@ NORETURN bug_routine(const char *file, int line,
 
 int redirect_stdio(const char *filename);
 
+/* error messages */
+#define ERR_OPEN_FILE "failed to open file ‘%s’"
+#define ERR_OPEN_DIR  "failed to open directory ‘%s’"
+
+#define ERR_STAT_FILE "failed to retrieve information for file ‘%s’"
+
+#define ERR_ACCESS_FILE "failed to access ‘%s’"
+
 #ifdef __cplusplus
 }
 #endif

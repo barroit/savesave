@@ -44,16 +44,25 @@ char *dirname(char *path)
 static int dispatch_file(struct file_iter *ctx, WIN32_FIND_DATA *ent)
 {
 	const char *basename = ent->cFileName;
-	const char *pathname;
+	const char *absname, *relname;
 
-	if (strcmp(basename, "..") == 0 ||
-	    strcmp(basename, ".") == 0)
+	if (is_dir_indicator(basename))
 		return 0;
 
 	if (ctx->sb->str[ctx->sb->len - 1] != '/')
 		strbuf_concat(ctx->sb, "/");
 	strbuf_concat(ctx->sb, basename);
-	pathname = ctx->sb->str;
+
+	absname = ctx->sb->str;
+	relname = straftr(absname, ctx->root);
+	BUG_ON(!relname);
+
+	struct file_iter_src src = {
+		.absname = absname,
+		.relname = relname,
+		.fd      = -1,
+		.st      = NULL,
+	};
 
 	/*
 	 * A reparse point could also have a FILE_ATTRIBUTE_DIRECTORY flag,
@@ -61,38 +70,34 @@ static int dispatch_file(struct file_iter *ctx, WIN32_FIND_DATA *ent)
 	 * want to open/traverse files/directories pointed by a symlink
 	 */
 	if (ent->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
-		return ctx->cb(pathname, -1, NULL, ctx->data);
+		return ctx->cb(&src, ctx->data);
 	} else if (ent->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-		strlist_push2(ctx->sl, pathname, 32);
+		strlist_push2(ctx->sl, absname, 32);
 		return 0;
 	}
 
 	int ret;
 	struct stat st;
 
-	ret = stat(pathname, &st);
+	ret = stat(absname, &st);
 	if (ret)
-		goto err_stat_file;
+		return warn_errno(ERR_STAT_FILE, absname);
 
+	src.st = &st;
 	if (S_ISREG(st.st_mode)) {
-		int fd = open(pathname, O_RDONLY);
+		int fd = open(absname, O_RDONLY);
 		if (fd == -1)
-			goto err_open_file;
+			return warn_errno(ERR_OPEN_FILE, absname);
 
-		ret = ctx->cb(pathname, fd, &st, ctx->data);
+		src.fd = fd;
+		ret = ctx->cb(&src, ctx->data);
 		close(fd);
 		return ret;
 	} else {
 		warn("‘%s’ has unsupported st_mode ‘%ud’, skipped",
-		     pathname, st.st_mode);
+		     absname, st.st_mode);
 		return 0;
 	}
-
-err_stat_file:
-	return warn_errno("failed to retrieve information for file ‘%s’",
-			  pathname);
-err_open_file:
-	return warn_errno("failed to open file ‘%s’", pathname);
 }
 
 int file_iter_do_exec(struct file_iter *ctx)

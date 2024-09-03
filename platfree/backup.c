@@ -5,12 +5,15 @@
  * Contact: barroit@linux.com
  */
 
+#include "backup.h"
 #include "savconf.h"
 #include "debug.h"
 #include "strbuf.h"
 #include "list.h"
 #include "termsg.h"
 #include "barroit/limits.h"
+#include "robio.h"
+#include "alloc.h"
 
 static char stru8_map[UINT8_MAX + 1][STRU8_MAX];
 
@@ -62,7 +65,7 @@ static int sort_backup(char *src, char *srcend, u8 stack, int *has_room)
 				return 1;
 			room++;
 		} else if (errno != ENOENT) {
-			return warn_errno("failed to access ‘%s’", src);
+			return warn_errno(ERR_ACCESS_FILE, src);
 		}
 
 		if (room == -1)
@@ -99,26 +102,20 @@ static int find_next_room(char *str, char *strend, u8 stack)
 			memcpy(strend, stru8_map[i + 1], sizeof(*stru8_map));
 			return 0;
 		} else if (errno != ENOENT) {
-			return warn_errno("failed to access ‘%s’", str);
+			return warn_errno(ERR_ACCESS_FILE, str);
 		}
 	}
 
 	BUG_ON(1);
 }
 
-int backup_routine(const struct savesave *c)
+static int request_next_room(const struct savesave *c, char *path)
 {
 	int err;
-
-	if (c->use_snapshot) {
-		/* create snapshot here */
-	}
-
-	char path[PATH_MAX];
 	char *pathend = path + c->backup_len;
-	memcpy(path, c->backup, c->backup_len);
-
 	int has_room;
+
+	memcpy(path, c->backup, c->backup_len);
 	err = sort_backup(path, pathend, c->stack, &has_room);
 	if (err)
 		goto err_sort_backup;
@@ -138,19 +135,80 @@ int backup_routine(const struct savesave *c)
 		return error("unable to find next backup file name of configuration ‘%s’",
 			     c->name);
 
-	DEBUG_RUN() {
-		printf("next backup name\n\t%s\n", path);
-		fflush(stdout);
-	}
-
-	if (c->use_compress) {
-		//
-	}
-
 	return 0;
 
 err_sort_backup:
 	*pathend = '*';
 	return error("unable to sort backup ‘%s’ of configuration ‘%s’",
 		     path, c->name);
+}
+
+int copy_file(const char *src, int fd1, struct stat *st, const char *dest);
+
+static FILE_ITER_CALLBACK(backup_file_compress)
+{
+	const struct savesave *c = data;
+
+	return 0;
+}
+
+static FILE_ITER_CALLBACK(backup_file_copy)
+{
+	const struct savesave *c = data;
+
+	// puts(src->absname);
+	// copy_file(src, fd, st, c->backup);
+	return 0;
+}
+
+static int do_backup(struct savesave *c)
+{
+	int ret;
+	struct file_iter ctx;
+	if (c->use_compress)
+		file_iter_init(&ctx, c->save, backup_file_compress, c);
+	else
+		file_iter_init(&ctx, c->save, backup_file_copy, c);
+
+	ret = file_iter_exec(&ctx);
+	file_iter_destroy(&ctx);
+
+	return ret;
+}
+
+static char *tmpdir_of_backup(const char *backup, size_t len)
+{
+	size_t ext = sizeof(CONFIG_TEMPORARY_EXTENTION);
+	char *ret = xmalloc(len + ext);
+
+	memcpy(ret, backup, len);
+	memcpy(&ret[len], CONFIG_TEMPORARY_EXTENTION, ext);
+
+	return ret;
+}
+
+int backup_routine(struct savesave *c)
+{
+	int ret;
+
+	char dest[PATH_MAX];
+	ret = request_next_room(c, dest);
+	if (ret)
+		return ret;
+
+	char *temp = tmpdir_of_backup(c->backup, c->backup_len);
+
+	DEBUG_RUN() {
+		printf("next backup name\n\t%s\n", dest);
+		fflush(stdout);
+	}
+
+	if (c->use_snapshot) {
+		/* create snapshot here */
+	}
+
+	ret = do_backup(c);
+
+	free(temp);
+	return ret;
 }

@@ -81,18 +81,18 @@ static inline int is_entry(const char *line, const char *prefix, char **ret)
 	return skip_prefix(line, prefix, ret) == 0 && isspace(**ret);
 }
 
-static int sizeof_file(const char *name, int fd, struct stat *st, void *data)
+static FILE_ITER_CALLBACK(sizeof_file)
 {
 	off64_t size;
 
-	if (!st)
+	if (!src->st)
 		/*
 		 * we don’t handle symbolic links; a constant is given that is
 		 * large enough for most symbolic link files
 		 */
 		size = 64;
 	else
-		size = st->st_size;
+		size = src->st->st_size;
 
 	*((off64_t *)data) += size;
 	return 0;
