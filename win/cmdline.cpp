@@ -52,7 +52,7 @@ void uarg_parser::parse_savconf()
 	size_t i;
 	for_each_idx(i, nconf) {
 		struct savesave *c = &savconf[i];
-		strrepl(c->save, '\\', '/');
-		strrepl(c->backup, '\\', '/');
+		strrepl(c->save_prefix, '\\', '/');
+		strrepl(c->backup_prefix, '\\', '/');
 	}
 }

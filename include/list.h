@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 #include "calc.h"
-#include "debug.h"
+#include "poison.h"
 
 struct list_head {
 	struct list_head *prev;

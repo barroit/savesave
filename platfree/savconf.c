@@ -211,9 +211,9 @@ static int assign_entry(const char *line, char **rest,
 			const struct savesave *conf, struct confent *ent)
 {
 	if (is_entry(line, "save", rest))
-		SETENT(ent, "save", &conf->save, parse_save, STRING);
+		SETENT(ent, "save", &conf->save_prefix, parse_save, STRING);
 	else if (is_entry(line, "backup", rest))
-		SETENT(ent, "backup", &conf->backup, prepare_backup, STRING);
+		SETENT(ent, "backup", &conf->backup_prefix, prepare_backup, STRING);
 	else if (is_entry(line, "period", rest))
 		SETENT(ent, "period", &conf->period, check_period, TIMESPAN);
 	else if (is_entry(line, "stack", rest))
@@ -298,9 +298,9 @@ static void validate_savconf(const struct savesave *c)
 {
 	struct strbuf sb = STRBUF_INIT;
 
-	if (!c->save)
+	if (!c->save_prefix)
 		strbuf_concat(&sb, "\tsave\n");
-	if (!c->backup)
+	if (!c->backup_prefix)
 		strbuf_concat(&sb, "\tbackup\n");
 	if (!c->period)
 		strbuf_concat(&sb, "\tperiod\n");
@@ -315,32 +315,17 @@ static void validate_savconf(const struct savesave *c)
 	    c->name, lines > 1 ? "s" : "", sb.str);
 }
 
-static void update_backup_path(struct savesave *c)
+static void update_backup_prefix(struct savesave *c)
 {
-	char *path = c->backup;
-	size_t extlen = sizeof(CONFIG_ARCHIVE_EXTENTION) - 1;
-	size_t dotlen = 1;
-	size_t size = strlen(c->backup) + strlen(c->name) + dotlen +
-		      extlen + dotlen + STRU8_MAX;
+	struct strbuf sb = STRBUF_INIT;
+	if (c->use_compress)
+		strbuf_printf(&sb, "%s/%s.%s.", c->backup_prefix,
+			      c->name, CONFIG_ARCHIVE_EXTENTION);
+	else
+		strbuf_printf(&sb, "%s/%s.", c->backup_prefix, c->name);
 
-	if (size > PATH_MAX ||
-	    (!c->use_compress && size - extlen - dotlen > PATH_MAX))
-		die("backup path ‘%s’ of configuration ‘%s’ is too long",
-		    c->backup, c->name);
-
-	c->backup = xmalloc(size);
-	int n = snprintf(c->backup, size, "%s/%s.", path, c->name);
-	BUG_ON(n < 0);
-
-	if (c->use_compress) {
-		int nn = snprintf(&c->backup[n], extlen + dotlen + 1,
-				  "%s.", CONFIG_ARCHIVE_EXTENTION);
-		BUG_ON(nn < 0);
-		n += nn;
-	}
-
-	c->backup_len = n;
-	free(path);
+	free(c->backup_prefix);
+	c->backup_prefix = sb.str;
 }
 
 static void post_parse_savconf(struct savesave *conf, size_t nl)
@@ -360,7 +345,7 @@ static void post_parse_savconf(struct savesave *conf, size_t nl)
 		    c->save_size > CONFIG_DO_SNAPSHOT_THRESHOLD)
 			c->use_snapshot = 1;
 
-		update_backup_path(c);
+		update_backup_prefix(c);
 	}
 }
 
@@ -434,7 +419,7 @@ void print_savconf(const struct savesave *conf, size_t nl)
 		       "\tstack\t %" PRIu8 "\n"
 		       "\tsnapshot %d\n"
 		       "\tzip\t %d\n\n",
-		       c->name, c->save, size, c->is_dir_save, c->backup,
+		       c->name, c->save_prefix, size, c->is_dir_save, c->backup_prefix,
 		       c->period, c->stack, c->use_snapshot, c->use_compress);
 	}
 }

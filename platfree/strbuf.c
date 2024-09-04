@@ -8,6 +8,7 @@
 #include "strbuf.h"
 #include "alloc.h"
 #include "debug.h"
+#include "poison.h"
 
 void strbuf_init(struct strbuf *sb, flag_t flags)
 {
@@ -17,14 +18,24 @@ void strbuf_init(struct strbuf *sb, flag_t flags)
 		sb->is_const = 1;
 }
 
+struct strbuf strbuf_from2(const char *str, flag_t _, size_t extalloc)
+{
+	struct strbuf sb = STRBUF_INIT;
+
+	sb.initlen = strbuf_concat2(&sb, str, extalloc);
+	return sb;
+}
+
 void strbuf_destroy(struct strbuf *sb)
 {
 	free(sb->str);
+	sb->str = STRBUF_POISON;
 	sb->cap = 0;
 }
 
 /*
- * Grow strbuf capacity by n (exclude null terminator)
+ * Grow capacity by n (exclude null terminator) if the available space is less
+ * than space required
  */
 static void strbuf_growlen(struct strbuf *sb, size_t n)
 {
@@ -44,11 +55,6 @@ size_t strbuf_move(struct strbuf *sb, const char *str)
 	return len;
 }
 
-size_t strbuf_concat(struct strbuf *sb, const char *str)
-{
-	return strbuf_concat2(sb, str, 0);
-}
-
 size_t strbuf_concat2(struct strbuf *sb, const char *str, size_t extalloc)
 {
 	size_t nl = strlen(str);
@@ -57,6 +63,26 @@ size_t strbuf_concat2(struct strbuf *sb, const char *str, size_t extalloc)
 	memcpy(sb->str + sb->len, str, nl + 1);
 	sb->len += nl;
 
+	return nl;
+}
+
+size_t strbuf_concatat(struct strbuf *sb, size_t idx, const char *str)
+{
+	BUG_ON(idx > sb->len);
+	if (idx == sb->len)
+		return strbuf_concat(sb, str);
+
+	size_t nl = strlen(str);
+	size_t alloc = 0;
+	size_t overlap = sb->len - (idx + 1);
+
+	if (nl > overlap) {
+		alloc = nl - overlap;
+		strbuf_growlen(sb, alloc);
+	}
+
+	memcpy(&sb->str[idx], str, nl);
+	sb->len += alloc;
 	return nl;
 }
 

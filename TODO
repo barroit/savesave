@@ -1,10 +1,4 @@
                                   TODO LIST
 
 ----
-remove path length limit check, library function already handle this
-
-----
-use malloc instead of alloc path on stack
-
-----
 separate string and path functions to their dedicated header/source files

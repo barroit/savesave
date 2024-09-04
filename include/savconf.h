@@ -15,12 +15,11 @@ extern "C" {
 struct savesave {
 	char *name;
 
-	char *save;
+	char *save_prefix;
+	char *backup_prefix;
+
 	off64_t save_size;
 	int is_dir_save;
-
-	char *backup;
-	size_t backup_len;
 
 	int use_compress;
 	int use_snapshot;

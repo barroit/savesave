@@ -10,6 +10,7 @@
 #include "strbuf.h"
 #include "list.h"
 #include "debug.h"
+#include "poison.h"
 
 void strlist_init(struct strlist *sl, flag_t flags)
 {
@@ -31,6 +32,7 @@ void strlist_destroy(struct strlist *sl)
 	}
 
 	free(sl->list);
+	sl->list = STRLIST_POISON;
 	sl->cap = 0;
 }
 

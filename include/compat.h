@@ -110,8 +110,6 @@ extern "C" {
 #define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
 #define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
 
-#define PATH_MAX MAX_PATH
-
 #define SSIZE_MAX INT64_MAX
 typedef SSIZE_T ssize_t;
 

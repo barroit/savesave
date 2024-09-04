@@ -15,6 +15,12 @@
 #include "robio.h"
 #include "alloc.h"
 
+#define ERR_SORT_BACKUP "unable to sort backup ‘%s’ of configuration ‘%s’"
+#define ERR_DROP_BACKUP \
+	"unable to drop deprecated backup of configuration ‘%s’"
+#define ERR_NEXT_BACKUP \
+	"unable to determine next backup file name of configuration ‘%s’"
+
 static char stru8_map[UINT8_MAX + 1][STRU8_MAX];
 
 CONSTRUCTOR init_u8tstr_table(void)
@@ -29,118 +35,111 @@ CONSTRUCTOR init_u8tstr_table(void)
 		
 }
 
-static int move_backup(const char *src, const char *dest)
+static int sort_backup(struct strbuf *src, struct strbuf *dest, u8 stack)
 {
 	int err;
-
-	err = rename(src, dest);
-	if (err)
-		return warn_errno("failed to rename ‘%s’ to ‘%s’", src, dest);
-	return 0;
-}
-
-static int sort_backup(char *src, char *srcend, u8 stack, int *has_room)
-{
-	int err;
-
 	u8 i;
 	int room = -1;
 
-	char dest[PATH_MAX];
-	size_t len = srcend - src;
-	char *destend = dest + len;
-
-	memcpy(dest, src, len);
 	for_each_idx(i, stack) {
-		memcpy(srcend, stru8_map[i], sizeof(*stru8_map));
+		strbuf_concatat(src, src->initlen, stru8_map[i]);
 
-		err = access(src, F_OK);
+		err = access(src->str, F_OK);
 		if (!err) {
 			if (room == -1)
 				continue;
 
-			memcpy(destend, stru8_map[room], sizeof(*stru8_map));
-			err = move_backup(src, dest);
+			strbuf_concatat(dest, src->initlen, stru8_map[room]);
+			err = rename(src->str, dest->str);
 			if (err)
-				return 1;
+				return warn_errno(ERR_RENAME_FILE,
+						  src->str, dest->str);
 			room++;
 		} else if (errno != ENOENT) {
-			return warn_errno(ERR_ACCESS_FILE, src);
+			return warn_errno(ERR_ACCESS_FILE, src->str);
 		}
 
 		if (room == -1)
 			room = i;
 	}
 
-	if (has_room)
-		*has_room = room != -1;
-	return 0;
+	return room != -1;
 }
 
-static int drop_deprecated_backup(char *str, char *strend, u8 stack)
+static int drop_deprecated_backup(struct strbuf *path)
 {
 	int err;
 
-	strcpy(strend, "0");
-	err = remove(str);
+	strbuf_concatat(path, path->initlen, "0");
+	err = remove(path->str);
 	if (err)
-		return warn_errno("failed to remove ‘%s’", str);
+		return warn_errno(ERR_REMOVE_FILE, path->str);
+
 	return 0;
 }
 
-static int find_next_room(char *str, char *strend, u8 stack)
+static int find_next_room(struct strbuf *next, u8 stack)
 {
 	int err;
 	u8 i;
+
 	for_each_idx_back(i, stack - 1) {
-		memcpy(strend, stru8_map[i], sizeof(*stru8_map));
+		strbuf_concatat(next, next->initlen, stru8_map[i]);
 
-		err = access(str, F_OK);
+		err = access(next->str, F_OK);
 		if (!err) {
-			BUG_ON(i == stack - 1);
-
-			memcpy(strend, stru8_map[i + 1], sizeof(*stru8_map));
+			strbuf_concatat(next, next->initlen, stru8_map[i + 1]);
 			return 0;
 		} else if (errno != ENOENT) {
-			return warn_errno(ERR_ACCESS_FILE, str);
+			return warn_errno(ERR_ACCESS_FILE, next->str);
 		}
 	}
 
 	BUG_ON(1);
 }
 
-static int request_next_room(const struct savesave *c, char *path)
+static char *get_next_backup_name(const struct savesave *c)
 {
-	int err;
-	char *pathend = path + c->backup_len;
+	int ret;
 	int has_room;
+	struct strbuf src = strbuf_from2(c->backup_prefix, 0, STRU8_MAX);
+	struct strbuf dest = strbuf_from2(c->backup_prefix, 0, STRU8_MAX);
 
-	memcpy(path, c->backup, c->backup_len);
-	err = sort_backup(path, pathend, c->stack, &has_room);
-	if (err)
-		goto err_sort_backup;
-
-	if (!has_room) {
-		err = drop_deprecated_backup(path, pathend, c->stack);
-		if (err)
-			return error("unable to drop deprecated backup of configuration ‘%s’",
-				     c->name);
-		err = sort_backup(path, pathend, c->stack, NULL);
-		if (err)
-			goto err_sort_backup;
+	has_room = sort_backup(&src, &dest, c->stack);
+	if (has_room == -1) {
+		strbuf_concatat(&src, src.initlen, "*");
+		ret = error(ERR_SORT_BACKUP, src.str, c->name);
+		goto cleanup;
 	}
 
-	err = find_next_room(path, pathend, c->stack);
-	if (err)
-		return error("unable to find next backup file name of configuration ‘%s’",
-			     c->name);
+	if (!has_room) {
+		ret = drop_deprecated_backup(&dest);
+		if (ret) {
+			error(ERR_DROP_BACKUP, c->name);
+			goto cleanup;
+		}
 
-	return 0;
+		has_room = sort_backup(&src, &dest, c->stack);
+		if (has_room == -1) {
+			strbuf_concatat(&src, src.initlen, "*");
+			ret = error(ERR_SORT_BACKUP, src.str, c->name);
+			goto cleanup;
+		}
+	}
 
-err_sort_backup:
-	*pathend = '*';
-	return error("unable to sort backup ‘%s’ of configuration ‘%s’",
-		     path, c->name);
+	ret = find_next_room(&dest, c->stack);
+	if (ret)
+		error(ERR_NEXT_BACKUP, c->name);
+
+cleanup:
+	strbuf_destroy(&src);
+
+	if (ret) {
+		strbuf_destroy(&dest);
+		return NULL;
+	}
+
+	return dest.str;
 }
 
 int copy_file(const char *src, int fd1, struct stat *st, const char *dest);
@@ -166,9 +165,9 @@ static int do_backup(struct savesave *c)
 	int ret;
 	struct file_iter ctx;
 	if (c->use_compress)
-		file_iter_init(&ctx, c->save, backup_file_compress, c);
+		file_iter_init(&ctx, c->save_prefix, backup_file_compress, c);
 	else
-		file_iter_init(&ctx, c->save, backup_file_copy, c);
+		file_iter_init(&ctx, c->save_prefix, backup_file_copy, c);
 
 	ret = file_iter_exec(&ctx);
 	file_iter_destroy(&ctx);
@@ -176,27 +175,24 @@ static int do_backup(struct savesave *c)
 	return ret;
 }
 
-static char *tmpdir_of_backup(const char *backup, size_t len)
+static char *tmpdir_of_backup(const char *backup)
 {
-	size_t ext = sizeof(CONFIG_TEMPORARY_EXTENTION);
-	char *ret = xmalloc(len + ext);
+	struct strbuf sb = strbuf_from2(backup, 0,
+					sizeof(CONFIG_TEMPORARY_EXTENTION));
 
-	memcpy(ret, backup, len);
-	memcpy(&ret[len], CONFIG_TEMPORARY_EXTENTION, ext);
-
-	return ret;
+	strbuf_concat(&sb, CONFIG_TEMPORARY_EXTENTION);
+	return sb.str;
 }
 
 int backup_routine(struct savesave *c)
 {
 	int ret;
 
-	char dest[PATH_MAX];
-	ret = request_next_room(c, dest);
-	if (ret)
-		return ret;
+	char *dest = get_next_backup_name(c);
+	if (!dest)
+		return 1;
 
-	char *temp = tmpdir_of_backup(c->backup, c->backup_len);
+	char *temp = tmpdir_of_backup(c->backup_prefix);
 
 	DEBUG_RUN() {
 		printf("next backup name\n\t%s\n", dest);
@@ -209,6 +205,7 @@ int backup_routine(struct savesave *c)
 
 	ret = do_backup(c);
 
+	free(dest);
 	free(temp);
 	return ret;
 }

@@ -16,6 +16,7 @@ struct strbuf {
 	char *str;
 	size_t len;
 	size_t cap;
+	size_t initlen;
 
 	int is_const;
 };
@@ -25,6 +26,13 @@ struct strbuf {
 #define STRBUF_CONSTANT 1 << 0
 
 void strbuf_init(struct strbuf *sb, flag_t flags);
+
+struct strbuf strbuf_from2(const char *str, flag_t flags, size_t extalloc);
+
+static inline struct strbuf strbuf_from(const char *str, flag_t flags)
+{
+	return strbuf_from2(str, flags, 0);
+}
 
 /*
  * A destroyed strbuf object can be re-initialised using strbuf_init();
@@ -38,9 +46,14 @@ static inline void strbuf_zerolen(struct strbuf *sb)
 
 size_t strbuf_move(struct strbuf *sb, const char *str);
 
-size_t strbuf_concat(struct strbuf *sb, const char *str);
-
 size_t strbuf_concat2(struct strbuf *sb, const char *str, size_t extalloc);
+
+static inline size_t strbuf_concat(struct strbuf *sb, const char *str)
+{
+	return strbuf_concat2(sb, str, 0);
+}
+
+size_t strbuf_concatat(struct strbuf *sb, size_t idx, const char *str);
 
 size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...);
 

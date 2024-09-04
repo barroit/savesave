@@ -48,6 +48,9 @@ int redirect_stdio(const char *filename);
 
 #define ERR_ACCESS_FILE "failed to access ‘%s’"
 
+#define ERR_RENAME_FILE "failed to rename file ‘%s’ to ‘%s’"
+#define ERR_REMOVE_FILE "failed to remove file ‘%s’"
+
 #ifdef __cplusplus
 }
 #endif
