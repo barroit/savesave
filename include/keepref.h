@@ -14,7 +14,7 @@ extern "C" {
 
 void __keepref(void *ptr, size_t size);
 
-#ifdef CONFIG_SUPPRESS_LEAK_REPORT
+#ifdef CONFIG_SUPPRESS_ANNOTATED_LEAKS
 # define KEEPREF(var) __keepref(&(var), sizeof(var))
 #else
 # define KEEPREF(var) do {} while (0)

@@ -131,11 +131,16 @@ endmenu # "Zstandard"
 
 menu "Debugging"
 
+config DETECT_MEMORY_LEAK
+	bool "detect unintentional memory leak"
+	imply DISABLE_CONSOLE_OUTPUT
+	imply SUPPRESS_ANNOTATED_LEAKS
+
 config DISABLE_CONSOLE_OUTPUT
 	bool "disable console output"
 	depends on $(BUILD) = "windows"
 
-config SUPPRESS_LEAK_REPORT
-	bool "keep reference to unreleased memory"
+config SUPPRESS_ANNOTATED_LEAKS
+	bool "suppress annotated leaks"
 
 endmenu # "Debugging"

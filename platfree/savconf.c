@@ -213,7 +213,8 @@ static int assign_entry(const char *line, char **rest,
 	if (is_entry(line, "save", rest))
 		SETENT(ent, "save", &conf->save_prefix, parse_save, STRING);
 	else if (is_entry(line, "backup", rest))
-		SETENT(ent, "backup", &conf->backup_prefix, prepare_backup, STRING);
+		SETENT(ent, "backup", &conf->backup_prefix,
+		       prepare_backup, STRING);
 	else if (is_entry(line, "period", rest))
 		SETENT(ent, "period", &conf->period, check_period, TIMESPAN);
 	else if (is_entry(line, "stack", rest))
