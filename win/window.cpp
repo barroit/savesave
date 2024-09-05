@@ -6,7 +6,7 @@
  */
 
 #include "win/ui.hpp"
-#include "win/termsg.hpp"
+#include "win/termas.hpp"
 
 #define CLASS_ID APPNAME
 
@@ -85,7 +85,7 @@ int create_app_window(HINSTANCE app, HWND *window)
 				 CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 				 NULL, NULL, app, NULL);
 	if (!(*window))
-		return error_winerr("unable to create window");
+		return error_winerr("failed to create window");
 
 	return 0;
 }

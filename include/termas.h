@@ -5,8 +5,8 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef TERMSG_H
-#define TERMSG_H
+#ifndef TERMAS_H
+#define TERMAS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,21 +38,14 @@ NORETURN bug_routine(const char *file, int line,
 
 #define bug(...) bug_routine(__FILE__, __LINE__, __VA_ARGS__)
 
-int redirect_stdio(const char *filename);
-
-/* error messages */
-#define ERR_OPEN_FILE "failed to open file ‘%s’"
-#define ERR_OPEN_DIR  "failed to open directory ‘%s’"
-
-#define ERR_STAT_FILE "failed to retrieve information for file ‘%s’"
-
-#define ERR_ACCESS_FILE "failed to access ‘%s’"
-
-#define ERR_RENAME_FILE "failed to rename file ‘%s’ to ‘%s’"
-#define ERR_REMOVE_FILE "failed to remove file ‘%s’"
+/* common error messages */
+#define ERR_OPEN_FILE   "failed to open file ‘%s’"
+#define ERR_CREAT_FILE  "failed to create file at ‘%s’"
+#define ERR_STAT_FILE   "failed to retrieve information for file ‘%s’"
+#define ERR_ACCESS_FILE "failed to access file ‘%s’"
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* TERMSG_H */
+#endif /* TERMAS_H */

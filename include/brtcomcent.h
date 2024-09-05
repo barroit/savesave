@@ -7,8 +7,8 @@
  * This file shall only be include by build system
  */
 
-#ifndef COMPAT_H
-#define COMPAT_H
+#ifndef BRTCOMCENT_H
+#define BRTCOMCENT_H
 
 /*
  * include MSVC's <atomic> with stdatomic.h provided by clang, will cause
@@ -32,17 +32,13 @@
 # include <filesystem>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stddef.h>
 #include <stdint.h>
 #include <inttypes.h>
+#include <string.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include <errno.h>
 #include <ctype.h>
 #include <assert.h>
@@ -65,6 +61,7 @@ extern "C" {
 # include <versionhelpers.h>
 # include <commctrl.h>
 # include <direct.h>
+# include <basetsd.h>
 #else /* linux */
 # include <unistd.h>
 # include <pwd.h>
@@ -72,23 +69,25 @@ extern "C" {
 # include <sys/time.h>
 # include <libgen.h>
 # include <dirent.h>
-# ifndef NO_SYS_SELECT_H
-#  include <sys/select.h>
-# endif
+# include <sys/select.h>
 #endif
 
 #include "compiler.h"
 
-#include "generated/appinfo.h"
-#include "generated/apphelp.h"
+#include "ansidecl.h"
+#include "poll.h"
+#include "getopt.h"
 
-#include "compat/ansidecl.h"
-#include "compat/poll.h"
-#include "compat/getopt.h"
+#include "barroit/limits.h"
+#include "barroit/types.h"
+#include "barroit/string.h"
+#include "barroit/zstd.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef _WIN32
-#include <BaseTsd.h>
-#include <stdint.h>
 
 #define read	_read
 #define write	_write
@@ -131,12 +130,10 @@ NORETURN winexit(int code);
 
 #endif /* ---- _WIN32 ----- */
 
-#include "cntio.h"
-
-#include "barroit/types.h"
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* COMPAT_H */
+#include "cntio.h"
+
+#endif /* BRTCOMCENT_H */

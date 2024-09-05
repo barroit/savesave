@@ -5,11 +5,15 @@
  * Contact: barroit@linux.com
  */
 
-#include "robio.h"
-#include "termsg.h"
+#include "path.h"
 
 int is_abs_path(const char *path)
 {
 	std::filesystem::path p = path;
 	return p.is_absolute();
+}
+
+const char *get_home_dir()
+{
+	return getenv("USERPROFILE");
 }

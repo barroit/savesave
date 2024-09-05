@@ -6,7 +6,7 @@
  */
 
 #include "runopt.h"
-#include "termsg.h"
+#include "termas.h"
 #include "list.h"
 #include "strbuf.h"
 

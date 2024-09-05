@@ -10,9 +10,8 @@
 #include "debug.h"
 #include "strbuf.h"
 #include "list.h"
-#include "termsg.h"
-#include "barroit/limits.h"
-#include "robio.h"
+#include "termas.h"
+#include "fileiter.h"
 #include "alloc.h"
 
 #define ERR_SORT_BACKUP "unable to sort backup ‘%s’ of configuration ‘%s’"
@@ -52,7 +51,7 @@ static int sort_backup(struct strbuf *src, struct strbuf *dest, u8 stack)
 			strbuf_concatat(dest, src->initlen, stru8_map[room]);
 			err = rename(src->str, dest->str);
 			if (err)
-				return warn_errno(ERR_RENAME_FILE,
+				return warn_errno("failed to rename file ‘%s’ to ‘%s’",
 						  src->str, dest->str);
 			room++;
 		} else if (errno != ENOENT) {
@@ -73,7 +72,7 @@ static int drop_deprecated_backup(struct strbuf *path)
 	strbuf_concatat(path, path->initlen, "0");
 	err = remove(path->str);
 	if (err)
-		return warn_errno(ERR_REMOVE_FILE, path->str);
+		return warn_errno("failed to remove file ‘%s’", path->str);
 
 	return 0;
 }

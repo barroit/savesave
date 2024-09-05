@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "termsg.h"
+#include "termas.h"
 
 const char *strwinerror();
 

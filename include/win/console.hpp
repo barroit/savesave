@@ -8,8 +8,21 @@
 #pragma once
 
 #ifdef CONFIG_DISABLE_CONSOLE_OUTPUT
-# define _getch() do {} while (0)
-#endif
+
+#define _getch() do {} while (0)
+
+class console {
+	inline void setup_console() {}
+
+	inline void hide_console() {}
+	inline void show_console() {}
+
+	inline void redirect_stdio(const char *output) {}
+
+	inline bool is_active() { return false; }
+}
+
+#else
 
 class console {
 	FILE *stream;
@@ -19,16 +32,6 @@ class console {
 public:
 	console() : stream(NULL), handle(NULL), is_live(1) {}
 
-#ifdef CONFIG_DISABLE_CONSOLE_OUTPUT
-	inline void setup_console() {}
-
-	inline void hide_console() {}
-	inline void show_console() {}
-
-	inline void redirect_stdio(const char *output) {}
-
-	inline bool is_active() { return false; }
-#else
 	void setup_console();
 
 	inline void hide_console()
@@ -49,7 +52,8 @@ public:
 	{
 		return is_live;
 	}
-#endif
 };
 
-class console *get_console();
+#endif /* CONFIG_DISABLE_CONSOLE_OUTPUT */
+
+class console *get_app_console();

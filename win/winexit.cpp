@@ -7,7 +7,7 @@
 
 #undef exit
 
-#include "win/termsg.hpp"
+#include "win/termas.hpp"
 #include "win/console.hpp"
 
 static void waiting_user()
@@ -19,7 +19,7 @@ static void waiting_user()
 void winexit(int code)
 {
 	if (code) {
-		class console *con = get_console();
+		class console *con = get_app_console();
 		if (con->is_active())
 			con->show_console();
 		waiting_user();

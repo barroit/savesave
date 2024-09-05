@@ -6,13 +6,13 @@
  */
 
 #include "win/cmdline.hpp"
-#include "termsg.h"
+#include "termas.h"
 #include "strlist.h"
 #include "list.h"
 #include "strbuf.h"
 #include "keepref.h"
 
-static void dump_cmdline(const char *cmdline, size_t *argc, char ***argv)
+static void dump_cmdline(const char *cmdline, int *argc, char ***argv)
 {
 	std::string line = std::string(APPNAME) + " " + std::string(cmdline);
 	std::istringstream stream(std::move(line));
@@ -23,36 +23,22 @@ static void dump_cmdline(const char *cmdline, size_t *argc, char ***argv)
 	while (stream >> std::quoted(opt))
 		strlist_push(&sl, opt.c_str());
 
-	*argc = sl.nl;
+	*argc = (int)sl.nl;
 	*argv = strlist_dump(&sl);
 	strlist_destroy(&sl);
 }
 
-void uarg_parser::parse_cmdline(const char *cmdline)
+void parse_cmdline(const char *cmdline, struct cmdarg *args)
 {
 	char **argv;
-	size_t argc;
+	int argc;
 	dump_cmdline(cmdline, &argc, &argv);
 
-	parse_option(argc, argv, &args);
+	parse_option(argc, argv, args);
 	destroy_dumped_strlist(argv);
 
-	if (!args.savconf)
-		args.savconf = get_default_savconf_path();
-	if (!args.savconf)
+	if (!args->savconf)
+		args->savconf = get_default_savconf_path();
+	if (!args->savconf)
 		die("no savconf was provided");
-	
-	KEEPREF(args);
-}
-
-void uarg_parser::parse_savconf()
-{
-	nconf = ::parse_savconf(args.savconf, &savconf);
-
-	size_t i;
-	for_each_idx(i, nconf) {
-		struct savesave *c = &savconf[i];
-		strrepl(c->save_prefix, '\\', '/');
-		strrepl(c->backup_prefix, '\\', '/');
-	}
 }

@@ -8,8 +8,7 @@
  */
 
 #include "compress.h"
-#include "barroit/zstd.h"
-#include "termsg.h"
+#include "termas.h"
 #include "debug.h"
 
 CONSTRUCTOR check_libzstd_mt(void)

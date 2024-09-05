@@ -6,8 +6,9 @@
  */
 
 #include "win/console.hpp"
-#include "termsg.h"
+#include "termas.h"
 #include "debug.h"
+#include "ioop.h"
 
 #ifndef CONFIG_DISABLE_CONSOLE_OUTPUT
 

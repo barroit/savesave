@@ -7,13 +7,14 @@
 
 #include "savconf.h"
 #include "robio.h"
-#include "termsg.h"
+#include "termas.h"
 #include "strbuf.h"
 #include "alloc.h"
 #include "list.h"
 #include "text2num.h"
-#include "barroit/limits.h"
 #include "debug.h"
+#include "path.h"
+#include "fileiter.h"
 
 struct savesave_context {
 	char *line;
@@ -23,6 +24,38 @@ struct savesave_context {
 	size_t nl;
 	size_t cap;
 };
+
+static int read_savconf(const char *name, char **text)
+{
+	int fd = open(name, O_RDONLY);
+	if (fd == -1)
+		return error_errno("failed to open savconf ‘%s’", name);
+
+	struct stat st;
+	if (fstat(fd, &st) == -1) {
+		error_errno("failed to retrieve information for savconf ‘%s’",
+			    name);
+		goto err_stat_fd;
+	}
+
+	char *buf = xmalloc(st.st_size + 1);
+	buf[st.st_size] = 0;
+
+	if (robread(fd, buf, st.st_size) == -1) {
+		error_errno("failed to read savconf ‘%s’", name);
+		goto err_read_file;
+	}
+
+	*text = buf;
+	close(fd);
+	return 0;
+
+err_read_file:
+	free(buf);
+err_stat_fd:;
+	close(fd);
+	return 1;
+}
 
 static char *skip_space(const char *str)
 {
@@ -381,18 +414,22 @@ static void do_parse_savconf(struct savesave_context *ctx)
 
 size_t parse_savconf(const char *path, struct savesave **conf)
 {
-	char *str = readfile(path);
-	if (!str)
-		die_errno("failed to read content from ‘%s’", path);
-	else if (*str == 0)
+	int err;
+	char *txtconf;
+
+	err = read_savconf(path, &txtconf);
+	if (err)
+		die_errno("an error occurred while reading savconf ‘%s’",
+			  path);
+	else if (*txtconf == 0)
 		die("file ‘%s’ is empty", path);
 
 	struct savesave_context ctx = {
-		.line  = str,
+		.line  = txtconf,
 	};
 
 	do_parse_savconf(&ctx);
-	free(str);
+	free(txtconf);
 
 	*conf = ctx.conf;
 	return ctx.nl;

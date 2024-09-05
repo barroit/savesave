@@ -12,6 +12,9 @@
 extern "C" {
 #endif
 
+int cntcreat(const char *file, mode_t mode);
+#define creat cntcreat
+
 int cntopen2(const char *file, int oflag);
 int cntopen3(const char *file, int oflag, mode_t mode);
 #define open(...) FLEXCALL_FUNCTION3(cntopen, __VA_ARGS__)

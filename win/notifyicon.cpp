@@ -7,7 +7,7 @@
 
 #include "win/ui.hpp"
 #include "win/resid.hpp"
-#include "termsg.h"
+#include "termas.h"
 #include "debug.h"
 
 static void load_icon_resource(HINSTANCE app, HICON *icon)

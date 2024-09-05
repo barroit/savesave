@@ -7,78 +7,69 @@
 
 #include "win/console.hpp"
 #include "win/ui.hpp"
-#include "win/termsg.hpp"
+#include "win/termas.hpp"
 #include "robio.h"
 #include "win/cmdline.hpp"
 #include "win/backup.hpp"
 #include "savconf.h"
 #include "debug.h"
 #include "win/atenter.hpp"
+#include "win/savconf.hpp"
 
-static class console *console_reference;
-
-static void init_ui_component(HINSTANCE app)
-{
-	int err;
-
-	HWND window;
-	err = create_app_window(app, &window);
-	if (err)
-		exit(128);
-
-	NOTIFYICONDATA icon;
-	setup_notifyicon(app, window, &icon);
-
-	show_notifyicon(&icon);
-}
-
-static void loop_ui_message()
-{
-	MSG message;
-	while (GetMessage(&message, NULL, 0, 0) > 0) {
-		TranslateMessage(&message);
-		DispatchMessage(&message);
-	}
-}
+static class console appcon;
+static struct cmdarg args;
+static struct savesave *savconf;
 
 int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 {
+	int err;
 	/*
 	 * class constructor is guaranteed to run before main function, use
 	 * that for constructor function leak support on windows
 	 */
 	static class atenter constructor;
 
-	console con;
-	con.setup_console();
-	console_reference = &con;
-
+	appcon.setup_console();
 	constructor.precheck();
 
-	uarg_parser parser;
-
-	parser.parse_cmdline(cmdline);
-	if (parser.args.output)
-		con.redirect_stdio(parser.args.output);
+	parse_cmdline(cmdline, &args);
+	if (args.output)
+		appcon.redirect_stdio(args.output);
 	else 
-		con.hide_console();
+		appcon.hide_console();
 
-	parser.parse_savconf();
-	if (!parser.nconf)
-		die("‘%s’ must have at least one configuration",
-		    parser.args.savconf);
+	size_t confcnt = parse_savconf(args.savconf, &savconf);
+	if (!confcnt)
+		die("‘%s’ must have at least one configuration", args.savconf);
+	format_savconf(savconf, confcnt);
+
 	DEBUG_RUN()
-		print_savconf(parser.savconf, parser.nconf);
-	// backup bu{ parser.nconf };
-	// bu.create_backup_task(parser.savconf);
+		print_savconf(savconf, confcnt);
 
-	// init_ui_component(app);
-	// loop_ui_message();
+	// backup bu{ nconf };
+	// bu.create_backup_task(savconf);
+
+	exit(0);
+
+	HWND window;
+	err = create_app_window(app, &window);
+	if (err)
+		die("unable to initialize main window");
+
+	NOTIFYICONDATA icon;
+	setup_notifyicon(app, window, &icon);
+	show_notifyicon(&icon);
+
+	MSG message;
+	while (GetMessage(&message, NULL, 0, 0) > 0) {
+		TranslateMessage(&message);
+		DispatchMessage(&message);
+	}
 
 	return 0;
 }
 
-class console *get_console()
+class console *get_app_console()
 {
-	return console_reference;
+	return &appcon;
 }

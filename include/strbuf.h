@@ -63,10 +63,6 @@ void strbuf_trim(struct strbuf *sb);
 
 size_t strbuf_cntchr(struct strbuf *sb, int c);
 
-void strrepl(char *s, int c, int v);
-
-const char *straftr(const char *str, const char *prefix);
-
 #ifdef __cplusplus
 }
 #endif

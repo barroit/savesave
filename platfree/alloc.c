@@ -6,8 +6,7 @@
  */
 
 #include "alloc.h"
-#include "barroit/limits.h"
-#include "termsg.h"
+#include "termas.h"
 
 void alloc_limit_check(size_t n)
 {

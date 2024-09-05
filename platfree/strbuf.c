@@ -149,19 +149,3 @@ size_t strbuf_cntchr(struct strbuf *sb, int c)
 
 	return cnt;
 }
-
-void strrepl(char *s, int c, int v)
-{
-	while ((s = strchr(s, c)) != NULL)
-		*s++ = v;
-}
-
-const char *straftr(const char *str, const char *prefix)
-{
-	do {
-		if (!*prefix)
-			return str;
-	} while (*str++ == *prefix++);
-
-	return NULL;
-}

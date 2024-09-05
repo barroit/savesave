@@ -6,7 +6,7 @@
  */
 
 #include "text2num.h"
-#include "termsg.h"
+#include "termas.h"
 #include "calc.h"
 
 int str2ulong(const char *str, size_t len,

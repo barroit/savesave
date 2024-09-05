@@ -1,7 +1,7 @@
                                   TODO LIST
 
 ----
-separate string and path functions to their dedicated header/source files
+add custom assertion failure handling for windows
 
 ----
-add custom assertion failure handling for windows
+integrate gettext

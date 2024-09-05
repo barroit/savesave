@@ -7,7 +7,4 @@
 
 #pragma once
 
-#include "runopt.h"
-#include "savconf.h"
-
-void parse_cmdline(const char *cmdline, struct cmdarg *args);
+void format_savconf(struct savesave *savconf, size_t n);

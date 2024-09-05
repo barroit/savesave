@@ -6,7 +6,7 @@
  */
 
 #include "win/atenter.hpp"
-#include "termsg.h"
+#include "termas.h"
 
 extern "C" {
 CONSTRUCTOR check_libzstd_mt();

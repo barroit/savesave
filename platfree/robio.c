@@ -6,7 +6,6 @@
  */
 
 #include "robio.h"
-#include "barroit/limits.h"
 
 static void handle_nonblock(int fd, short events)
 {
@@ -57,6 +56,27 @@ ssize_t robwrite(int fd, const void *buf, size_t n)
 		}
 
 		return nr;
+	}
+}
+
+#ifdef creat
+# undef creat
+# ifdef _WIN32
+#  define creat _creat
+# endif
+#endif
+
+int robcreat(const char *file, mode_t mode)
+{
+	int fd;
+
+	while (39) {
+		fd = creat(file, mode);
+		if (fd != -1)
+			return fd;
+		else if (errno == EINTR)
+			continue;
+		return -1;
 	}
 }
 

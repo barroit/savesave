@@ -5,35 +5,12 @@
  * Contact: barroit@linux.com
  */
 
-#include "robio.h"
+#include "fileiter.h"
 #include "strbuf.h"
 #include "strlist.h"
-#include "termsg.h"
+#include "termas.h"
 #include "debug.h"
-
-static char *get_user_home(const char *user)
-{
-	struct passwd *pw = getpwnam(user);
-	if (!pw) {
-		warn_errno("can’t get home for ‘%s’ who invoked sudo", user);
-		return NULL;
-	}
-
-	return pw->pw_dir;
-}
-
-const char *get_home_dir(void)
-{
-	const char *home;
-	const char *user = getenv("SUDO_USER");
-	if (user)
-		home = get_user_home(user);
-	else
-		home = getenv("HOME");
-	if (!home)
-		die("your $HOME corrupted");
-	return home;
-}
+#include "path.h"
 
 static int dispatch_lnkfile(const char *abspath, const char *relpath,
 			    file_iterator_cb_t cb, void *data)
@@ -114,7 +91,7 @@ int file_iter_do_exec(struct file_iter *ctx)
 	const char *dirname = ctx->sb->str;
 	DIR *dir = opendir(dirname);
 	if (!dir)
-		return warn_errno(ERR_OPEN_DIR, dirname);
+		return warn_errno("failed to open directory ‘%s’", dirname);
 
 	int ret;
 	struct dirent *ent;

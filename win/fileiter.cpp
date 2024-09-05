@@ -3,42 +3,20 @@
  * Copyright 2024 Jiamu Sun
  *
  * Contact: barroit@linux.com
+ *
+ * we tried cpp17's file system, but the api is sucked, especially when coming
+ * with temporary object and value_type. So, use win32 api.
  */
 
+#include "fileiter.h"
 #include "strbuf.h"
 #include "strlist.h"
-#include "robio.h"
-#include "win/termsg.hpp"
+#include "win/termas.hpp"
 #include "debug.h"
+#include "path.h"
 
 extern "C"{
-const char *get_home_dir(void);
-
-char *dirname(char *path);
-
 int file_iter_do_exec(struct file_iter *ctx);
-}
-
-const char *get_home_dir()
-{
-	return getenv("USERPROFILE");
-}
-
-/*
- * we tried cpp17's file system, but the api is sucked, especially when coming
- * with temporary object
- */
-
-char *dirname(char *path)
-{
-	char drive[_MAX_DRIVE];
-	char dir[_MAX_DIR];
-
-	_splitpath(path, drive, dir, NULL, NULL);
-	memcpy(path, drive, 2);
-	memcpy(&path[2], dir, strlen(dir) + 1);
-
-	return path;
 }
 
 static int dispatch_file(struct file_iter *ctx, WIN32_FIND_DATA *ent)

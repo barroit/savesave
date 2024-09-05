@@ -57,7 +57,9 @@ add_compile_options(-O${CONFIG_COMPILER_OPTIMIZE})
 # By specifying a SHELL and quoting our options, we can disable Option
 # De-duplication
 add_compile_options("SHELL:-include ${GENERATED}/autoconf.h")
-add_compile_options("SHELL:-include ${ROOT}/include/compat.h")
+add_compile_options("SHELL:-include ${GENERATED}/appinfo.h")
+add_compile_options("SHELL:-include ${GENERATED}/apphelp.h")
+add_compile_options("SHELL:-include ${ROOT}/include/brtcomcent.h")
 
 list(APPEND languages C)
 
@@ -67,17 +69,15 @@ endif()
 
 project(${SAVESAVE_NAME} VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
 
-find_package(zstd CONFIG REQUIRED)
-if(BUILD STREQUAL windows)
-  get_target_property(LIBZSTD_INCLUDE_DIRS zstd::libzstd
-		      INTERFACE_INCLUDE_DIRECTORIES)
-endif()
+include_directories(BEFORE ${ROOT}/include)
 
 configure_file(${ROOT}/savesave.manifest.in
 	       ${ROOT}/savesave.manifest)
 
-include_directories(${ROOT}/include)
+find_package(zstd CONFIG REQUIRED)
 if(BUILD STREQUAL windows)
+  get_target_property(LIBZSTD_INCLUDE_DIRS zstd::libzstd
+		      INTERFACE_INCLUDE_DIRECTORIES)
   include_directories(${LIBZSTD_INCLUDE_DIRS})
 endif()
 
@@ -85,7 +85,7 @@ if(HOST STREQUAL linux)
   file(GLOB platspec_src LIST_DIRECTORIES false uni/*.c)
   set(mainfile ${ROOT}/entry/savesave.c)
 else()
-  file(GLOB platspec_src LIST_DIRECTORIES false win/*.cpp)
+  file(GLOB platspec_src LIST_DIRECTORIES false win/*.cpp win/*.c)
   set(mainfile ${ROOT}/entry/savesave.cpp)
 endif()
 add_library(platspec OBJECT ${platspec_src})

@@ -6,18 +6,13 @@
  */
 
 #include "alloc.h"
-#include "termsg.h"
-
-int is_abs_path(const char *path)
-{
-	return *path == '/';
-}
+#include "termas.h"
 
 int copy_file(const char *src, int fd1, struct stat *st, const char *dest)
 {
 	int fd2 = creat(dest, 0664);
 	if (fd2 == -1)
-		return error_errno("failed to create file at ‘%s’", dest);
+		return error_errno(ERR_CREAT_FILE, dest);
 
 	int ret = 0;
 	off_t remain = st->st_size;

@@ -7,7 +7,7 @@
 
 #include "win/backup.hpp"
 #include "savconf.h"
-#include "win/termsg.hpp"
+#include "win/termas.hpp"
 #include "backup.h"
 
 backup::backup(size_t nl)

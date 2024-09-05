@@ -26,6 +26,16 @@ void cntio_cntsub1(void)
 	BUG_ON(atomic_load(&fd_count) == UINT_MAX);
 }
 
+int cntcreat(const char *file, mode_t mode)
+{
+	int fd = robcreat(file, mode);
+	if (fd == -1)
+		return -1;
+
+	cntio_cntadd1();
+	return fd;
+}
+
 int cntopen2(const char *file, int oflag)
 {
 	return cntopen3(file, oflag, 0);

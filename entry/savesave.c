@@ -7,7 +7,7 @@
 
 #include "runopt.h"
 #include "robio.h"
-#include "termsg.h"
+#include "termas.h"
 #include "savconf.h"
 #include "debug.h"
 #include "backup.h"

@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-#include "termsg.h"
+#include "termas.h"
 #include "robio.h"
 #include "list.h"
 #include "alloc.h"
@@ -225,41 +225,4 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 	vreportf(stderr, lead, fmt, ap, NULL);
 
 	exit(128);
-}
-
-int redirect_stdio(const char *name)
-{
-	int err;
-
-	char *str = xstrdup(name);
-	const char *dir = dirname(str);
-	err = my_mkdir(dir);
-	free(str);
-	if (err && errno != EEXIST)
-		return error_errno("failed to create directory for log file ‘%s’",
-				   name);
-
-	int fd = open(name, O_WRONLY | O_CREAT, 0664);
-	if (fd == -1) {
-		error_errno("failed to open ‘%s’", name);
-		goto err_open_file;
-	}
-
-	if (dup2(fd, fileno(stdout)) == -1) {
-		error_errno("cannot redirect stdout to ‘%s’", name);
-		goto close_file;
-	}
-
-	if (dup2(fd, fileno(stderr)) == -1) {
-		error_errno("cannot redirect stderr to ‘%s’", name);
-		goto close_file;
-	}
-
-	close(fd);
-	return 0;
-
-close_file:
-	close(fd);
-err_open_file:
-	return 1;
 }

@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-#include "robio.h"
+#include "fileiter.h"
 #include "alloc.h"
 #include "strbuf.h"
 #include "strlist.h"
