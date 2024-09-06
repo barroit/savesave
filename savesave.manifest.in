@@ -30,7 +30,7 @@
         processorArchitecture="*"
         publicKeyToken="6595b64144ccf1df"
         language="*"/>
-      </dependentAssembly>
+    </dependentAssembly>
   </dependency>
   <asmv3:application>
     <asmv3:windowsSettings

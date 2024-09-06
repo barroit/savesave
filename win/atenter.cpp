@@ -7,6 +7,7 @@
 
 #include "win/atenter.hpp"
 #include "termas.h"
+#include "win/dumpstack.hpp"
 
 extern "C" {
 CONSTRUCTOR check_libzstd_mt();
@@ -16,6 +17,7 @@ CONSTRUCTOR init_u8tstr_table();
 atenter::atenter()
 {
 	init_u8tstr_table();
+	setup_crt_report_hook();
 }
 
 static void check_os_version()

@@ -35,8 +35,6 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	parse_cmdline(cmdline, &args);
 	if (args.output)
 		appcon.redirect_stdio(args.output);
-	else 
-		appcon.hide_console();
 
 	size_t confcnt = parse_savconf(args.savconf, &savconf);
 	if (!confcnt)

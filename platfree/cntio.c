@@ -13,7 +13,7 @@
 #include "debug.h"
 #include "robio.h"
 
-static atomic_uint fd_count = 0;
+static atomic_uint fd_count;
 
 void cntio_cntadd1(void)
 {

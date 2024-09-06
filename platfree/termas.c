@@ -74,8 +74,7 @@ static void record_cntrl_char(char *str, size_t nr, struct cntrl_char *cntrl)
 		 * limits the character range passed to iscntrl(), we need to
 		 * bypass this by adding a pre-check
 		 */
-		if (c >= -1 && c <= 255 &&
-		    c != '\t' && c != '\n' && iscntrl(c)) {
+		if (isascii(c) && !istab(c) && !isnewline(c) && iscntrl(c)) {
 			CAP_ALLOC(&cntrl->pos, 1, &cntrl->cap);
 			cntrl->pos[cntrl->nr++] = i;
 		}

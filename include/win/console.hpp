@@ -12,6 +12,7 @@
 #define _getch() do {} while (0)
 
 class console {
+public:
 	inline void setup_console() {}
 
 	inline void hide_console() {}
@@ -20,30 +21,30 @@ class console {
 	inline void redirect_stdio(const char *output) {}
 
 	inline bool is_active() { return false; }
-}
+};
 
 #else
 
 class console {
 	FILE *stream;
-	HWND handle;
+	HWND window;
 	bool is_live;
 
 public:
-	console() : stream(NULL), handle(NULL), is_live(1) {}
+	console() : stream(NULL), window(NULL), is_live(1) {}
 
 	void setup_console();
 
 	inline void hide_console()
 	{
 # ifndef NDEBUG
-		ShowWindow(handle, SW_HIDE);
+		ShowWindow(window, SW_HIDE);
 # endif
 	}
 
 	inline void show_console()
 	{
-		ShowWindow(handle, SW_SHOW);
+		ShowWindow(window, SW_SHOW);
 	}
 
 	void redirect_stdio(const char *output);

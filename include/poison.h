@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#define GENERIC_POISON ((void *) 0xdeadbeef)
+
 #define LIST_POISON1 ((void *) 0x100)
 #define LIST_POISON2 ((void *) 0x200)
 

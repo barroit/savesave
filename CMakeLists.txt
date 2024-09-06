@@ -107,7 +107,10 @@ else()
 endif()
 
 if(HOST STREQUAL windows)
-  target_link_libraries(savesave ws2_32 comctl32)
+  target_link_libraries(savesave ws2_32 comctl32 shlwapi)
+  if (NOT CONFIG_SOURCE_NDEBUG)
+    target_link_libraries(savesave dbghelp)
+  endif()
 endif()
 
 add_compile_definitions(_GNU_SOURCE)

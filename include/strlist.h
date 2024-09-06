@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-struct strbuf;
+#include "strbuf.h"
 
 struct strlist {
 	struct strbuf *list;
@@ -51,6 +51,13 @@ static inline char *strlist_pop(struct strlist *sl)
 char **strlist_dump(struct strlist *sl);
 
 void destroy_dumped_strlist(char **arr);
+
+void strlist_strsplt_every(struct strlist *sl, const char *str, size_t len);
+
+/*
+ * same as strlist_strsplt_every but align to previous word boundary
+ */
+void strlist_strsplt_every2(struct strlist *sl, const char *str, size_t len);
 
 #ifdef __cplusplus
 }

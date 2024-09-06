@@ -7,7 +7,6 @@
 
 #include "strlist.h"
 #include "alloc.h"
-#include "strbuf.h"
 #include "list.h"
 #include "debug.h"
 #include "poison.h"
@@ -117,4 +116,57 @@ void destroy_dumped_strlist(char **arr)
 	while (*p != NULL)
 		free(*p++);
 	free(arr);
+}
+
+void strlist_strsplt_every(struct strlist *sl, const char *str, size_t len)
+{
+	size_t tot = strlen(str);
+	char *ptr = xstrdup(str);
+	char *mp = ptr;
+	char *tail = &ptr[tot];
+
+	while (ptr < tail) {
+		if (ptr + len >= tail)
+			len = tail - ptr;
+
+		char tmp = ptr[len];
+		ptr[len] = 0;
+
+		strlist_push(sl, ptr);
+
+		ptr += len;
+		*ptr = tmp;
+	}
+
+	free(mp);
+}
+
+void strlist_strsplt_every2(struct strlist *sl, const char *str, size_t len)
+{
+	size_t tot = strlen(str);
+	char *ptr = xstrdup(str);
+	char *mp = ptr;
+	char *tail = &ptr[tot];
+
+	while (ptr < tail) {
+		if (ptr + len >= tail)
+			len = tail - ptr;
+
+		char *p = &ptr[len];
+		size_t l = len;
+
+		while (*p != 0 && !(isascii(*p) && isspace(*p))) {
+			p--;
+			l--;
+		}
+
+		*p = 0;
+		l += 1;
+
+		strlist_push(sl, ptr);
+
+		ptr += l;
+	}
+
+	free(mp);
 }

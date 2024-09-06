@@ -9,8 +9,7 @@
 
 int is_abs_path(const char *path)
 {
-	std::filesystem::path p = path;
-	return p.is_absolute();
+	return !PathIsRelative(path);
 }
 
 const char *get_home_dir()

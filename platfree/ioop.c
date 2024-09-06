@@ -29,12 +29,12 @@ int redirect_stdio(const char *name)
 		goto err_open_file;
 	}
 
-	if (dup2(fd, fileno(stdout)) == -1) {
+	if (dup2(fd, STDOUT_FILENO) == -1) {
 		error_errno("cannot redirect stdout to ‘%s’", name);
 		goto close_file;
 	}
 
-	if (dup2(fd, fileno(stderr)) == -1) {
+	if (dup2(fd, STDERR_FILENO) == -1) {
 		error_errno("cannot redirect stderr to ‘%s’", name);
 		goto close_file;
 	}

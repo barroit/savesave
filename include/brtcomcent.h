@@ -4,7 +4,7 @@
  *
  * Contact: barroit@linux.com
  *
- * This file shall only be include by build system
+ * This file shall only be included by build system
  */
 
 #ifndef BRTCOMCENT_H
@@ -29,7 +29,6 @@
 # include <sstream>
 # include <iostream>
 # include <string>
-# include <filesystem>
 #endif
 
 #include <stddef.h>
@@ -62,6 +61,11 @@
 # include <commctrl.h>
 # include <direct.h>
 # include <basetsd.h>
+# include <shlwapi.h>
+# ifndef NDEBUG
+#  include <dbghelp.h>
+#  include <crtdbg.h>
+# endif
 #else /* linux */
 # include <unistd.h>
 # include <pwd.h>
@@ -82,6 +86,7 @@
 #include "barroit/types.h"
 #include "barroit/string.h"
 #include "barroit/zstd.h"
+#include "barroit/ctype.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,13 +94,16 @@ extern "C" {
 
 #ifdef _WIN32
 
-#define read	_read
-#define write	_write
-#define strdup	_strdup
-#define access	_access
-#define fileno	_fileno
-#define dup2	_dup2
-#define mkdir	_mkdir
+#define STDOUT_FILENO ({ fileno(stdout); })
+#define STDERR_FILENO ({ fileno(stderr); })
+
+#define read   _read
+#define write  _write
+#define strdup _strdup
+#define access _access
+#define fileno _fileno
+#define dup2   _dup2
+#define mkdir  _mkdir
 
 #define F_OK 00
 #define W_OK 02

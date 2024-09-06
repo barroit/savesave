@@ -36,5 +36,5 @@ int main(int argc, char *const *argv)
 
 	backup_routine(savesave_list);
 
-	return 0;
+	exit(0);
 }

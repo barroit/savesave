@@ -6,9 +6,55 @@
  */
 
 #include "win/console.hpp"
+#include "win/autovar.hpp"
 #include "termas.h"
 #include "debug.h"
 #include "ioop.h"
+#include "poison.h"
+
+static HANDLE create_conhand()
+{
+	return CreateFile("CONOUT$", GENERIC_READ | GENERIC_WRITE, 0, NULL,
+			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+}
+
+static void release_conhand(HANDLE *con)
+{
+	CloseHandle(*con);
+}
+
+static void set_console_size(short size)
+{
+	class autovar<HANDLE> con{ create_conhand, release_conhand };
+	int err;
+
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	err = !GetConsoleScreenBufferInfo(*con, &info);
+	if (err)
+		return;
+	if (info.dwSize.X >= size)
+		return;
+
+	COORD coord = {
+		.X = size,
+		.Y = info.dwSize.Y,
+	};
+
+	err = !SetConsoleScreenBufferSize(*con, coord);
+	if (err)
+		return;
+
+	SMALL_RECT rect = {
+		.Left   = 0,
+		.Top    = 0,
+		.Right  = (short)(coord.X - 1),
+		.Bottom = 24,
+	};
+
+	err = !SetConsoleWindowInfo(*con, TRUE, &rect);
+	if (err)
+		SetConsoleScreenBufferSize(*con, info.dwSize);
+}
 
 #ifndef CONFIG_DISABLE_CONSOLE_OUTPUT
 
@@ -29,15 +75,18 @@ void console::setup_console()
 	if (err)
 		warn("failed to set console code page to utf-8");
 
-	handle = GetConsoleWindow();
-	BUG_ON(!handle);
+	window = GetConsoleWindow();
+	BUG_ON(!window);
+
+	set_console_size(CONFIG_DO_LINE_WRAP_THRESHOLD);
+	hide_console();
 }
 
 void console::redirect_stdio(const char *output)
 {
 	int err;
 
-	handle = NULL;
+	window = (HWND)GENERIC_POISON;
 	is_live = false;
 
 	/*
@@ -47,7 +96,7 @@ void console::redirect_stdio(const char *output)
 	if (err)
 		die("unable to redirect standard io");
 
-	stream = NULL;
+	stream = (FILE *)GENERIC_POISON;
 	FreeConsole();
 }
 

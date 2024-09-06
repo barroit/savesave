@@ -120,6 +120,10 @@ config DO_MMAP_THRESHOLD
 	int "threshold for using mmap (in MiB)"
 	default 102400
 
+config DO_LINE_WRAP_THRESHOLD
+	int "threshold for line wrap"
+	default 80
+
 endmenu # "Threshold"
 
 menu "Zstandard"
@@ -131,16 +135,16 @@ endmenu # "Zstandard"
 
 menu "Debugging"
 
-config DETECT_MEMORY_LEAK
-	bool "detect unintentional memory leak"
-	imply DISABLE_CONSOLE_OUTPUT
-	imply SUPPRESS_ANNOTATED_LEAKS
-
 config DISABLE_CONSOLE_OUTPUT
 	bool "disable console output"
 	depends on $(BUILD) = "windows"
 
 config SUPPRESS_ANNOTATED_LEAKS
 	bool "suppress annotated leaks"
+
+config MAX_DUMP_STACK
+	int "max dump stack (up to USHRT_MAX)"
+	depends on $(BUILD) = "windows"
+	default 64
 
 endmenu # "Debugging"
