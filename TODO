@@ -2,6 +2,3 @@
 
 ----
 integrate gettext
-
-----
-strlist - make string duplication as the default behavior

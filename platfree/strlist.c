@@ -15,13 +15,13 @@ void strlist_init(struct strlist *sl, flag_t flags)
 {
 	memset(sl, 0, sizeof(*sl));
 
-	if (flags & STRLIST_DUPSTR)
-		sl->do_dup = 1;
+	if (flags & STRLIST_USEMOVE)
+		sl->use_move = 1;
 }
 
 void strlist_destroy(struct strlist *sl)
 {
-	if (sl->do_dup) {
+	if (!sl->use_move) {
 		size_t i;
 		for_each_idx(i, sl->cap) {
 			struct strbuf *sb = &sl->list[i];
@@ -53,7 +53,7 @@ static void strlist_init_strbuf(struct strlist *sl, struct strbuf *sb)
 {
 	flag_t flag = 0;
 
-	if (!sl->do_dup)
+	if (sl->use_move)
 		flag |= STRBUF_CONSTANT;
 
 	strbuf_init(sb, flag);
@@ -61,7 +61,7 @@ static void strlist_init_strbuf(struct strlist *sl, struct strbuf *sb)
 
 size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc)
 {
-	BUG_ON(!sl->do_dup && extalloc);
+	BUG_ON(sl->use_move && extalloc);
 
 	if (strlist_need_grow(sl))
 		strlist_grow1(sl);
@@ -77,10 +77,10 @@ size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc)
 	if (sl->uninit <= sl->nl)
 		sl->uninit = sl->nl;
 
-	if (sl->do_dup)
-		return strbuf_concat2(sb, str, extalloc);
-	else
+	if (sl->use_move)
 		return strbuf_move(sb, str);
+	else
+		return strbuf_concat2(sb, str, extalloc);
 }
 
 char *strlist_pop2(struct strlist *sl, int dup)

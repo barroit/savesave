@@ -17,9 +17,8 @@ static void dump_cmdline(const char *cmdline, int *argc, char ***argv)
 	std::string line = std::string(APPNAME) + " " + std::string(cmdline);
 	std::istringstream stream(std::move(line));
 	std::string opt;
-	struct strlist sl;
+	struct strlist sl = STRLIST_INIT;
 
-	strlist_init(&sl, STRLIST_DUPSTR);
 	while (stream >> std::quoted(opt))
 		strlist_push(&sl, opt.c_str());
 

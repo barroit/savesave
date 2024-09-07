@@ -60,10 +60,9 @@ static void assert_failure_routine()
 
 static int savesave_report_hook(int type, char *message, int *)
 {
-	struct strlist sl;
 	size_t i;
+	struct strlist sl = STRLIST_INIT;
 
-	strlist_init(&sl, STRLIST_DUPSTR);
 	strlist_strsplt_every2(&sl, message, CONFIG_DO_LINE_WRAP_THRESHOLD);
 
 	for_each_idx(i, sl.nl)

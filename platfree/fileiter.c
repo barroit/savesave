@@ -21,7 +21,7 @@ void file_iter_init(struct file_iter *ctx, const char *root,
 	strbuf_init(ctx->sb, 0);
 
 	ctx->sl = xmalloc(sizeof(*ctx->sl));
-	strlist_init(ctx->sl, STRLIST_DUPSTR);
+	strlist_init(ctx->sl, 0);
 
 	ctx->cb = cb;
 	ctx->data = data;

@@ -20,12 +20,12 @@ struct strlist {
 	size_t nl;
 	size_t cap;
 
-	int do_dup;
+	int use_move;
 };
 
 #define STRLIST_INIT { 0 }
 
-#define STRLIST_DUPSTR 1 << 0
+#define STRLIST_USEMOVE 1 << 0
 
 void strlist_init(struct strlist *sl, flag_t flags);
 
