@@ -58,10 +58,9 @@ static void get_optarg(const char **key)
 
 static void print_version(void)
 {
-	printf("%s/%s-%s %s\n"
-	       "   %s-%s\n",
-	       APPNAME, APPHOST, APPARCH, APPVERSION,
-	       "libzstd", ZSTD_versionString());
+	printf("%s/%s-%s %s\n", APPNAME, APPHOST, APPARCH, APPVERSION);
+	printf("   libzstd-%s\n", ZSTD_versionString());
+	printf("   gettext-%s\n", GETTEXT_VERSION);
 }
 
 void parse_option(int argc, char *const *argv, struct cmdarg *args)

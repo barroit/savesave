@@ -4,4 +4,7 @@
 add cntio version of dup2
 
 ----
-add gettext version in --version handler
+make macro name and kconfig key more clarity
+
+----
+refactor CMakeLists.txt

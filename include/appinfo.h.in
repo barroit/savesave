@@ -20,3 +20,7 @@
 #ifndef APPHOST
 # define APPHOST "@HOST@"
 #endif
+
+#if !defined(CONFIG_DISABLE_GETTEXT) && !defined(GETTEXT_VERSION)
+# define GETTEXT_VERSION "@GETTEXT_VERSION@"
+#endif

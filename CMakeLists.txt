@@ -18,11 +18,12 @@ endif()
 
 set(ROOT ${CMAKE_SOURCE_DIR})
 
+# ------------------------------- generated --------------------------------
 set(GENERATED ${ROOT}/include/generated)
 file(MAKE_DIRECTORY ${GENERATED})
 
+# -------------------------------- kconfig ---------------------------------
 include(${ROOT}/scripts/kconfig.cmake)
-include(${ROOT}/scripts/genheader.cmake)
 
 if(BUILD STREQUAL linux)
   set(CMAKE_C_COMPILER ${CONFIG_CC_NAME})
@@ -82,6 +83,17 @@ find_package(Intl)
 if(NOT CONFIG_DISALBE_GETTEXT AND Intl_FOUND)
   link_libraries(Intl::Intl)
   add_compile_definitions(HAVE_INTL)
+
+  if(NOT Intl_VERSION)
+    find_package(Gettext)
+    if (GETTEXT_FOUND)
+      set(GETTEXT_VERSION ${GETTEXT_VERSION_STRING})
+    else()
+      set(GETTEXT_VERSION "unknown")
+    endif()
+  else()
+    set(GETTEXT_VERSION ${Intl_VERSION})
+  endif()
 endif()
 
 # ---------------------------------- zstd ----------------------------------
@@ -145,3 +157,6 @@ if(BUILD STREQUAL windows)
   file(GLOB dlls ${CMAKE_BINARY_DIR}/*.dll)
   install(FILES ${dlls} DESTINATION ".")
 endif()
+
+# ---------------------------- generated header ----------------------------
+include(${ROOT}/scripts/genheader.cmake)
