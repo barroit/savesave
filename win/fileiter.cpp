@@ -59,20 +59,20 @@ static int dispatch_file(struct file_iter *ctx, WIN32_FIND_DATA *ent)
 
 	ret = stat(absname, &st);
 	if (ret)
-		return warn_errno(_(ERR_STAT_FILE), absname);
+		return warn_errno(_(ERRMAS_STAT_FILE), absname);
 
 	src.st = &st;
 	if (S_ISREG(st.st_mode)) {
 		int fd = open(absname, O_RDONLY);
 		if (fd == -1)
-			return warn_errno(_(ERR_OPEN_FILE), absname);
+			return warn_errno(_(ERRMAS_OPEN_FILE), absname);
 
 		src.fd = fd;
 		ret = ctx->cb(&src, ctx->data);
 		close(fd);
 		return ret;
 	} else {
-		warn("‘%s’ has unsupported st_mode ‘%ud’, skipped",
+		warn(_("`%s' has unsupported st_mode `%ud', skipped"),
 		     absname, st.st_mode);
 		return 0;
 	}
@@ -88,7 +88,8 @@ int file_iter_do_exec(struct file_iter *ctx)
 	strbuf_concat(ctx->sb, "/*");
 	HANDLE dir = FindFirstFile(ctx->sb->str, &ent);
 	if (dir == INVALID_HANDLE_VALUE)
-		return warn_winerr("failed to open directory ‘%s’", dirname);
+		return warn_winerr(_("failed to open directory `%s'"),
+				   dirname);
 
 	do {
 		ret = dispatch_file(ctx, &ent);

@@ -13,7 +13,7 @@ int str2ulong(const char *str, size_t len,
 	      unsigned long max, unsigned long *val)
 {
 	if (isspace(*str) || *str == '-')
-		return error("unexpected leading char found in ‘%s’", str);
+		return error(_("unexpected leading char found in `%s'"), str);
 
 	char *tail;
 
@@ -21,11 +21,11 @@ int str2ulong(const char *str, size_t len,
 	*val = strtoul(str, &tail, 10);
 
 	if (errno != 0)
-		return error_errno("failed to convert ‘%s’", str);
+		return error_errno(_("failed to convert `%s'"), str);
 	else if (tail - str != len)
-		return error("invalid char found in ‘%s’", str);
+		return error(_("invalid char found in `%s'"), str);
 	else if (*val > max)
-		return error("‘%s’ is too big (up to %lu)", str, max);
+		return error(_("`%s' is too big (up to %lu)"), str, max);
 
 	return 0;
 }
@@ -59,7 +59,8 @@ int str2period(const char *str, u32 *val)
 	if (!isdigit(lc)) {
 		err = char2mult(lc, &mult);
 		if (err)
-			return error("unknown time unit specifier ‘%c’", lc);
+			return error(_("unknown time unit specifier `%c'"),
+				     lc);
 		len -= 1;
 	}
 
@@ -85,5 +86,5 @@ int str2bool(const char *str, int *val)
 	return 0;
 
 err_unknown_value:
-		return error("unknown bool value ‘%s’", str);
+		return error(_("unknown bool value `%s'"), str);
 }

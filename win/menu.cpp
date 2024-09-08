@@ -19,7 +19,7 @@ static int setup_menu(HMENU menu)
 
 	err = !SetMenuInfo(menu, &info);
 	if (err)
-		return error_winerr("failed to set menu infomation");
+		return error_winerr(_("failed to set menu infomation"));
 
 	return 0;
 }

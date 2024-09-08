@@ -17,7 +17,8 @@ backup::backup(size_t nl)
 
 	use_defque = !queue;
 	if (use_defque)
-		warn_winerr("fallback to default timer queue due to a failure when creating timer queue");
+		warn_winerr(
+_("failed to create timer queue (fallback to default timer queue)"));
 }
 
 backup::~backup()
@@ -35,8 +36,8 @@ static void do_backup(void *conf, unsigned char)
 
 	err = backup_routine(c);
 	if (err)
-		error("an error occurred while making backup for configuration ‘%s’",
-		      c->name);
+		error(
+_("an error occurred while making backup for configuration `%s'"), c->name);
 }
 
 void backup::create_backup_task(const struct savesave *conf)
@@ -57,7 +58,7 @@ void backup::create_backup_task(const struct savesave *conf)
 					     (void *)conf++, countdown,
 					     countdown, flag);
 		if (!pass)
-			die_winerr("failed to create a timer for configuration ‘%s’",
-				   conf->name);
+			die_winerr(
+_("failed to create a timer for configuration `%s'"), conf->name);
 	}
 }

@@ -32,13 +32,13 @@ static int dispatch_regfile(const char *absname, const char *relname,
 
 	int fd = open(absname, O_RDONLY);
 	if (fd == -1)
-		return warn_errno(_(ERR_OPEN_FILE), absname);
+		return warn_errno(_(ERRMAS_OPEN_FILE), absname);
 
 	struct stat st;
 	ret = fstat(fd, &st);
 	if (ret) {
 		close(fd);
-		return warn_errno(_(ERR_STAT_FILE), absname);
+		return warn_errno(_(ERRMAS_STAT_FILE), absname);
 	}
 
 	struct file_iter_src src = {
@@ -78,9 +78,9 @@ static int dispatch_file(struct file_iter *ctx, struct dirent *ent)
 	case DT_LNK:
 		return dispatch_lnkfile(absname, relname, ctx->cb, ctx->data);
 	case DT_UNKNOWN:
-		return warn("can’t determine file type for ‘%s’", absname);
+		return warn(_("can't determine file type for `%s'"), absname);
 	default:
-		warn("‘%s’ has unsupported file type ‘%d’, skipped",
+		warn(_("`%s' has unsupported file type `%d', skipped"),
 		     absname, ent->d_type);
 		return 0;
 	}
@@ -91,7 +91,7 @@ int file_iter_do_exec(struct file_iter *ctx)
 	const char *dirname = ctx->sb->str;
 	DIR *dir = opendir(dirname);
 	if (!dir)
-		return warn_errno("failed to open directory ‘%s’", dirname);
+		return warn_errno(_("failed to open directory `%s'"), dirname);
 
 	int ret;
 	struct dirent *ent;

@@ -40,7 +40,8 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 
 	size_t confcnt = parse_savconf(args.savconf, &savconf);
 	if (!confcnt)
-		die("‘%s’ must have at least one configuration", args.savconf);
+		die(_("`%s' must have at least one configuration"),
+		    args.savconf);
 	format_savconf(savconf, confcnt);
 
 	DEBUG_RUN()
@@ -52,7 +53,7 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	HWND window;
 	err = create_app_window(app, &window);
 	if (err)
-		die("unable to initialize main window");
+		die(_("unable to initialize main window"));
 
 	NOTIFYICONDATA icon;
 	setup_notifyicon(app, window, &icon);

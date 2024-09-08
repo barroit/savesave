@@ -42,8 +42,8 @@ static void report_positional_argument(int idx, int argc, char *const *argv)
 	}
 
 	strbuf_truncate(&sb, 2);
-	error("positional argument%s %s %s not allowd",
-	      n > 1 ? "s" : "", sb.str, n > 1 ? "are" : "is");
+	error(n > 1 ? _("positional arguments %s are not allowd") :
+	      _("positional argument %s is not allowd"), sb.str);
 
 	strbuf_destroy(&sb);
 }
@@ -51,7 +51,7 @@ static void report_positional_argument(int idx, int argc, char *const *argv)
 static void get_optarg(const char **key)
 {
 	if (*optarg == 0)
-		die("empty string is not allowed");
+		die(_("empty string is not allowed"));
 
 	*key = optarg;
 }

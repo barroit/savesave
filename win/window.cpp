@@ -40,7 +40,7 @@ static LRESULT handle_menu_click(HWND window, enum menu_button button)
 		DestroyWindow(window);
 		break;
 	case BUTTON_ABOUT:
-		warn("‘About’ feature is not available yet");
+		warn(_("`About' feature is not available yet"));
 	}
 
 	return 0;
@@ -79,13 +79,13 @@ int create_app_window(HINSTANCE app, HWND *window)
 
 	ATOM id = RegisterClassEx(&wclass);
 	if (!id)
-		return error_winerr("failed to register window class");
+		return error_winerr(_("failed to register window class"));
 
 	*window = CreateWindowEx(0, CLASS_ID, NULL, WS_MINIMIZE, CW_USEDEFAULT,
 				 CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 				 NULL, NULL, app, NULL);
 	if (!(*window))
-		return error_winerr("failed to create window");
+		return error_winerr(_("failed to create window"));
 
 	return 0;
 }

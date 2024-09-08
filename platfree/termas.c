@@ -23,7 +23,8 @@ static void vreport_prefix(char **buf, size_t *avail, const char *lead)
 {
 	size_t n = strlen(lead);
 	if (n > *avail) {
-		fprintf(stderr, "BUG!!! too long a prefix ‘%.10s...’\n", lead);
+		fprintf(stderr, "BUG!!! ");
+		fprintf(stderr, _("too long a prefix `%.10s...'\n"),lead);
 		abort();
 	}
 
@@ -36,7 +37,8 @@ static void vreport_message(char **buf, size_t *avail,
 {
 	int nr = vsnprintf(*buf, *avail + 1, /* \0 is unnecessary */ fmt, ap);
 	if (nr < 0) {
-		fprintf(stderr, "fatal: unable to format message ‘%s’\n", fmt);
+		fprintf(stderr, _("fatal: unable to format message `%s'\n"),
+			fmt);
 		exit(128);
 	} else if ((unsigned)nr > *avail) {
 		nr = *avail;
@@ -142,7 +144,7 @@ void vreport_format_cntrl_char(char *str, size_t len, size_t *avail)
 	size_t lasidx = len - 1;
 	/*
 	 * for consistency, if the offset is beyond to avail, we simply replace
-	 * all unexpected control characters with ‘?’
+	 * all unexpected control characters with `?'
 	 */
 	if (unlikely(off > *avail)) {
 		format_cntrl_char_simple(str, cntrl.pos, cntrl.nr);

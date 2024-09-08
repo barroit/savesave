@@ -33,8 +33,8 @@ extern NORETURN __die_routine(const char *, const char *, const char *, ...);
 #define st_mult(a, b)							\
 ({									\
 	if (unlikely(uint_mult_overflows(a, b))) {			\
-		__die_routine("fatal: ", NULL, "size overflow: "	\
-			      "%" PRIuMAX " * %" PRIuMAX ,		\
+		__die_routine(_("fatal: "), NULL, _("size overflow: "	\
+			      "%" PRIuMAX " * %" PRIuMAX ""),		\
 			      (uintmax_t)(a), (uintmax_t)(b));		\
 	}								\
 	((a) * (b));							\
@@ -43,8 +43,8 @@ extern NORETURN __die_routine(const char *, const char *, const char *, ...);
 #define st_add(a, b)							\
 ({									\
 	if (unlikely(uint_add_overflows(a, b))) {			\
-		__die_routine("fatal: ", NULL, "size overflow: "	\
-			      "%" PRIuMAX " + %" PRIuMAX ,		\
+		__die_routine(_("fatal: "), NULL, _("size overflow: "	\
+			      "%" PRIuMAX " + %" PRIuMAX ""),		\
 			      (uintmax_t)(a), (uintmax_t)(b));		\
 	}								\
 	((a) + (b));							\

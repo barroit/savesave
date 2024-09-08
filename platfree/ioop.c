@@ -20,22 +20,22 @@ int redirect_stdio(const char *name)
 	free(tmp);
 
 	if (err && errno != EEXIST)
-		return error_errno("failed to create directory for log file ‘%s’",
-				   name);
+		return error_errno(
+_("failed to create directory for log file `%s'"), name);
 
 	int fd = creat(name, 0664);
 	if (fd == -1) {
-		error_errno(_(ERR_CREAT_FILE), name);
+		error_errno(_(ERRMAS_CREAT_FILE), name);
 		goto err_open_file;
 	}
 
 	if (dup2(fd, STDOUT_FILENO) == -1) {
-		error_errno("cannot redirect stdout to ‘%s’", name);
+		error_errno(_("cannot redirect stdout to `%s'"), name);
 		goto close_file;
 	}
 
 	if (dup2(fd, STDERR_FILENO) == -1) {
-		error_errno("cannot redirect stderr to ‘%s’", name);
+		error_errno(_("cannot redirect stderr to `%s'"), name);
 		goto close_file;
 	}
 

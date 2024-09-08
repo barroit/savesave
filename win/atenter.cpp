@@ -25,7 +25,7 @@ atenter::atenter()
 static void check_os_version()
 {
 	if (!IsWindows7OrGreater())
-		die("unsupported windows version (at least win7)");
+		die(_("unsupported windows version (at least win7)"));
 }
 
 void atenter::precheck()

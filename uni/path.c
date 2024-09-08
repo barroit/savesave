@@ -52,7 +52,7 @@ const char *get_home_dir(void)
 		home = getenv("HOME");
 
 	if (!home)
-		die("your $HOME corrupted");
+		die(_("your $HOME corrupted"));
 
 	return home;
 }

@@ -2,3 +2,6 @@
 
 ----
 make macro name and kconfig key more clarity
+
+----
+make HELP_MESSAGE compatible with gettext

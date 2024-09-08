@@ -20,7 +20,8 @@ CONSTRUCTOR(check_libzstd_mt)
 
 	res = ZSTD_CCtx_setParameter(ctx, ZSTD_c_nbWorkers, 400);
 	if (ZSTD_isError(res))
-		die("savesave requires a multithreading supported version of libzstd");
+		die(
+_("savesave requires a multithreading supported version of libzstd"));
 
 	ZSTD_freeCCtx(ctx);
 }

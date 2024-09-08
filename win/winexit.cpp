@@ -12,7 +12,7 @@
 
 static void waiting_user()
 {
-	puts("Press any key to continue...");
+	puts(_("Press any key to continue..."));
 	_getch();
 }
 

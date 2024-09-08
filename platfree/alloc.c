@@ -11,7 +11,8 @@
 void alloc_limit_check(size_t n)
 {
 	if (n > MAX_ALLOC_SIZE) {
-		die("attempting to allocate %" PRIuMAX " over limit %" PRIuMAX,
+		die(_("attempting to allocate "
+		    "%" PRIuMAX " over limit %" PRIuMAX ""),
 		    (uintmax_t)n, (uintmax_t)MAX_ALLOC_SIZE);
 	}
 }
@@ -20,7 +21,7 @@ void alloced_or_die(void *ptr, size_t size)
 {
 	if (likely(ptr))
 		return;
-	die("out of memory (tried to allocate %" PRIuMAX " bytes)", size);
+	die(_("out of memory (tried to allocate %" PRIuMAX " bytes)"), size);
 }
 
 void *xrealloc(void *ptr, size_t size)
@@ -69,6 +70,6 @@ char *xstrdup(const char *src)
 {
 	char *str = strdup(src);
 	if (!str) /* ENOMEM */
-		die_errno("failed to duplicate string");
+		die_errno(_("failed to duplicate string"));
 	return str;
 }

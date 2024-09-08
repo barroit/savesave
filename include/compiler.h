@@ -59,7 +59,7 @@ extern "C" {
 ({									\
 	static_assert(same_type(*(ptr), typeof_member(type, member)) ||	\
 		      same_type(*(ptr), void),				\
-		      "pointer type mismatch in containerof()");	\
+		      _("pointer type mismatch in containerof()"));	\
 	((type *)(((void *)ptr) - offsetof(type, member)));		\
 })
 

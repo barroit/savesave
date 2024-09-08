@@ -15,9 +15,140 @@ msgstr  "Report-Msgid-Bugs-To: barroit@linux.com\n"
         "Content-Type: text/plain; charset=UTF-8\n"
         "Content-Transfer-Encoding: 8bit\n"
 
+#: uni/fileiter.c:81
+#, c-format
+msgid   "can't determine file type for `%s'"
+msgstr  ""
+
+#: uni/fileiter.c:83
+#, c-format
+msgid   "`%s' has unsupported file type `%d', skipped"
+msgstr  ""
+
+#: uni/fileiter.c:94 win/fileiter.cpp:91
+#, c-format
+msgid   "failed to open directory `%s'"
+msgstr  ""
+
 #: uni/path.c:40
 #, c-format
 msgid   "can't get home directory for sudo user `%s'"
+msgstr  ""
+
+#: uni/path.c:55
+msgid   "your $HOME corrupted"
+msgstr  ""
+
+#: uni/robio.c:23
+#, c-format
+msgid   "failed to copy file from `%s' to `%s'"
+msgstr  ""
+
+#: win/atenter.cpp:28
+msgid   "unsupported windows version (at least win7)"
+msgstr  ""
+
+#: win/backup.cpp:21
+msgid   "failed to create timer queue (fallback to default timer queue)"
+msgstr  ""
+
+#: win/backup.cpp:40
+#, c-format
+msgid   "an error occurred while making backup for configuration `%s'"
+msgstr  ""
+
+#: win/backup.cpp:62
+#, c-format
+msgid   "failed to create a timer for configuration `%s'"
+msgstr  ""
+
+#: win/cmdline.cpp:42 entry/savesave.c:30
+msgid   "no savconf was provided"
+msgstr  ""
+
+#: win/console.cpp:76
+msgid   "failed to set console code page to utf-8"
+msgstr  ""
+
+#: win/console.cpp:97
+msgid   "unable to redirect standard io"
+msgstr  ""
+
+#: win/dumpstack.cpp:28
+msgid   "failed to initialize symbol handler"
+msgstr  ""
+
+#: win/dumpstack.cpp:52
+msgid   "failed to retrieve symbol for 0x<PRIxMAX>"
+msgstr  ""
+
+#: win/fileiter.cpp:75
+#, c-format
+msgid   "`%s' has unsupported st_mode `%ud', skipped"
+msgstr  ""
+
+#: win/menu.cpp:22
+msgid   "failed to set menu infomation"
+msgstr  ""
+
+#: win/window.cpp:43
+msgid   "`About' feature is not available yet"
+msgstr  ""
+
+#: win/window.cpp:82
+msgid   "failed to register window class"
+msgstr  ""
+
+#: win/window.cpp:88
+msgid   "failed to create window"
+msgstr  ""
+
+#: win/winexit.cpp:15
+msgid   "Press any key to continue..."
+msgstr  ""
+
+#: platfree/alloc.c:14
+#, c-format
+msgid   "attempting to allocate %<PRIuMAX> over limit %<PRIuMAX>"
+msgstr  ""
+
+#: platfree/alloc.c:24
+#, c-format
+msgid   "out of memory (tried to allocate %<PRIuMAX> bytes)"
+msgstr  ""
+
+#: platfree/alloc.c:73
+msgid   "failed to duplicate string"
+msgstr  ""
+
+#: platfree/backup.c:52
+#, c-format
+msgid   "failed to rename file `%s' to `%s'"
+msgstr  ""
+
+#: platfree/backup.c:72
+#, c-format
+msgid   "failed to remove file `%s'"
+msgstr  ""
+
+#: platfree/backup.c:115
+#, c-format
+msgid   "unable to drop deprecated backup of configuration `%s'"
+msgstr  ""
+
+#: platfree/backup.c:130
+#, c-format
+msgid   "unable to determine next backup file name of configuration `%s'"
+msgstr  ""
+
+#: platfree/backup.c:196
+#, c-format
+msgid   "next backup name\n"
+        "\t%s\n"
+msgstr  ""
+
+#: platfree/compress.c:24
+msgid   "savesave requires a multithreading supported version of libzstd"
 msgstr  ""
 
 #: platfree/getopt.c:579
@@ -75,8 +206,192 @@ msgstr  ""
 msgid   "%s: option `-W %s' doesn't allow an argument\n"
 msgstr  ""
 
-#: entry/savesave.cpp:40
-msgid   "test"
+#: platfree/ioop.c:24
+#, c-format
+msgid   "failed to create directory for log file `%s'"
+msgstr  ""
+
+#: platfree/ioop.c:33
+#, c-format
+msgid   "cannot redirect stdout to `%s'"
+msgstr  ""
+
+#: platfree/ioop.c:38
+#, c-format
+msgid   "cannot redirect stderr to `%s'"
+msgstr  ""
+
+#: platfree/runopt.c:45
+#, c-format
+msgid   "positional arguments %s are not allowd"
+msgstr  ""
+
+#: platfree/runopt.c:46
+#, c-format
+msgid   "positional argument %s is not allowd"
+msgstr  ""
+
+#: platfree/runopt.c:54
+msgid   "empty string is not allowed"
+msgstr  ""
+
+#: platfree/savconf.c:158
+#, c-format
+msgid   "save path `%s' must be an absolute path"
+msgstr  ""
+
+#: platfree/savconf.c:163
+#, c-format
+msgid   "save path `%s' does not exist"
+msgstr  ""
+
+#: platfree/savconf.c:172
+#, c-format
+msgid   "unsupported save file mode `%d'"
+msgstr  ""
+
+#: platfree/savconf.c:185
+#, c-format
+msgid   "failed to create backup directory `%s'"
+msgstr  ""
+
+#: platfree/savconf.c:192
+#, c-format
+msgid   "unable to get metadata for backup directory `%s'"
+msgstr  ""
+
+#: platfree/savconf.c:194
+#, c-format
+msgid   "file `%s' is not a directory"
+msgstr  ""
+
+#: platfree/savconf.c:198
+#, c-format
+msgid   "unable to access backup directory `%s'"
+msgstr  ""
+
+#: platfree/savconf.c:208
+msgid   "stack cannot be 0"
+msgstr  ""
+
+#: platfree/savconf.c:216
+msgid   "period cannot be 0"
+msgstr  ""
+
+#: platfree/savconf.c:271
+#, c-format
+msgid   "name '%s' must have a value"
+msgstr  ""
+
+#: platfree/savconf.c:302
+#, c-format
+msgid   "unrecognized name found in `%s'"
+msgstr  ""
+
+#: platfree/savconf.c:327
+msgid   "encountered an unknown line"
+msgstr  ""
+
+#: platfree/savconf.c:349
+#, c-format
+msgid   "configuration `%s' missing the following fields\n"
+        "\n"
+        "%s"
+msgstr  ""
+
+#: platfree/savconf.c:350
+#, c-format
+msgid   "configuration `%s' missing the following field\n"
+        "\n"
+        "%s"
+msgstr  ""
+
+#: platfree/savconf.c:402
+#, c-format
+msgid   "failed to parse savesave configuration\n"
+        "%7<PRIuMAX>:%s"
+msgstr  ""
+
+#: platfree/savconf.c:424
+#, c-format
+msgid   "an error occurred while reading savconf `%s'"
+msgstr  ""
+
+#: platfree/savconf.c:427
+#, c-format
+msgid   "file `%s' is empty"
+msgstr  ""
+
+#: platfree/termas.c:27
+#, c-format
+msgid   "too long a prefix `%.10s...'\n"
+msgstr  ""
+
+#: platfree/termas.c:40
+#, c-format
+msgid   "fatal: unable to format message `%s'\n"
+msgstr  ""
+
+#: platfree/text2num.c:16
+#, c-format
+msgid   "unexpected leading char found in `%s'"
+msgstr  ""
+
+#: platfree/text2num.c:24
+#, c-format
+msgid   "failed to convert `%s'"
+msgstr  ""
+
+#: platfree/text2num.c:26
+#, c-format
+msgid   "invalid char found in `%s'"
+msgstr  ""
+
+#: platfree/text2num.c:28
+#, c-format
+msgid   "`%s' is too big (up to %lu)"
+msgstr  ""
+
+#: platfree/text2num.c:62
+#, c-format
+msgid   "unknown time unit specifier `%c'"
+msgstr  ""
+
+#: platfree/text2num.c:89
+#, c-format
+msgid   "unknown bool value `%s'"
+msgstr  ""
+
+#: entry/savesave.c:34
+#, c-format
+msgid   "`%s' must contain at least one configuration"
+msgstr  ""
+
+#: entry/savesave.cpp:43
+#, c-format
+msgid   "`%s' must have at least one configuration"
+msgstr  ""
+
+#: entry/savesave.cpp:56
+msgid   "unable to initialize main window"
+msgstr  ""
+
+#: include/calc.h:36 include/calc.h:46 include/termas.h:38 include/termas.h:40
+msgid   "fatal: "
+msgstr  ""
+
+#: include/calc.h:36
+#, c-format
+msgid   "size overflow: %<PRIuMAX> * %<PRIuMAX>"
+msgstr  ""
+
+#: include/calc.h:46
+#, c-format
+msgid   "size overflow: %<PRIuMAX> + %<PRIuMAX>"
+msgstr  ""
+
+#: include/compiler.h:62
+msgid   "pointer type mismatch in containerof()"
 msgstr  ""
 
 #: include/termas.h:28 include/termas.h:30
@@ -85,8 +400,4 @@ msgstr  ""
 
 #: include/termas.h:33 include/termas.h:35
 msgid   "error: "
-msgstr  ""
-
-#: include/termas.h:38 include/termas.h:40
-msgid   "fatal: "
 msgstr  ""

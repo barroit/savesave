@@ -25,7 +25,7 @@ static void assert_failure_routine()
 	SymSetOptions(opt | SYMOPT_LOAD_LINES);
 	err = !SymInitialize(proc, NULL, TRUE);
 	if (err)
-		die_winerr("failed to initialize symbol handler");
+		die_winerr(_("failed to initialize symbol handler"));
 
 	void *stack[CONFIG_MAX_DUMP_STACK];
 	unsigned short frames = CaptureStackBackTrace(0, sizeof_array(stack),
@@ -48,8 +48,8 @@ static void assert_failure_routine()
 
 		err = !SymFromAddr(proc, addr, 0, symbol);
 		if (err)
-			die_winerr("failed to retrieve symbol for 0x" PRIxMAX,
-				   addr);
+			die_winerr(
+_("failed to retrieve symbol for 0x" PRIxMAX ""), addr);
 
 		printf("%5d: 0x%" PRIxMAX " - %s\n",
 		       frames - i - 1, symbol->Address, symbol->Name);

@@ -29,11 +29,11 @@ static int read_savconf(const char *name, char **text)
 {
 	int fd = open(name, O_RDONLY);
 	if (fd == -1)
-		return error_errno("failed to open savconf ‘%s’", name);
+		return error_errno("failed to open savconf `%s'", name);
 
 	struct stat st;
 	if (fstat(fd, &st) == -1) {
-		error_errno("failed to retrieve information for savconf ‘%s’",
+		error_errno("failed to retrieve information for savconf `%s'",
 			    name);
 		goto err_stat_fd;
 	}
@@ -42,7 +42,7 @@ static int read_savconf(const char *name, char **text)
 	buf[st.st_size] = 0;
 
 	if (robread(fd, buf, st.st_size) == -1) {
-		error_errno("failed to read savconf ‘%s’", name);
+		error_errno("failed to read savconf `%s'", name);
 		goto err_read_file;
 	}
 
@@ -83,7 +83,7 @@ static int check_unique_savconf(const struct savesave *conf, size_t nr)
 	for_each_idx(i, nr - 1) {
 		if (likely(strcmp(conf[i].name, name)))
 			continue;
-		return error("configuration name ‘%s’ conflicts at config indexes %zd and %zd",
+		return error("configuration name `%s' conflicts at config indexes %zd and %zd",
 			     name, i, nr - 1);
 	}
 
@@ -120,7 +120,7 @@ static FILE_ITER_CALLBACK(sizeof_file)
 
 	if (!src->st)
 		/*
-		 * we don’t handle symbolic links; a constant is given that is
+		 * we don't handle symbolic links; a constant is given that is
 		 * large enough for most symbolic link files
 		 */
 		size = 64;
@@ -142,7 +142,7 @@ int calc_dir_size(const char *base, off64_t *size)
 	file_iter_destroy(&ctx);
 
 	if (ret)
-		return error("unable to calculate directory size for ‘%s’",
+		return error("unable to calculate directory size for `%s'",
 			     base);
 
 	return 0;
@@ -155,11 +155,12 @@ static int parse_save(void *__save, struct savesave *conf)
 	struct stat st;
 
 	if (!is_absolute_path(save))
-		return error("save path ‘%s’ is not an absolute path", save);
+		return error(_("save path `%s' must be an absolute path"),
+			     save);
 
 	err = stat(save, &st);
 	if (err)
-		return error("save path ‘%s’ does not exist", save);
+		return error(_("save path `%s' does not exist"), save);
 
 	if (S_ISREG(st.st_mode)) {
 		conf->save_size = st.st_size;
@@ -168,7 +169,7 @@ static int parse_save(void *__save, struct savesave *conf)
 		conf->is_dir_save = 1;
 		return calc_dir_size(save, &conf->save_size);
 	} else {
-		return error("unsupported save file mode ‘%d’", st.st_mode);
+		return error(_("unsupported save file mode `%d'"), st.st_mode);
 	}
 
 	return 0;
@@ -181,20 +182,20 @@ static int prepare_backup(void *__backup, struct savesave *_)
 
 	err = my_mkdir(backup);
 	if (err && errno != EEXIST)
-		return error_errno("failed to create backup directory ‘%s’",
+		return error_errno(_("failed to create backup directory `%s'"),
 				   backup);
 
 	struct stat st;
 	err = stat(backup, &st);
 	if (err)
-		return error_errno("unable to get metadata for backup directory ‘%s’",
-				   backup);
+		return error_errno(
+_("unable to get metadata for backup directory `%s'"), backup);
 	if (!S_ISDIR(st.st_mode))
-		return error("file ‘%s’ is not a directory", backup);
+		return error(_("file `%s' is not a directory"), backup);
 
 	err = access(backup, W_OK | X_OK);
 	if (err)
-		return error_errno("unable to access backup directory ‘%s’",
+		return error_errno(_("unable to access backup directory `%s'"),
 				   backup);
 
 	return 0;
@@ -204,7 +205,7 @@ static int check_stack(void *__stack, struct savesave *_)
 {
 	u8 stack = *(u8 *)__stack;
 	if (stack == 0)
-		return error("stack cannot be 0");
+		return error(_("stack cannot be 0"));
 	return 0;
 }
 
@@ -212,7 +213,7 @@ static int check_period(void *__period, struct savesave *_)
 {
 	u32 period = *(u32 *)__period;
 	if (period == 0)
-		return error("period cannot be 0");
+		return error(_("period cannot be 0"));
 	return 0;
 }
 
@@ -267,8 +268,7 @@ static int parse_entry_value(const char *rest, struct savesave *conf,
 {
 	rest = skip_space(rest);
 	if (!*rest)
-		return error("name ‘%s’ must be defined with a value",
-			     entry->name);
+		return error(_("name '%s' must have a value"), entry->name);
 
 	int res = 0;
 	switch (entry->type) {
@@ -299,7 +299,7 @@ static int parse_entry_line(const char *line, struct savesave *conf)
 
 	err = assign_entry(line, &rest, conf, &entry);
 	if (err)
-		return error("unrecognized name found in ‘%s’", line);
+		return error(_("unrecognized name found in `%s'"), line);
 
 	return parse_entry_value(rest, conf, &entry);
 }
@@ -324,7 +324,7 @@ static int parse_savconf_line(struct savesave_context *ctx)
 	} else if (skip_prefix(line, "\t", &str) == 0 && isalpha(*str)) {
 		return parse_entry_line(str, &ctx->conf[ctx->nl - 1]);
 	} else {
-		return error("encountered an unknown line");
+		return error(_("encountered an unknown line"));
 	}
 }
 
@@ -345,8 +345,10 @@ static void validate_savconf(const struct savesave *c)
 		return;
 
 	size_t lines = strbuf_cntchr(&sb, '\n');
-	die("configuration ‘%s’ missing the following field%s\n\n%s",
-	    c->name, lines > 1 ? "s" : "", sb.str);
+	die(lines > 1 ?
+	    _("configuration `%s' missing the following fields\n\n%s") :
+	    _("configuration `%s' missing the following field\n\n%s"),
+	    c->name, sb.str);
 }
 
 static void update_backup_prefix(struct savesave *c)
@@ -397,8 +399,8 @@ static void do_parse_savconf(struct savesave_context *ctx)
 
 		err = parse_savconf_line(ctx);
 		if (err)
-			die("failed to parse savesave configuration\n"
-			    "%7" PRIuMAX ":%s", cnt, ctx->line);
+			die(_("failed to parse savesave configuration\n"
+			    "%7" PRIuMAX ":%s"), cnt, ctx->line);
 
 		if (is_final)
 			break;
@@ -419,10 +421,10 @@ size_t parse_savconf(const char *path, struct savesave **conf)
 
 	err = read_savconf(path, &txtconf);
 	if (err)
-		die_errno("an error occurred while reading savconf ‘%s’",
+		die_errno(_("an error occurred while reading savconf `%s'"),
 			  path);
 	else if (*txtconf == 0)
-		die("file ‘%s’ is empty", path);
+		die(_("file `%s' is empty"), path);
 
 	struct savesave_context ctx = {
 		.line  = txtconf,
@@ -441,7 +443,7 @@ void print_savconf(const struct savesave *conf, size_t nl)
 	const struct savesave *c;
 
 	/*
-	 * for consistency, we can’t use off_t, because there is no length
+	 * for consistency, we can't use off_t, because there is no length
 	 * modifier dedicated to this type
 	 */
 	ssize_t size;

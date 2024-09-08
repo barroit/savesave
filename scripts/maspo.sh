@@ -10,7 +10,8 @@ region=('ja_JP' 'zh_CN')
 
 case $1 in
 'update')
-	xgettext -k_ -kN_ -k -i --omit-header -o locale/generated.pot	\
+	xgettext -k_ -kN_ -k -i --omit-header --from-code=UTF-8		\
+		 -o locale/generated.pot				\
 		 uni/*.c	win/*.c		win/*.cpp		\
 		 platfree/*.c						\
 		 entry/*.c	entry/*.cpp				\

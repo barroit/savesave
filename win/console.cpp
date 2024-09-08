@@ -73,7 +73,7 @@ void console::setup_console()
 
 	err = !SetConsoleOutputCP(CP_UTF8);
 	if (err)
-		warn("failed to set console code page to utf-8");
+		warn(_("failed to set console code page to utf-8"));
 
 	window = GetConsoleWindow();
 	BUG_ON(!window);
@@ -94,7 +94,7 @@ void console::redirect_stdio(const char *output)
 	 */
 	err = ::redirect_stdio(output);
 	if (err)
-		die("unable to redirect standard io");
+		die(_("unable to redirect standard io"));
 
 	stream = (FILE *)GENERIC_POISON;
 	FreeConsole();

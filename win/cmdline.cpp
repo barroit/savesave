@@ -39,5 +39,5 @@ void parse_cmdline(const char *cmdline, struct cmdarg *args)
 	if (!args->savconf)
 		args->savconf = get_default_savconf_path();
 	if (!args->savconf)
-		die("no savconf was provided");
+		die(_("no savconf was provided"));
 }

@@ -14,11 +14,8 @@
 #include "fileiter.h"
 #include "alloc.h"
 
-#define ERR_SORT_BACKUP "unable to sort backup ‘%s’ of configuration ‘%s’"
-#define ERR_DROP_BACKUP \
-	"unable to drop deprecated backup of configuration ‘%s’"
-#define ERR_NEXT_BACKUP \
-	"unable to determine next backup file name of configuration ‘%s’"
+#define ERRMAS_SORT_BACKUP \
+	"unable to sort backup `%s' of configuration `%s'"
 
 static char stru8_map[UINT8_MAX + 1][STRU8_MAX];
 
@@ -51,11 +48,11 @@ static int sort_backup(struct strbuf *src, struct strbuf *dest, u8 stack)
 			strbuf_concatat(dest, src->initlen, stru8_map[room]);
 			err = rename(src->str, dest->str);
 			if (err)
-				return warn_errno("failed to rename file ‘%s’ to ‘%s’",
-						  src->str, dest->str);
+				return warn_errno(
+_("failed to rename file `%s' to `%s'"), src->str, dest->str);
 			room++;
 		} else if (errno != ENOENT) {
-			return warn_errno(_(ERR_ACCESS_FILE), src->str);
+			return warn_errno(_(ERRMAS_ACCESS_FILE), src->str);
 		}
 
 		if (room == -1)
@@ -72,7 +69,7 @@ static int drop_deprecated_backup(struct strbuf *path)
 	strbuf_concatat(path, path->initlen, "0");
 	err = remove(path->str);
 	if (err)
-		return warn_errno("failed to remove file ‘%s’", path->str);
+		return warn_errno(_("failed to remove file `%s'"), path->str);
 
 	return 0;
 }
@@ -90,7 +87,7 @@ static int find_next_room(struct strbuf *next, u8 stack)
 			strbuf_concatat(next, next->initlen, stru8_map[i + 1]);
 			return 0;
 		} else if (errno != ENOENT) {
-			return warn_errno(_(ERR_ACCESS_FILE), next->str);
+			return warn_errno(_(ERRMAS_ACCESS_FILE), next->str);
 		}
 	}
 
@@ -107,28 +104,30 @@ static char *get_next_backup_name(const struct savesave *c)
 	has_room = sort_backup(&src, &dest, c->stack);
 	if (has_room == -1) {
 		strbuf_concatat(&src, src.initlen, "*");
-		ret = error(ERR_SORT_BACKUP, src.str, c->name);
+		ret = error(_(ERRMAS_SORT_BACKUP), src.str, c->name);
 		goto cleanup;
 	}
 
 	if (!has_room) {
 		ret = drop_deprecated_backup(&dest);
 		if (ret) {
-			error(ERR_DROP_BACKUP, c->name);
+			error(
+_("unable to drop deprecated backup of configuration `%s'"), c->name);
 			goto cleanup;
 		}
 
 		has_room = sort_backup(&src, &dest, c->stack);
 		if (has_room == -1) {
 			strbuf_concatat(&src, src.initlen, "*");
-			ret = error(ERR_SORT_BACKUP, src.str, c->name);
+			ret = error(_(ERRMAS_SORT_BACKUP), src.str, c->name);
 			goto cleanup;
 		}
 	}
 
 	ret = find_next_room(&dest, c->stack);
 	if (ret)
-		error(ERR_NEXT_BACKUP, c->name);
+		error(
+_("unable to determine next backup file name of configuration `%s'"), c->name);
 
 cleanup:
 	strbuf_destroy(&src);
@@ -194,7 +193,7 @@ int backup_routine(struct savesave *c)
 	char *temp = tmpdir_of_backup(c->backup_prefix);
 
 	DEBUG_RUN() {
-		printf("next backup name\n\t%s\n", dest);
+		printf(_("next backup name\n\t%s\n"), dest);
 		fflush(stdout);
 	}
 
