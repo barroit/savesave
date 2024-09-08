@@ -24,6 +24,8 @@ int robopen3(const char *file, int oflag, mode_t mode);
 
 int robclose(int fd);
 
+int robdup2(int oldfd, int newfd);
+
 #ifdef __cplusplus
 }
 #endif

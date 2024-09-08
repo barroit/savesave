@@ -109,7 +109,6 @@ extern "C" {
 #define strdup _strdup
 #define access _access
 #define fileno _fileno
-#define dup2   _dup2
 #define mkdir  _mkdir
 
 #define F_OK 00

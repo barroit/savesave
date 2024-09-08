@@ -126,3 +126,24 @@ int robclose(int fd)
 		return err;
 	}
 }
+
+#ifdef dup2
+# undef dup2
+# ifdef _WIN32
+#  define dup2 _dup2
+# endif
+#endif
+
+int robdup2(int oldfd, int newfd)
+{
+	int fd;
+
+	while (39) {
+		fd = dup2(oldfd, newfd);
+		if (fd != -1)
+			return fd;
+		else if (errno == EINTR)
+			continue;
+		return -1;
+	}
+}

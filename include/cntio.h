@@ -3,6 +3,8 @@
  * Copyright 2024 Jiamu Sun
  *
  * Contact: barroit@linux.com
+ *
+ * automatically included by build system
  */
 
 #ifndef CNTIO_H
@@ -31,6 +33,9 @@ int cntclosedir(DIR *dirp);
 #define closedir cntclosedir
 
 #endif
+
+int cntdup2(int oldfd, int newfd);
+#define dup2 cntdup2
 
 /* more over, dup, pipe... */
 

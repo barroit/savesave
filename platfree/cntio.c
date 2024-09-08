@@ -9,7 +9,6 @@
 # pragma GCC diagnostic ignored "-Wsometimes-uninitialized"
 #endif
 
-#include "cntio.h"
 #include "debug.h"
 #include "robio.h"
 
@@ -61,4 +60,13 @@ int cntclose(int fd)
 
 	cntio_cntsub1();
 	return 0;
+}
+
+int cntdup2(int oldfd, int newfd)
+{
+	int fd = robdup2(oldfd, newfd);
+	if (fd != -1)
+		cntio_cntadd1();
+
+	return fd;
 }
