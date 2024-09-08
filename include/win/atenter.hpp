@@ -5,7 +5,8 @@
  * Contact: barroit@linux.com
  */
 
-#pragma once
+#ifndef ATENTER_HPP
+#define ATENTER_HPP
 
 class atenter {
 public:
@@ -17,3 +18,5 @@ public:
 	 */
 	void precheck();
 };
+
+#endif /* ATENTER_HPP */

@@ -5,7 +5,8 @@
  * Contact: barroit@linux.com
  */
 
-#pragma once
+#ifndef CONSOLE_HPP
+#define CONSOLE_HPP
 
 #ifdef CONFIG_DISABLE_CONSOLE_OUTPUT
 
@@ -23,7 +24,7 @@ public:
 	inline bool is_active() { return false; }
 };
 
-#else
+#else /* NOT CONFIG_DISABLE_CONSOLE_OUTPUT */
 
 class console {
 	FILE *stream;
@@ -58,3 +59,5 @@ public:
 #endif /* CONFIG_DISABLE_CONSOLE_OUTPUT */
 
 class console *get_app_console();
+
+#endif /* CONSOLE_HPP */

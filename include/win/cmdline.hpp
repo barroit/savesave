@@ -5,9 +5,12 @@
  * Contact: barroit@linux.com
  */
 
-#pragma once
+#ifndef CMDLINE_HPP
+#define CMDLINE_HPP
 
 #include "runopt.h"
 #include "savconf.h"
 
 void parse_cmdline(const char *cmdline, struct cmdarg *args);
+
+#endif /* CMDLINE_HPP */

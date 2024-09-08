@@ -5,7 +5,8 @@
  * Contact: barroit@linux.com
  */
 
-#pragma once
+#ifndef AUTOVAR_HPP
+#define AUTOVAR_HPP
 
 template <typename type_name>
 class autovar {
@@ -33,3 +34,5 @@ public:
 		return &resource;
 	}
 };
+
+#endif /* AUTOVAR_HPP */

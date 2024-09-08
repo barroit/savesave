@@ -5,7 +5,10 @@
  * Contact: barroit@linux.com
  */
 
-#pragma once
+#ifndef RESID_HPP
+#define RESID_HPP
 
 #define APP_MANIFEST 1
 #define NOTIFY_ICON  101
+
+#endif /* RESID_HPP */

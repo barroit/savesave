@@ -5,7 +5,8 @@
  * Contact: barroit@linux.com
  */
 
-#pragma once
+#ifndef BACKUP_HPP
+#define BACKUP_HPP
 
 struct savesave;
 
@@ -22,3 +23,5 @@ public:
 
 	void create_backup_task(const struct savesave *);
 };
+
+#endif /* BACKUP_HPP */

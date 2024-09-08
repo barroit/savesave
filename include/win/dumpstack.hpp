@@ -5,6 +5,9 @@
  * Contact: barroit@linux.com
  */
 
-#pragma once
+#ifndef DUMPSTACK_HPP
+#define DUMPSTACK_HPP
 
 void setup_crt_report_hook();
+
+#endif /* DUMPSTACK_HPP */

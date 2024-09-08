@@ -1,7 +1,7 @@
                                   TODO LIST
 
 ----
-use standard include guard in hpp files
+add cntio version of dup2
 
 ----
-add cntio version of dup2
+add gettext version in --version handler

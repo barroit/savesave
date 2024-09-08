@@ -5,6 +5,9 @@
  * Contact: barroit@linux.com
  */
 
+#ifndef UI_HPP
+#define UI_HPP
+
 int create_app_window(HINSTANCE app, HWND *window);
 
 enum menu_button {
@@ -19,3 +22,5 @@ int show_popup_menu(HWND window, POINT *cursor);
 void setup_notifyicon(HINSTANCE app, HWND window, NOTIFYICONDATA *icon);
 
 void show_notifyicon(NOTIFYICONDATA *icon);
+
+#endif /* UI_HPP */
