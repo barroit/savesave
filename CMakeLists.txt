@@ -1,11 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-only
 cmake_minimum_required(VERSION 3.21)
 
-set(BUILD $ENV{BUILD})
+# ----------------------------- build profile ------------------------------
 set(ARCH  $ENV{ARCH})
-
-set(SAVESAVE_NAME savesave)
-set(SAVESAVE_VERSION $ENV{SAVESAVE_VERSION})
+set(BUILD $ENV{BUILD})
 
 # follow the gcc concepts:
 #   build is the machine you are building on
@@ -18,13 +16,14 @@ endif()
 
 set(ROOT ${CMAKE_SOURCE_DIR})
 
-# ------------------------------- generated --------------------------------
+# -------------------------- generated directory ---------------------------
 set(GENERATED ${ROOT}/include/generated)
 file(MAKE_DIRECTORY ${GENERATED})
 
 # -------------------------------- kconfig ---------------------------------
 include(${ROOT}/scripts/kconfig.cmake)
 
+# -------------------------------- compiler --------------------------------
 if(BUILD STREQUAL linux)
   set(CMAKE_C_COMPILER ${CONFIG_CC_NAME})
   # we do not use cpp on linux
@@ -55,11 +54,15 @@ add_compile_options(-g${CONFIG_COMPILER_DEBUG})
 set_choiced_value(CONFIG_COMPILER_OPTIMIZE)
 add_compile_options(-O${CONFIG_COMPILER_OPTIMIZE})
 
+# ---------------------------- project profile -----------------------------
 list(APPEND languages C)
 
 if(HOST STREQUAL windows)
   list(APPEND languages CXX)
 endif()
+
+set(SAVESAVE_NAME savesave)
+set(SAVESAVE_VERSION $ENV{SAVESAVE_VERSION})
 
 project(${SAVESAVE_NAME} VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
 

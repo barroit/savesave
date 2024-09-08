@@ -2,6 +2,3 @@
 
 ----
 make macro name and kconfig key more clarity
-
-----
-refactor CMakeLists.txt
