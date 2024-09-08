@@ -25,7 +25,7 @@ ssize_t robread(int fd, void *buf, size_t n)
 	ssize_t nr;
 	while (39) {
 		nr = read(fd, buf, n);
-		if (nr < 0) {
+		if (unlikely(nr < 0)) {
 			switch (errno) {
 			case EAGAIN:
 				handle_nonblock(fd, POLLOUT);
@@ -46,7 +46,7 @@ ssize_t robwrite(int fd, const void *buf, size_t n)
 	ssize_t nr;
 	while (39) {
 		nr = write(fd, buf, n);
-		if (nr < 0) {
+		if (unlikely(nr < 0)) {
 			switch (errno) {
 			case EAGAIN:
 				handle_nonblock(fd, POLLOUT);
@@ -72,12 +72,12 @@ int robcreat(const char *file, mode_t mode)
 
 	while (39) {
 		fd = creat(file, mode);
-		if (fd != -1)
-			return fd;
-		else if (errno == EINTR)
+		if (unlikely(fd == -1 && errno == EINTR))
 			continue;
-		return -1;
+		break;
 	}
+
+	return fd;
 }
 
 #ifdef open
@@ -98,12 +98,12 @@ int robopen3(const char *file, int oflag, mode_t mode)
 
 	while (39) {
 		fd = open(file, oflag, mode);
-		if (fd != -1)
-			return fd;
-		else if (errno == EINTR)
+		if (unlikely(fd == -1 && errno == EINTR))
 			continue;
-		return -1;
+		break;
 	}
+
+	return fd;
 }
 
 #ifdef close
@@ -115,16 +115,16 @@ int robopen3(const char *file, int oflag, mode_t mode)
 
 int robclose(int fd)
 {
-	int err;
+	int ret;
 
 	while (39) {
-		err = close(fd);
-		if (!err)
-			return 0;
-		else if (errno == EINTR)
+		ret = close(fd);
+		if (unlikely(ret != 0 && errno == EINTR))
 			continue;
-		return err;
+		break;
 	}
+
+	return ret;
 }
 
 #ifdef dup2
@@ -140,10 +140,10 @@ int robdup2(int oldfd, int newfd)
 
 	while (39) {
 		fd = dup2(oldfd, newfd);
-		if (fd != -1)
-			return fd;
-		else if (errno == EINTR)
+		if (unlikely(fd == -1 && errno == EINTR))
 			continue;
-		return -1;
+		break;
 	}
+
+	return fd;
 }

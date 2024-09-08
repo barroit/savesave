@@ -28,10 +28,9 @@ void cntio_cntsub1(void)
 int cntcreat(const char *file, mode_t mode)
 {
 	int fd = robcreat(file, mode);
-	if (fd == -1)
-		return -1;
+	if (likely(fd != -1))
+		cntio_cntadd1();
 
-	cntio_cntadd1();
 	return fd;
 }
 
@@ -43,29 +42,27 @@ int cntopen2(const char *file, int oflag)
 int cntopen3(const char *file, int oflag, mode_t mode)
 {
 	int fd = robopen(file, oflag, mode);
-	if (fd == -1)
-		return -1;
+	if (likely(fd != -1))
+		cntio_cntadd1();
 
-	cntio_cntadd1();
 	return fd;
 }
 
 int cntclose(int fd)
 {
-	int err;
+	int ret;
 
-	err = robclose(fd);
-	if (err)
-		return -1;
+	ret = robclose(fd);
+	if (likely(ret == 0))
+		cntio_cntsub1();
 
-	cntio_cntsub1();
-	return 0;
+	return ret;
 }
 
 int cntdup2(int oldfd, int newfd)
 {
 	int fd = robdup2(oldfd, newfd);
-	if (fd != -1)
+	if (likely(fd != -1))
 		cntio_cntadd1();
 
 	return fd;
