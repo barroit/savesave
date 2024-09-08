@@ -12,7 +12,11 @@ char *dirname(char *path)
 
 	_splitpath(path, drive, dir, NULL, NULL);
 	memcpy(path, drive, 2);
-	memcpy(&path[2], dir, strlen(dir) + 1);
 
+	size_t len = strlen(dir);
+	if (dir[len - 1] == '\\' || dir[len - 1] == '/')
+		dir[--len] = 0;
+
+	memcpy(&path[2], dir, len + 1);
 	return path;
 }

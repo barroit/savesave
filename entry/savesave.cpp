@@ -22,6 +22,8 @@ static struct savesave *savconf;
 
 int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 {
+	setup_message_i18n();
+
 	int err;
 	/*
 	 * class constructor is guaranteed to run before main function, use
@@ -47,8 +49,6 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	// backup bu{ nconf };
 	// bu.create_backup_task(savconf);
 
-	exit(0);
-
 	HWND window;
 	err = create_app_window(app, &window);
 	if (err)
@@ -64,7 +64,7 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 		DispatchMessage(&message);
 	}
 
-	return 0;
+	exit(0);
 }
 
 class console *get_app_console()

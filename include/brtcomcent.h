@@ -88,6 +88,13 @@
 #include "barroit/zstd.h"
 #include "barroit/ctype.h"
 
+#ifdef HAVE_INTL
+# include <libintl.h>
+# include <locale.h>
+#endif
+
+#include "i18n.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -119,6 +126,8 @@ extern "C" {
 
 #define SSIZE_MAX INT64_MAX
 typedef SSIZE_T ssize_t;
+
+#define PATH_MAX MAX_PATH
 
 typedef unsigned int mode_t;
 

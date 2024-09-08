@@ -6,8 +6,27 @@
  */
 
 #include "path.h"
+#include "debug.h"
+#include "alloc.h"
 
-int is_abs_path(const char *path)
+static char *executable_dirname;
+
+extern "C" {
+CONSTRUCTOR(populate_executable_dir);
+}
+
+CONSTRUCTOR(populate_executable_dir)
+{
+	char exe[PATH_MAX];
+	DWORD len = GetModuleFileName(NULL, exe, sizeof(exe));
+
+	BUG_ON(len == 0);
+
+	char *dir = dirname(exe);
+	executable_dirname = xstrdup(dir);
+}
+
+int is_absolute_path(const char *path)
 {
 	return !PathIsRelative(path);
 }
@@ -15,4 +34,9 @@ int is_abs_path(const char *path)
 const char *get_home_dir()
 {
 	return getenv("USERPROFILE");
+}
+
+const char *get_executable_dirname(void)
+{
+	return executable_dirname;
 }

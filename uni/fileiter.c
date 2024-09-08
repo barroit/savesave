@@ -32,13 +32,13 @@ static int dispatch_regfile(const char *absname, const char *relname,
 
 	int fd = open(absname, O_RDONLY);
 	if (fd == -1)
-		return warn_errno(ERR_OPEN_FILE, absname);
+		return warn_errno(_(ERR_OPEN_FILE), absname);
 
 	struct stat st;
 	ret = fstat(fd, &st);
 	if (ret) {
 		close(fd);
-		return warn_errno(ERR_STAT_FILE, absname);
+		return warn_errno(_(ERR_STAT_FILE), absname);
 	}
 
 	struct file_iter_src src = {

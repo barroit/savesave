@@ -63,6 +63,8 @@ void strbuf_trim(struct strbuf *sb);
 
 size_t strbuf_cntchr(struct strbuf *sb, int c);
 
+void strbuf_normalize_path(struct strbuf *sb);
+
 #ifdef __cplusplus
 }
 #endif

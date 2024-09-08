@@ -11,7 +11,7 @@
 #include "termas.h"
 #include "debug.h"
 
-CONSTRUCTOR check_libzstd_mt(void)
+CONSTRUCTOR(check_libzstd_mt)
 {
 	int res;
 

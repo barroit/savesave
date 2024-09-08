@@ -154,7 +154,7 @@ static int parse_save(void *__save, struct savesave *conf)
 	int err;
 	struct stat st;
 
-	if (!is_abs_path(save))
+	if (!is_absolute_path(save))
 		return error("save path ‘%s’ is not an absolute path", save);
 
 	err = stat(save, &st);
@@ -450,7 +450,7 @@ void print_savconf(const struct savesave *conf, size_t nl)
 		size = c->save_size / 1000 / 1000;
 		printf("%s\n"
 		       "\tsave\t %s\n"
-		       "\tsize\t %" PRIiMAX "M\n"
+		       "\tsize\t %" PRIdMAX "M\n"
 		       "\tdir\t %d\n"
 		       "\tbackup\t %s\n"
 		       "\tperiod\t %" PRIu32 "\n"

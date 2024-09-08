@@ -1,9 +1,17 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Lines starting with ‘#’ are comments.
 
+config nether
+	save	 C:\Users\barroit\paper-server\world_nether
+	backup	 C:\Users\barroit\backup
+	period	 2H
+	stack	 5
+	snapshot n
+	zip	 y
+
 # Each configuration starts with a ‘config’; there is no limit to the number of
 # configurations as long as each name is unique
-config Overworld
+config overworld
 
 # Indentation is important; lines can include any number of blank lines and
 # comments.
@@ -27,11 +35,3 @@ config Overworld
 
 	# zip indicates whether to compress the backup into a zip file
 	zip	 n
-
-config Eether
-	save	 C:\Users\barroit\paper-server\world_nether
-	backup	 C:\Users\barroit\backup
-	period	 2H
-	stack	 5
-	snapshot n
-	zip	 y

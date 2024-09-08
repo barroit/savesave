@@ -54,13 +54,6 @@ add_compile_options(-g${CONFIG_COMPILER_DEBUG})
 set_choiced_value(CONFIG_COMPILER_OPTIMIZE)
 add_compile_options(-O${CONFIG_COMPILER_OPTIMIZE})
 
-# By specifying a SHELL and quoting our options, we can disable Option
-# De-duplication
-add_compile_options("SHELL:-include ${GENERATED}/autoconf.h")
-add_compile_options("SHELL:-include ${GENERATED}/appinfo.h")
-add_compile_options("SHELL:-include ${GENERATED}/apphelp.h")
-add_compile_options("SHELL:-include ${ROOT}/include/brtcomcent.h")
-
 list(APPEND languages C)
 
 if(HOST STREQUAL windows)
@@ -69,18 +62,37 @@ endif()
 
 project(${SAVESAVE_NAME} VERSION ${SAVESAVE_VERSION} LANGUAGES ${languages})
 
-include_directories(BEFORE ${ROOT}/include)
+# -------------------------------- include ---------------------------------
+# By specifying a SHELL and quoting our options, we can disable Option
+# De-duplication
+add_compile_options("SHELL:-include ${GENERATED}/autoconf.h")
+add_compile_options("SHELL:-include ${GENERATED}/appinfo.h")
+add_compile_options("SHELL:-include ${GENERATED}/apphelp.h")
+add_compile_options("SHELL:-include ${ROOT}/include/brtcomcent.h")
 
-configure_file(${ROOT}/savesave.manifest.in
-	       ${ROOT}/savesave.manifest)
+include_directories(${ROOT}/include)
 
-find_package(zstd CONFIG REQUIRED)
+# -------------------------------- manifest --------------------------------
 if(BUILD STREQUAL windows)
-  get_target_property(LIBZSTD_INCLUDE_DIRS zstd::libzstd
-		      INTERFACE_INCLUDE_DIRECTORIES)
-  include_directories(${LIBZSTD_INCLUDE_DIRS})
+  configure_file(${ROOT}/savesave.manifest.in ${ROOT}/savesave.manifest)
 endif()
 
+# -------------------------------- gettext ---------------------------------
+find_package(Intl)
+if(NOT CONFIG_DISALBE_GETTEXT AND Intl_FOUND)
+  link_libraries(Intl::Intl)
+  add_compile_definitions(HAVE_INTL)
+endif()
+
+# ---------------------------------- zstd ----------------------------------
+find_package(zstd CONFIG REQUIRED)
+if(CONFIG_LINK_LIBZSTD_STATIC)
+  link_libraries(zstd::libzstd_static)
+else()
+  link_libraries(zstd::libzstd_shared)
+endif()
+
+# -------------------------------- platspec --------------------------------
 if(HOST STREQUAL linux)
   file(GLOB platspec_src LIST_DIRECTORIES false uni/*.c)
   set(mainfile ${ROOT}/entry/savesave.c)
@@ -90,9 +102,11 @@ else()
 endif()
 add_library(platspec OBJECT ${platspec_src})
 
+# -------------------------------- platfree --------------------------------
 file(GLOB platfree_src LIST_DIRECTORIES false platfree/*.c)
 add_library(platfree OBJECT ${platfree_src})
 
+# -------------------------------- savesave --------------------------------
 if(HOST STREQUAL linux)
   add_executable(savesave ${mainfile})
 else()
@@ -100,12 +114,7 @@ else()
 endif()
 target_link_libraries(savesave platfree platspec)
 
-if(CONFIG_LINK_LIBZSTD_STATIC)
-  target_link_libraries(savesave zstd::libzstd_static)
-else()
-  target_link_libraries(savesave zstd::libzstd_shared)
-endif()
-
+# ---------------------------------- dll -----------------------------------
 if(HOST STREQUAL windows)
   target_link_libraries(savesave ws2_32 comctl32 shlwapi)
   if (NOT CONFIG_SOURCE_NDEBUG)
@@ -113,6 +122,7 @@ if(HOST STREQUAL windows)
   endif()
 endif()
 
+# ------------------------------- definition -------------------------------
 add_compile_definitions(_GNU_SOURCE)
 
 if(CONFIG_SOURCE_NDEBUG)
@@ -124,4 +134,14 @@ if(HOST STREQUAL windows)
 			  WINVER=_WIN32_WINNT_WIN7
 			  _WIN32_WINNT=_WIN32_WINNT_WIN7)
   add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+endif()
+
+# ------------------------------ installation ------------------------------
+install(TARGETS savesave DESTINATION ".")
+install(DIRECTORY ${ROOT}/locale/ DESTINATION locale
+	FILES_MATCHING PATTERN *.mo PERMISSIONS OWNER_READ)
+
+if(BUILD STREQUAL windows)
+  file(GLOB dlls ${CMAKE_BINARY_DIR}/*.dll)
+  install(FILES ${dlls} DESTINATION ".")
 endif()

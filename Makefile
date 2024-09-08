@@ -21,7 +21,7 @@ clean:
 
 distclean:
 	@rm -rf $(abs_root)/include/generated
-	@rm -rf $(abs_build)
+	@git ls-files --directory -o $(abs_root)/build | xargs rm -rf
 	@rm -f $(abs_root)/.config*
 
 .PHONY: menuconfig

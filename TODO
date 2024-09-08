@@ -1,4 +1,7 @@
                                   TODO LIST
 
 ----
-integrate gettext
+use standard include guard in hpp files
+
+----
+add cntio version of dup2

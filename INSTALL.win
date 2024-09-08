@@ -17,7 +17,9 @@ Before install SaveSave, the following requirements need to be met
 
 	vcpkg
 
-	libzstd (tested with version 1.5.5)
+	libzstd (install via vcpkg, tested with version 1.5.5)
+
+	gettext (install via vcpkg, optional, tested with version 0.22)
 
 Before building the program, you need to set the environment variable ‘MT’ to
 the path of mt.exe. This path can be easily obtained by using a command. Open

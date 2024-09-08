@@ -9,6 +9,7 @@
 #include "alloc.h"
 #include "debug.h"
 #include "poison.h"
+#include "list.h"
 
 void strbuf_init(struct strbuf *sb, flag_t flags)
 {
@@ -148,4 +149,12 @@ size_t strbuf_cntchr(struct strbuf *sb, int c)
 			cnt++;
 
 	return cnt;
+}
+
+void strbuf_normalize_path(struct strbuf *sb)
+{
+	size_t i;
+	for_each_idx(i, sb->len)
+		if (sb->str[i] == '\\')
+			sb->str[i] = '/';
 }

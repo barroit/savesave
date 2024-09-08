@@ -127,9 +127,20 @@ config DO_LINE_WRAP_THRESHOLD
 endmenu # "Threshold"
 
 menu "Zstandard"
+	depends on $(BUILD) = "linux"
 
 config LINK_LIBZSTD_STATIC
 	bool "link against libzstd static library"
+
+endmenu # "Zstandard"
+
+menu "Gettext"
+
+config USER_LOCALE
+	string "user locale for gettext"
+
+config DISALBE_GETTEXT
+	bool "disable i18n features"
 
 endmenu # "Zstandard"
 

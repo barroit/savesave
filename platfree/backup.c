@@ -22,7 +22,7 @@
 
 static char stru8_map[UINT8_MAX + 1][STRU8_MAX];
 
-CONSTRUCTOR init_u8tstr_table(void)
+CONSTRUCTOR(init_u8tstr_table)
 {
 	size_t i;
 	int n;
@@ -55,7 +55,7 @@ static int sort_backup(struct strbuf *src, struct strbuf *dest, u8 stack)
 						  src->str, dest->str);
 			room++;
 		} else if (errno != ENOENT) {
-			return warn_errno(ERR_ACCESS_FILE, src->str);
+			return warn_errno(_(ERR_ACCESS_FILE), src->str);
 		}
 
 		if (room == -1)
@@ -90,7 +90,7 @@ static int find_next_room(struct strbuf *next, u8 stack)
 			strbuf_concatat(next, next->initlen, stru8_map[i + 1]);
 			return 0;
 		} else if (errno != ENOENT) {
-			return warn_errno(ERR_ACCESS_FILE, next->str);
+			return warn_errno(_(ERR_ACCESS_FILE), next->str);
 		}
 	}
 

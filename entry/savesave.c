@@ -19,6 +19,8 @@ static size_t savesave_nr;
 
 int main(int argc, char *const *argv)
 {
+	setup_message_i18n();
+
 	if (argc > 1)
 		parse_option(argc, argv, &args);
 

@@ -25,7 +25,7 @@ int redirect_stdio(const char *name)
 
 	int fd = creat(name, 0664);
 	if (fd == -1) {
-		error_errno(ERR_CREAT_FILE, name);
+		error_errno(_(ERR_CREAT_FILE), name);
 		goto err_open_file;
 	}
 

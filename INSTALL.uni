@@ -13,6 +13,8 @@ Before install SaveSave, the following requirements need to be met
 
 	libzstd (tested with version 1.5.5)
 
+	gettext (optional, tested with version 0.21)
+
 Normally you can just do ‘make’, and that will build the program under build/
 directory. If you want to do a config, you can do
 

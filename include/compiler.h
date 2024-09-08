@@ -23,9 +23,9 @@ extern "C" {
 /*
  * __attribute__((constructor)) just does not work on windows
  */
-# define CONSTRUCTOR void
+# define CONSTRUCTOR(name) void name(void)
 #else
-# define CONSTRUCTOR static void __attribute__((constructor))
+# define CONSTRUCTOR(name) static void __attribute__((constructor)) name(void)
 #endif
 
 #define __CONCAT2(a, b)	a##b

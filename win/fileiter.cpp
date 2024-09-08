@@ -59,13 +59,13 @@ static int dispatch_file(struct file_iter *ctx, WIN32_FIND_DATA *ent)
 
 	ret = stat(absname, &st);
 	if (ret)
-		return warn_errno(ERR_STAT_FILE, absname);
+		return warn_errno(_(ERR_STAT_FILE), absname);
 
 	src.st = &st;
 	if (S_ISREG(st.st_mode)) {
 		int fd = open(absname, O_RDONLY);
 		if (fd == -1)
-			return warn_errno(ERR_OPEN_FILE, absname);
+			return warn_errno(_(ERR_OPEN_FILE), absname);
 
 		src.fd = fd;
 		ret = ctx->cb(&src, ctx->data);

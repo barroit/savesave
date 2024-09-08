@@ -10,14 +10,16 @@
 #include "win/dumpstack.hpp"
 
 extern "C" {
-CONSTRUCTOR check_libzstd_mt();
-CONSTRUCTOR init_u8tstr_table();
+CONSTRUCTOR(check_libzstd_mt);
+CONSTRUCTOR(init_u8tstr_table);
+CONSTRUCTOR(populate_executable_dir);
 }
 
 atenter::atenter()
 {
 	init_u8tstr_table();
 	setup_crt_report_hook();
+	populate_executable_dir();
 }
 
 static void check_os_version()
