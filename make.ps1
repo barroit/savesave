@@ -54,7 +54,8 @@ if ($command -eq 'distclean') {
 
 cmake -G Ninja "$abs_root" -B "$abs_build" `
       -DCMAKE_INSTALL_PREFIX="$install_dest" `
-      -DCMAKE_TOOLCHAIN_FILE="$vcpgk_tc"
+      -DCMAKE_TOOLCHAIN_FILE="$vcpgk_tc" `
+      -DCMAKE_BUILD_TYPE=Debug
 if (! $?) {
 	exit 1
 }

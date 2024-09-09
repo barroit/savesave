@@ -244,9 +244,9 @@ msgid   "Usage: savesave.exe [--version] [--help] [--config <path>]\n"
         "    -f, --config <file>  specify config path\n"
 msgstr  "使用法: savesave.exe [--version] [--help] [--config <path>]\n"
         "\n"
-	"    --version            プログラムのバージョンを表示\n"
-	"    --help               ヘルプメッセージを表示\n"
-	"    -f, --config <file>  設定ファイルのパスを指定\n"
+        "    --version            プログラムのバージョンを表示\n"
+        "    --help               ヘルプメッセージを表示\n"
+        "    -f, --config <file>  設定ファイルのパスを指定\n"
 
 #: platfree/savconf.c:158
 #, c-format
@@ -380,14 +380,9 @@ msgstr  ""
 msgid   "`%s' must contain at least one configuration"
 msgstr  ""
 
-#: entry/savesave.cpp:43
-#, c-format
-msgid   "`%s' must have at least one configuration"
-msgstr  ""
-
-#: entry/savesave.cpp:56
-msgid   "unable to initialize main window"
-msgstr  ""
+#: entry/savesave.cpp:38
+msgid   "test"
+msgstr  "テスト"
 
 #: include/calc.h:36 include/calc.h:46 include/termas.h:38 include/termas.h:40
 msgid   "fatal: "
@@ -413,7 +408,4 @@ msgstr  ""
 
 #: include/termas.h:33 include/termas.h:35
 msgid   "error: "
-msgstr  "エラー：　"
-
-#~ msgid        "test"
-#~ msgstr       "テスト"
+msgstr  "エラー: "

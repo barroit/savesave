@@ -6,13 +6,9 @@
  */
 
 #include "win/cmdline.hpp"
-#include "termas.h"
 #include "strlist.h"
-#include "list.h"
-#include "strbuf.h"
-#include "keepref.h"
 
-static void dump_cmdline(const char *cmdline, int *argc, char ***argv)
+int cmdline2argv(const char *cmdline, char ***argv)
 {
 	std::string line = std::string(SAVESAVE_NAME) + " " +
 			   std::string(cmdline);
@@ -23,22 +19,9 @@ static void dump_cmdline(const char *cmdline, int *argc, char ***argv)
 	while (stream >> std::quoted(opt))
 		strlist_push(&sl, opt.c_str());
 
-	*argc = (int)sl.nl;
-	*argv = strlist_dump(&sl);
+	int argc = (int)sl.nl;
+	*argv = strlist_dump2arr(&sl);
 	strlist_destroy(&sl);
-}
 
-void parse_cmdline(const char *cmdline, struct cmdarg *args)
-{
-	char **argv;
-	int argc;
-	dump_cmdline(cmdline, &argc, &argv);
-
-	parse_option(argc, argv, args);
-	destroy_dumped_strlist(argv);
-
-	if (!args->savconf)
-		args->savconf = get_default_savconf_path();
-	if (!args->savconf)
-		die(_("no savconf was provided"));
+	return argc;
 }

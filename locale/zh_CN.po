@@ -375,13 +375,8 @@ msgstr  ""
 msgid   "`%s' must contain at least one configuration"
 msgstr  ""
 
-#: entry/savesave.cpp:43
-#, c-format
-msgid   "`%s' must have at least one configuration"
-msgstr  ""
-
-#: entry/savesave.cpp:56
-msgid   "unable to initialize main window"
+#: entry/savesave.cpp:38
+msgid   "test"
 msgstr  ""
 
 #: include/calc.h:36 include/calc.h:46 include/termas.h:38 include/termas.h:40

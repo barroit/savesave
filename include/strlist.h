@@ -48,7 +48,7 @@ static inline char *strlist_pop(struct strlist *sl)
 	return strlist_pop2(sl, 1);
 }
 
-char **strlist_dump(struct strlist *sl);
+char **strlist_dump2arr(struct strlist *sl);
 
 void destroy_dumped_strlist(char **arr);
 

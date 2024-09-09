@@ -143,15 +143,26 @@ endmenu # "Gettext"
 
 menu "Debugging"
 
+config SOURCE_NDEBUG
+	bool "define NDEBUG"
+
+
 config SUPPRESS_ANNOTATED_LEAKS
 	bool "suppress annotated leaks"
 
+menu "Windows"
+	depends on $(BUILD) = "windows"
+
+config IS_CONSOLE_APP
+	bool "build console version of savesave (not link against WinMain)"
+
+config DEBUG_INTLDLL
+	bool "debug libintl"
+
 config MAX_DUMP_STACK
 	int "max dump stack (up to USHRT_MAX)"
-	depends on $(BUILD) = "windows"
 	default 64
 
-config SOURCE_NDEBUG
-	bool "define NDEBUG"
+endmenu # "Windows"
 
 endmenu # "Debugging"

@@ -58,6 +58,8 @@ public:
 
 #endif /* CONFIG_DISABLE_CONSOLE_OUTPUT */
 
+void setup_console_codepage();
+
 class console *get_app_console();
 
 #endif /* CONSOLE_HPP */

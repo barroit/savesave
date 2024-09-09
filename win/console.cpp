@@ -71,10 +71,6 @@ void console::setup_console()
 	stream = freopen("CONOUT$", "w", stderr);
 	BUG_ON(!stream);
 
-	err = !SetConsoleOutputCP(CP_UTF8);
-	if (err)
-		warn(_("failed to set console code page to utf-8"));
-
 	window = GetConsoleWindow();
 	BUG_ON(!window);
 
@@ -101,3 +97,14 @@ void console::redirect_stdio(const char *output)
 }
 
 #endif /* CONFIG_DISABLE_CONSOLE_OUTPUT */
+
+void setup_console_codepage()
+{
+	int err;
+
+	err = !SetConsoleOutputCP(CP_UTF8);
+	if (err)
+		warn(_("failed to set console output codepage to 65001"));
+
+	/* SetConsoleCP for input codepage? */
+}

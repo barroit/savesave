@@ -97,7 +97,7 @@ char *strlist_pop2(struct strlist *sl, int dup)
 	return str;
 }
 
-char **strlist_dump(struct strlist *sl)
+char **strlist_dump2arr(struct strlist *sl)
 {
 	size_t i;
 	size_t nl = sl->nl;

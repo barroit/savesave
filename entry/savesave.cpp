@@ -15,42 +15,78 @@
 #include "debug.h"
 #include "win/atenter.hpp"
 #include "win/savconf.hpp"
+#include "runopt.h"
+#include "strlist.h"
 
 static class console appcon;
 static struct cmdarg args;
 static struct savesave *savconf;
 
+#ifdef CONFIG_IS_CONSOLE_APP
+int main(int argc, char **argv)
+#else
 int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
+#endif
 {
-	setup_message_i18n();
-
-	int err;
 	/*
 	 * class constructor is guaranteed to run before main function, use
 	 * that for constructor function leak support on windows
 	 */
 	static class atenter constructor;
 
+#ifndef CONFIG_IS_CONSOLE_APP
 	appcon.setup_console();
+#endif
+	setup_console_codepage();
+
+	/*
+	 * gettext-runtime/intl/dcigettext.c:guess_category_value
+	 * > // The highest priority value is the value of the 'LANGUAGE'
+	 * > // environment variable.
+	 * > language = getenv ("LANGUAGE");
+	 *
+	 * Setting LANGUAGE ensures that guess_category_value is preferred to
+	 * return this value. Otherwise, it returns the locale variable, which
+	 * may default to the default locale.
+	 */
+	setenv("LANGUAGE", CONFIG_TARGET_LOCALE, 1);
+	setup_message_i18n();
+
 	constructor.precheck();
 
-	parse_cmdline(cmdline, &args);
+#ifndef CONFIG_IS_CONSOLE_APP
+	char **argv;
+	int argc = cmdline2argv(cmdline, &argv);
+#endif
+
+	parse_option(argc, argv, &args);
+
+#ifndef CONFIG_IS_CONSOLE_APP
+	destroy_dumped_strlist(argv);
+#endif
+
+	if (!args.savconf)
+		args.savconf = get_default_savconf_path();
+	if (!args.savconf)
+		die(_("no savconf was provided"));
 	if (args.output)
 		appcon.redirect_stdio(args.output);
 
-	size_t confcnt = parse_savconf(args.savconf, &savconf);
-	if (!confcnt)
+	size_t nl = parse_savconf(args.savconf, &savconf);
+	if (!nl)
 		die(_("`%s' must have at least one configuration"),
 		    args.savconf);
-	format_savconf(savconf, confcnt);
 
+	format_savconf(savconf, nl);
 	DEBUG_RUN()
-		print_savconf(savconf, confcnt);
+		print_savconf(savconf, nl);
 
-	// backup bu{ nconf };
-	// bu.create_backup_task(savconf);
-
+#ifdef CONFIG_IS_CONSOLE_APP
+	exit(0); /* TODO LATER IMPL */
+#else
+	int err;
 	HWND window;
+
 	err = create_app_window(app, &window);
 	if (err)
 		die(_("unable to initialize main window"));
@@ -66,6 +102,7 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	}
 
 	exit(0);
+#endif /* CONFIG_IS_CONSOLE_APP */
 }
 
 class console *get_app_console()

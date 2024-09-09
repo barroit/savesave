@@ -8,9 +8,6 @@
 #ifndef CMDLINE_HPP
 #define CMDLINE_HPP
 
-#include "runopt.h"
-#include "savconf.h"
-
-void parse_cmdline(const char *cmdline, struct cmdarg *args);
+int cmdline2argv(const char *cmdline, char ***argv);
 
 #endif /* CMDLINE_HPP */

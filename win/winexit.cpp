@@ -18,7 +18,7 @@ static void waiting_user()
 
 void winexit(int code)
 {
-	if (code) {
+	if (code && !IS_DEFINED(CONFIG_IS_CONSOLE_APP)) {
 		class console *con = get_app_console();
 		if (con->is_active())
 			con->show_console();

@@ -88,7 +88,7 @@ void parse_option(int argc, char *const *argv, struct cmdarg *args)
 			exit(128);
 		case OPT_HELP:
 			puts(_(helpmas));
-			exit(0);
+			exit(128);
 		case -1:
 			goto finish;
 		case OPT_FLAG:

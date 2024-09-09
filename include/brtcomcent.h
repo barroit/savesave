@@ -89,6 +89,9 @@
 #include "barroit/ctype.h"
 
 #ifdef HAVE_INTL
+# ifdef CONFIG_DEBUG_INTLDLL
+#  define _INTL_REDIRECT_INLINE
+# endif
 # include <libintl.h>
 # include <locale.h>
 #endif
@@ -110,6 +113,7 @@ extern "C" {
 #define access _access
 #define fileno _fileno
 #define mkdir  _mkdir
+#define putenv _putenv
 
 #define F_OK 00
 #define W_OK 02
@@ -134,6 +138,7 @@ typedef off_t off64_t;
 
 char *strchrnul(const char *s, int c);
 char *dirname(char *path);
+int setenv(const char *name, const char *value, int overwrite);
 
 NORETURN winexit(int code);
 #define exit winexit

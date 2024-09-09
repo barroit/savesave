@@ -63,6 +63,13 @@ extern "C" {
 	((type *)(((void *)ptr) - offsetof(type, member)));		\
 })
 
+#define __ARG_PLACEHOLDER_1 0,
+#define __take_second_arg(fir, sec, ...) sec
+
+#define ___IS_DEFINED(arg) __take_second_arg(arg 1, 0)
+#define __IS_DEFINED(val)  ___IS_DEFINED(__ARG_PLACEHOLDER_##val)
+#define IS_DEFINED(x)      __IS_DEFINED(x)
+
 #ifdef __cplusplus
 }
 #endif
