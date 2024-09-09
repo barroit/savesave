@@ -78,7 +78,7 @@ void console::setup_console()
 	window = GetConsoleWindow();
 	BUG_ON(!window);
 
-	set_console_size(CONFIG_DO_LINE_WRAP_THRESHOLD);
+	set_console_size(CONFIG_LINEWRAP_THRESHOLD);
 	hide_console();
 }
 

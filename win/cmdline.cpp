@@ -14,7 +14,8 @@
 
 static void dump_cmdline(const char *cmdline, int *argc, char ***argv)
 {
-	std::string line = std::string(APPNAME) + " " + std::string(cmdline);
+	std::string line = std::string(SAVESAVE_NAME) + " " +
+			   std::string(cmdline);
 	std::istringstream stream(std::move(line));
 	std::string opt;
 	struct strlist sl = STRLIST_INIT;

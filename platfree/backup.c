@@ -176,9 +176,9 @@ static int do_backup(struct savesave *c)
 static char *tmpdir_of_backup(const char *backup)
 {
 	struct strbuf sb = strbuf_from2(backup, 0,
-					sizeof(CONFIG_TEMPORARY_EXTENTION));
+					sizeof(CONFIG_TMPFILE_EXTENTION));
 
-	strbuf_concat(&sb, CONFIG_TEMPORARY_EXTENTION);
+	strbuf_concat(&sb, CONFIG_TMPFILE_EXTENTION);
 	return sb.str;
 }
 

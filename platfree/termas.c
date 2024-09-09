@@ -119,7 +119,7 @@ static void format_cntrl_char_advanced(char *str, size_t lasidx,
 			memmove(base + off, base, baslen);
 
 		base += off;
-		memcpy(base - replen, CONFIG_CNTRL_CHAR_REPLACEMENT, replen);
+		memcpy(base - replen, CONFIG_CNTRL_REPLACEMENT, replen);
 		off -= replen - 1;
 		lasidx = cntrl[i] - 1; /* cntrl[i] == 0 is fine */
 	}
@@ -135,7 +135,7 @@ void vreport_format_cntrl_char(char *str, size_t len, size_t *avail)
 	if (!cntrl.nr)
 		goto cleanup;
 
-	size_t replen = strlen(CONFIG_CNTRL_CHAR_REPLACEMENT);
+	size_t replen = strlen(CONFIG_CNTRL_REPLACEMENT);
 	/*
 	 * original cntrl character already takes 1 place, so the size we
 	 * actually need is len - 1

@@ -8,7 +8,7 @@
 #include "win/ui.hpp"
 #include "win/termas.hpp"
 
-#define CLASS_ID APPNAME
+#define CLASS_ID SAVESAVE_NAME
 
 static bool is_request_menu(LPARAM arg)
 {

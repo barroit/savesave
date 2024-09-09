@@ -374,11 +374,11 @@ static void post_parse_savconf(struct savesave *conf, size_t nl)
 
 		if (c->use_compress == -1 &&
 		    c->is_dir_save &&
-		    c->save_size > CONFIG_DO_COMPRESS_THRESHOLD)
+		    c->save_size > CONFIG_COMPRESSING_THRESHOLD)
 			c->use_compress = 1;
 
 		if (c->use_snapshot == -1 &&
-		    c->save_size > CONFIG_DO_SNAPSHOT_THRESHOLD)
+		    c->save_size > CONFIG_SNAPSHOT_THRESHOLD)
 			c->use_snapshot = 1;
 
 		update_backup_prefix(c);
@@ -450,31 +450,36 @@ void print_savconf(const struct savesave *conf, size_t nl)
 	for_each_idx(i, nl) {
 		c = &conf[i];
 		size = c->save_size / 1000 / 1000;
-		printf("%s\n"
-		       "\tsave\t %s\n"
-		       "\tsize\t %" PRIdMAX "M\n"
-		       "\tdir\t %d\n"
-		       "\tbackup\t %s\n"
-		       "\tperiod\t %" PRIu32 "\n"
-		       "\tstack\t %" PRIu8 "\n"
-		       "\tsnapshot %d\n"
-		       "\tzip\t %d\n\n",
-		       c->name, c->save_prefix, size, c->is_dir_save, c->backup_prefix,
-		       c->period, c->stack, c->use_snapshot, c->use_compress);
+
+		printf("%s\n", c->name);
+		printf("	save	 %s\n", c->save_prefix);
+		printf("	backup	 %s\n", c->backup_prefix);
+		putchar('\n');
+
+		printf("	size	 %" PRIdMAX "M\n", size);
+		printf("	dirsave	 %d\n", c->is_dir_save);
+		putchar('\n');
+
+		printf("	compress %d\n", c->use_compress);
+		printf("	snapshot %d\n", c->use_snapshot);
+		putchar('\n');
+
+		printf("	period	 %" PRIu32 "\n", c->period);
+		printf("	stack	 %" PRIu8 "\n", c->stack);
+		putchar('\n');
 	}
 }
 
 char *get_default_savconf_path(void)
 {
 	struct strbuf sb = STRBUF_INIT;
-	char *path = getenv(CONFIG_DEFAULT_SAVCONF_ENVNAME);
+	char *path = getenv(CONFIG_SAVCONF_ENVNAME);
 
 	if (path) {
 		strbuf_concat(&sb, path);
 	} else {
 		const char *home = get_home_dir();
-		strbuf_printf(&sb, "%s/%s", home,
-			      CONFIG_DEFAULT_SAVCONF_BASENAME);
+		strbuf_printf(&sb, "%s/%s", home, CONFIG_SAVCONF_BASENAME);
 	}
 
 	if (access(sb.str, R_OK) == 0)

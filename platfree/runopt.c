@@ -58,7 +58,8 @@ static void get_optarg(const char **key)
 
 static void print_version(void)
 {
-	printf("%s/%s-%s %s\n", APPNAME, APPHOST, APPARCH, APPVERSION);
+	printf("%s/%s-%s %s\n", SAVESAVE_NAME,
+	       SAVESAVE_HOST, SAVESAVE_ARCH, SAVESAVE_VERSION);
 	printf("   libzstd-%s\n", ZSTD_versionString());
 	printf("   gettext-%s\n", GETTEXT_VERSION);
 }

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 mainmenu "Savesave/$(BUILD)-$(ARCH) $(SAVESAVE_VERSION) Configuration"
 
-menu "Compiler"
+menu "Compiling"
 
 choice
 	prompt "CC"
@@ -70,9 +70,6 @@ config COMPILER_OPTIMIZE_3
 
 endchoice
 
-config SOURCE_NDEBUG
-	bool "define NDEBUG"
-
 config COMPILER_WARNING_ALL
 	bool "use -Wall"
 	default y
@@ -80,75 +77,71 @@ config COMPILER_WARNING_ALL
 config COMPILER_WARNING_EXTRA
 	bool "use -Wextra"
 
-endmenu # "Compiler"
+config LINK_LIBZSTD_STATIC
+	bool "link against libzstd static library"
+	depends on $(BUILD) = "linux"
 
-menu "Features"
+endmenu # "Compiling"
 
-config CNTRL_CHAR_REPLACEMENT
+menu "Console"
+
+config CNTRL_REPLACEMENT
 	string "control char replacement"
 	default "�"
 
-config DEFAULT_SAVCONF_BASENAME
+config DISABLE_CONSOLE_OUTPUT
+	bool "disable console output"
+	depends on $(BUILD) = "windows"
+
+endmenu # "Console"
+
+menu "Filename"
+
+config SAVCONF_BASENAME
 	string "basename of savconf"
 	default ".savesave"
 
-config DEFAULT_SAVCONF_ENVNAME
+config SAVCONF_ENVNAME
 	string "getenv name of savconf"
 	default "SAVESAVE"
 
 config ARCHIVE_EXTENTION
 	string "file extension for archive file (no dot)"
-	default "zst"
+	default "ss"
 
-config TEMPORARY_EXTENTION
+config TMPFILE_EXTENTION
 	string "file extension for temporary directory (no dot)"
 	default "tmp"
 
-endmenu # "Features"
+endmenu # "Filename"
 
-menu "Threshold"
+menu "Threshld"
 
-config DO_COMPRESS_THRESHOLD
+config COMPRESSING_THRESHOLD
 	int "size threshold for compression (in KiB)"
 	default 30720
 
-config DO_SNAPSHOT_THRESHOLD
-	int "threshold for creating snapshot (in MiB)"
+config SNAPSHOT_THRESHOLD
+	int "size threshold for creating snapshot (in MiB)"
 	default 102400
 
-config DO_MMAP_THRESHOLD
-	int "threshold for using mmap (in MiB)"
-	default 102400
-
-config DO_LINE_WRAP_THRESHOLD
-	int "threshold for line wrap"
+config LINEWRAP_THRESHOLD
+	int "character threshold for line wrap"
 	default 80
 
-endmenu # "Threshold"
-
-menu "Zstandard"
-	depends on $(BUILD) = "linux"
-
-config LINK_LIBZSTD_STATIC
-	bool "link against libzstd static library"
-
-endmenu # "Zstandard"
+endmenu # "Threshld"
 
 menu "Gettext"
-
-config USER_LOCALE
-	string "user locale for gettext"
 
 config DISALBE_GETTEXT
 	bool "disable i18n features"
 
-endmenu # "Zstandard"
+config TARGET_LOCALE
+	string "user locale for gettext"
+
+endmenu # "Gettext"
 
 menu "Debugging"
-
-config DISABLE_CONSOLE_OUTPUT
-	bool "disable console output"
-	depends on $(BUILD) = "windows"
 
 config SUPPRESS_ANNOTATED_LEAKS
 	bool "suppress annotated leaks"
@@ -157,5 +150,8 @@ config MAX_DUMP_STACK
 	int "max dump stack (up to USHRT_MAX)"
 	depends on $(BUILD) = "windows"
 	default 64
+
+config SOURCE_NDEBUG
+	bool "define NDEBUG"
 
 endmenu # "Debugging"

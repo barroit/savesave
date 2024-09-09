@@ -19,13 +19,13 @@ void setup_message_i18n(void)
 	strbuf_concat(&sb, "/locale");
 	strbuf_normalize_path(&sb);
 
-	textdomain(APPNAME);
-	bindtextdomain(APPNAME, sb.str);
-	bind_textdomain_codeset(APPNAME, "UTF-8");
+	textdomain(SAVESAVE_NAME);
+	bindtextdomain(SAVESAVE_NAME, sb.str);
+	bind_textdomain_codeset(SAVESAVE_NAME, "UTF-8");
 
 	strbuf_zerolen(&sb);
-	if (*CONFIG_USER_LOCALE != 0)
-		strbuf_printf(&sb, "%s.UTF-8", CONFIG_USER_LOCALE);
+	if (*CONFIG_TARGET_LOCALE != 0)
+		strbuf_printf(&sb, "%s.UTF-8", CONFIG_TARGET_LOCALE);
 
 	setlocale(LC_TIME,     sb.str);
 	setlocale(LC_MONETARY, sb.str);

@@ -49,7 +49,7 @@ void backup::create_backup_task(const struct savesave *conf)
 	ULONG flag;
 	while (conf->name != NULL) {
 		countdown = conf->period * 1000;
-		if (conf->save_size > CONFIG_DO_COMPRESS_THRESHOLD)
+		if (conf->save_size > CONFIG_COMPRESSING_THRESHOLD)
 			flag = WT_EXECUTELONGFUNCTION;
 		else
 			flag = WT_EXECUTEDEFAULT;

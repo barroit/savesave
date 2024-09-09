@@ -5,20 +5,20 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef APPNAME
-# define APPNAME "@SAVESAVE_NAME@"
+#ifndef SAVESAVE_NAME
+# define SAVESAVE_NAME "@SAVESAVE_NAME@"
 #endif
 
-#ifndef APPVERSION
-# define APPVERSION "@SAVESAVE_VERSION@"
+#ifndef SAVESAVE_VERSION
+# define SAVESAVE_VERSION "@SAVESAVE_VERSION@"
 #endif
 
-#ifndef APPARCH
-# define APPARCH "@ARCH@"
+#ifndef SAVESAVE_ARCH
+# define SAVESAVE_ARCH "@ARCH@"
 #endif
 
-#ifndef APPHOST
-# define APPHOST "@HOST@"
+#ifndef SAVESAVE_HOST
+# define SAVESAVE_HOST "@HOST@"
 #endif
 
 #if !defined(CONFIG_DISABLE_GETTEXT) && !defined(GETTEXT_VERSION)

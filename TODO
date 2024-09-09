@@ -1,7 +1,7 @@
                                   TODO LIST
 
 ----
-make macro name and kconfig key more clarity
+make HELP_MESSAGE compatible with gettext
 
 ----
-make HELP_MESSAGE compatible with gettext
+replace getopt with parse_option (more robust)
