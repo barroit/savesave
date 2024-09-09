@@ -38,19 +38,7 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	appcon.setup_console();
 #endif
 	setup_console_codepage();
-
-	/*
-	 * gettext-runtime/intl/dcigettext.c:guess_category_value
-	 * > // The highest priority value is the value of the 'LANGUAGE'
-	 * > // environment variable.
-	 * > language = getenv ("LANGUAGE");
-	 *
-	 * Setting LANGUAGE ensures that guess_category_value is preferred to
-	 * return this value. Otherwise, it returns the locale variable, which
-	 * may default to the default locale.
-	 */
-	setenv("LANGUAGE", CONFIG_TARGET_LOCALE, 1);
-	setup_message_i18n();
+	setup_message_translation();
 
 	constructor.precheck();
 
