@@ -63,7 +63,7 @@ msgstr  ""
 msgid   "failed to create a timer for configuration `%s'"
 msgstr  ""
 
-#: win/cmdline.cpp:42 entry/savesave.c:30
+#: win/cmdline.cpp:43 entry/savesave.c:30
 msgid   "no savconf was provided"
 msgstr  ""
 
@@ -222,19 +222,31 @@ msgstr  ""
 msgid   "cannot redirect stderr to `%s'"
 msgstr  ""
 
-#: platfree/runopt.c:45
+#: platfree/runopt.c:39
 #, c-format
 msgid   "positional arguments %s are not allowd"
 msgstr  ""
 
-#: platfree/runopt.c:46
+#: platfree/runopt.c:40
 #, c-format
 msgid   "positional argument %s is not allowd"
 msgstr  ""
 
-#: platfree/runopt.c:54
+#: platfree/runopt.c:48
 msgid   "empty string is not allowed"
 msgstr  ""
+
+#: platfree/runopt.c:62
+msgid   "Usage: savesave.exe [--version] [--help] [--config <path>]\n"
+        "\n"
+        "    --version            print program version\n"
+        "    --help               get help message\n"
+        "    -f, --config <file>  specify config path\n"
+msgstr  "使用法: savesave.exe [--version] [--help] [--config <path>]\n"
+        "\n"
+	"    --version            プログラムのバージョンを表示\n"
+	"    --help               ヘルプメッセージを表示\n"
+	"    -f, --config <file>  設定ファイルのパスを指定\n"
 
 #: platfree/savconf.c:158
 #, c-format

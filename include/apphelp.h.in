@@ -12,22 +12,12 @@
 extern "C" {
 #endif
 
-#define HELP_MESSAGE_WINDOWS							\
-"Usage: savesave.exe [--version] [--help] [--config <path>]\n"			\
-"\n"										\
-"    --version            print program version\n"				\
-"    --help               get help message\n"					\
-"    -f, --config <file>  specify config path\n"				\
-"\n"										\
-"Usually, you can just double click the executable, and this will start the\n"	\
-"application and automatically back up your saves at regular intervals\n"
-
-#define HELP_MESSAGE_LINUX					\
-"Usage: savesave [--version] [--help] [--config <path>]\n"	\
+#define SAVESAVE_HELPMAS					\
+"Usage: savesave.exe [--version] [--help] [--config <path>]\n"	\
 "\n"								\
 "    --version            print program version\n"		\
 "    --help               get help message\n"			\
-"    -f, --config <file>  specify config path\n"		\
+"    -f, --config <file>  specify config path\n"
 
 #ifdef __cplusplus
 }

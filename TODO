@@ -1,7 +1,4 @@
                                   TODO LIST
 
 ----
-make HELP_MESSAGE compatible with gettext
-
-----
 replace getopt with parse_option (more robust)

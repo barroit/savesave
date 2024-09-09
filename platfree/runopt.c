@@ -10,12 +10,6 @@
 #include "list.h"
 #include "strbuf.h"
 
-#ifdef __linux
-# define HELP_MESSAGE HELP_MESSAGE_LINUX
-#else
-# define HELP_MESSAGE HELP_MESSAGE_WINDOWS
-#endif
-
 #define OPT(n, ha, f, v) \
 	{ .name = (n), .has_arg = (ha), .flag = (f), .val = (v) }
 
@@ -64,6 +58,14 @@ static void print_version(void)
 	printf("   gettext-%s\n", GETTEXT_VERSION);
 }
 
+const char helpmas[] = N_(
+"Usage: savesave.exe [--version] [--help] [--config <path>]\n"
+"\n"
+"    --version            print program version\n"
+"    --help               get help message\n"
+"    -f, --config <file>  specify config path\n"
+);
+
 void parse_option(int argc, char *const *argv, struct cmdarg *args)
 {
 	enum optid opt;
@@ -85,7 +87,7 @@ void parse_option(int argc, char *const *argv, struct cmdarg *args)
 			print_version();
 			exit(128);
 		case OPT_HELP:
-			puts(HELP_MESSAGE);
+			puts(_(helpmas));
 			exit(0);
 		case -1:
 			goto finish;
