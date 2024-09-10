@@ -23,7 +23,7 @@ void strrepl(char *str, int c, int r);
  *
  * return  - the pointer to the next character. Otherwise, NULL is returned.
  */
-const char *straftr(const char *str, const char *pref);
+char *straftr(const char *str, const char *pref);
 
 #ifdef __cplusplus
 }

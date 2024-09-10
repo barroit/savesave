@@ -70,6 +70,8 @@ extern "C" {
 #define __IS_DEFINED(val)  ___IS_DEFINED(__ARG_PLACEHOLDER_##val)
 #define IS_DEFINED(x)      __IS_DEFINED(x)
 
+#define ERROR_HANDLE(name, stmt) if (0) { name: stmt }
+
 #ifdef __cplusplus
 }
 #endif

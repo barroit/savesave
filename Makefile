@@ -28,3 +28,16 @@ distclean:
 
 menuconfig:
 	@MENUCONFIG_STYLE=aquatic menuconfig
+
+scripts := $(notdir $(wildcard scripts/*.sh))
+args    := $(filter-out $(scripts),$(MAKECMDGOALS))
+
+.PHONY: $(args)
+
+$(args):
+	@:
+
+.PHONY: $(scripts)
+
+$(scripts):
+	@bash scripts/$@ $(args)

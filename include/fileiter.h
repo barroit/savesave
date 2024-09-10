@@ -12,35 +12,36 @@
 extern "C" {
 #endif
 
-struct file_iter_src {
+struct fileiter_file {
 	const char *absname;
 	const char *relname;
+	const char *basname;
 
 	int fd;
 	struct stat *st;
 };
 
-typedef int (*file_iterator_cb_t)(struct file_iter_src *src, void *data);
+typedef int (*fileiter_callback)(struct fileiter_file *src, void *data);
 
-#define FILE_ITER_CALLBACK(name) \
-	int name(struct file_iter_src *src, void *data)
+#define FILEITER_CALLBACK(name) \
+	int name(struct fileiter_file *src, void *data)
 
-struct file_iter {
+struct fileiter {
 	const char *root;
 
 	struct strbuf *sb;
 	struct strlist *sl;
 
-	file_iterator_cb_t cb;
+	fileiter_callback cb;
 	void *data;
 };
 
-void file_iter_init(struct file_iter *ctx, const char *head,
-		    file_iterator_cb_t cb, void *data);
+void fileiter_init(struct fileiter *ctx, const char *head,
+		   fileiter_callback cb, void *data);
 
-void file_iter_destroy(struct file_iter *ctx);
+void fileiter_destroy(struct fileiter *ctx);
 
-int file_iter_exec(struct file_iter *ctx);
+int fileiter_exec(struct fileiter *ctx);
 
 #ifdef __cplusplus
 }

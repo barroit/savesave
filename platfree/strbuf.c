@@ -23,7 +23,7 @@ struct strbuf strbuf_from2(const char *str, flag_t _, size_t extalloc)
 {
 	struct strbuf sb = STRBUF_INIT;
 
-	sb.initlen = strbuf_concat2(&sb, str, extalloc);
+	sb.baslen = strbuf_concat2(&sb, str, extalloc);
 	return sb;
 }
 
@@ -157,4 +157,10 @@ void strbuf_normalize_path(struct strbuf *sb)
 	for_each_idx(i, sb->len)
 		if (sb->str[i] == '\\')
 			sb->str[i] = '/';
+}
+
+void strbuf_reset2base(struct strbuf *sb, const char *base)
+{
+	strbuf_zerolen(sb);
+	sb->baslen = strbuf_concat(sb, base);
 }

@@ -16,26 +16,26 @@
 #include "path.h"
 
 extern "C"{
-int file_iter_do_exec(struct file_iter *ctx);
+int fileiter_do_exec(struct fileiter *ctx);
 }
 
-static int dispatch_file(struct file_iter *ctx, WIN32_FIND_DATA *ent)
+static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 {
-	const char *basename = ent->cFileName;
+	const char *basname = ent->cFileName;
 	const char *absname, *relname;
 
-	if (is_dir_indicator(basename))
+	if (is_dir_indicator(basname))
 		return 0;
 
 	if (ctx->sb->str[ctx->sb->len - 1] != '/')
 		strbuf_concat(ctx->sb, "/");
-	strbuf_concat(ctx->sb, basename);
+	strbuf_concat(ctx->sb, basname);
 
 	absname = ctx->sb->str;
 	relname = straftr(absname, ctx->root);
 	BUG_ON(!relname);
 
-	struct file_iter_src src = {
+	struct fileiter_file src = {
 		.absname = absname,
 		.relname = relname,
 		.fd      = -1,
@@ -78,27 +78,31 @@ static int dispatch_file(struct file_iter *ctx, WIN32_FIND_DATA *ent)
 	}
 }
 
-int file_iter_do_exec(struct file_iter *ctx)
+int fileiter_do_exec(struct fileiter *ctx)
 {
+	strbuf_concat(ctx->sb, "/*");
+
 	int ret = 0;
 	WIN32_FIND_DATA ent;
-	const char *dirname = ctx->sb->str;
-	size_t dirlen = ctx->sb->len;
 
-	strbuf_concat(ctx->sb, "/*");
-	HANDLE dir = FindFirstFile(ctx->sb->str, &ent);
+	const char *pattern = ctx->sb->str;
+	HANDLE dir = FindFirstFile(pattern, &ent);
+
 	if (dir == INVALID_HANDLE_VALUE)
-		return warn_winerr(_("failed to open directory `%s'"),
-				   dirname);
+		goto err_find_file;
 
 	do {
 		ret = dispatch_file(ctx, &ent);
 		if (ret)
 			break;
 
-		strbuf_truncate(ctx->sb, ctx->sb->len - dirlen);
+		strbuf_reset(ctx->sb);
 	} while (FindNextFile(dir, &ent) != NULL);
 
 	FindClose(dir);
 	return ret;
+
+err_find_file:
+	return warn_winerr(_("failed to find first file from pattern `%s'"),
+			   pattern);
 }

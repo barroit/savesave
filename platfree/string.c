@@ -11,11 +11,11 @@ void strrepl(char *str, int c, int r)
 		*str++ = r;
 }
 
-const char *straftr(const char *str, const char *pref)
+char *straftr(const char *str, const char *pref)
 {
 	do {
 		if (!*pref)
-			return str;
+			return (char *)str;
 	} while (*str++ == *pref++);
 
 	return NULL;

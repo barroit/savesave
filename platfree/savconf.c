@@ -114,7 +114,7 @@ static inline int is_entry(const char *line, const char *prefix, char **ret)
 	return skip_prefix(line, prefix, ret) == 0 && isspace(**ret);
 }
 
-static FILE_ITER_CALLBACK(sizeof_file)
+static FILEITER_CALLBACK(sizeof_file)
 {
 	off64_t size;
 
@@ -134,12 +134,12 @@ static FILE_ITER_CALLBACK(sizeof_file)
 int calc_dir_size(const char *base, off64_t *size)
 {
 	int ret;
-	struct file_iter ctx;
+	struct fileiter ctx;
 
-	file_iter_init(&ctx, base, sizeof_file, size);
+	fileiter_init(&ctx, base, sizeof_file, size);
 
-	ret = file_iter_exec(&ctx);
-	file_iter_destroy(&ctx);
+	ret = fileiter_exec(&ctx);
+	fileiter_destroy(&ctx);
 
 	if (ret)
 		return error("unable to calculate directory size for `%s'",

@@ -14,9 +14,11 @@
 #include "fileiter.h"
 #include "alloc.h"
 
-#define ERRMAS_SORT_BACKUP \
-	"unable to sort backup `%s' of configuration `%s'"
-
+struct backup_callback_ctx {
+	struct savesave *conf;
+	struct strbuf name;
+};
+	
 static char stru8_map[UINT8_MAX + 1][STRU8_MAX];
 
 CONSTRUCTOR(init_u8tstr_table)
@@ -38,21 +40,20 @@ static int sort_backup(struct strbuf *src, struct strbuf *dest, u8 stack)
 	int room = -1;
 
 	for_each_idx(i, stack) {
-		strbuf_concatat(src, src->initlen, stru8_map[i]);
+		strbuf_concatat_base(src, stru8_map[i]);
 
 		err = access(src->str, F_OK);
 		if (!err) {
 			if (room == -1)
 				continue;
 
-			strbuf_concatat(dest, src->initlen, stru8_map[room]);
+			strbuf_concatat_base(dest, stru8_map[room]);
 			err = rename(src->str, dest->str);
 			if (err)
-				return warn_errno(
-_("failed to rename file `%s' to `%s'"), src->str, dest->str);
+				goto err_rename_file;
 			room++;
 		} else if (errno != ENOENT) {
-			return warn_errno(_(ERRMAS_ACCESS_FILE), src->str);
+			goto err_access_file;
 		}
 
 		if (room == -1)
@@ -60,13 +61,19 @@ _("failed to rename file `%s' to `%s'"), src->str, dest->str);
 	}
 
 	return room != -1;
+
+err_rename_file:
+	return warn_errno(_("failed to rename file `%s' to `%s'"),
+			  src->str, dest->str);
+err_access_file:
+	return warn_errno(_(ERRMAS_ACCESS_FILE), src->str);
 }
 
 static int drop_deprecated_backup(struct strbuf *path)
 {
 	int err;
 
-	strbuf_concatat(path, path->initlen, "0");
+	strbuf_concatat_base(path, "0");
 	err = remove(path->str);
 	if (err)
 		return warn_errno(_("failed to remove file `%s'"), path->str);
@@ -80,11 +87,11 @@ static int find_next_room(struct strbuf *next, u8 stack)
 	u8 i;
 
 	for_each_idx_back(i, stack - 1) {
-		strbuf_concatat(next, next->initlen, stru8_map[i]);
+		strbuf_concatat_base(next, stru8_map[i]);
 
 		err = access(next->str, F_OK);
 		if (!err) {
-			strbuf_concatat(next, next->initlen, stru8_map[i + 1]);
+			strbuf_concatat_base(next, stru8_map[i + 1]);
 			return 0;
 		} else if (errno != ENOENT) {
 			return warn_errno(_(ERRMAS_ACCESS_FILE), next->str);
@@ -97,39 +104,43 @@ static int find_next_room(struct strbuf *next, u8 stack)
 static char *get_next_backup_name(const struct savesave *c)
 {
 	int ret;
-	int has_room;
 	struct strbuf src = strbuf_from2(c->backup_prefix, 0, STRU8_MAX);
 	struct strbuf dest = strbuf_from2(c->backup_prefix, 0, STRU8_MAX);
 
-	has_room = sort_backup(&src, &dest, c->stack);
-	if (has_room == -1) {
-		strbuf_concatat(&src, src.initlen, "*");
-		ret = error(_(ERRMAS_SORT_BACKUP), src.str, c->name);
-		goto cleanup;
-	}
+	ret = sort_backup(&src, &dest, c->stack);
+	if (ret == -1)
+		goto err_sort_backup;
 
-	if (!has_room) {
+	if (!ret) {
 		ret = drop_deprecated_backup(&dest);
-		if (ret) {
-			error(
-_("unable to drop deprecated backup of configuration `%s'"), c->name);
-			goto cleanup;
-		}
+		if (ret)
+			goto err_drop_backup;
 
-		has_room = sort_backup(&src, &dest, c->stack);
-		if (has_room == -1) {
-			strbuf_concatat(&src, src.initlen, "*");
-			ret = error(_(ERRMAS_SORT_BACKUP), src.str, c->name);
-			goto cleanup;
-		}
+		ret = sort_backup(&src, &dest, c->stack);
+		if (ret == -1)
+			goto err_sort_backup;
 	}
 
 	ret = find_next_room(&dest, c->stack);
 	if (ret)
-		error(
-_("unable to determine next backup file name of configuration `%s'"), c->name);
+		goto err_find_next;
 
-cleanup:
+	ERROR_HANDLE(err_drop_backup, {
+		error(_("unable to drop deprecated backup of configuration `%s'"),
+		      c->name);
+	});
+
+	ERROR_HANDLE(err_sort_backup, {
+		strbuf_concatat_base(&src, "*");
+		error(_("unable to sort backup `%s' of configuration `%s'"),
+		      src.str, c->name);
+	});
+
+	ERROR_HANDLE(err_find_next, {
+		error(_("unable to determine next backup file name of configuration `%s'"),
+		      c->name);
+	});
+
 	strbuf_destroy(&src);
 
 	if (ret) {
@@ -140,36 +151,52 @@ cleanup:
 	return dest.str;
 }
 
-int copy_file(const char *src, int fd1, struct stat *st, const char *dest);
-
-static FILE_ITER_CALLBACK(backup_file_compress)
+static FILEITER_CALLBACK(backup_file_compress)
 {
 	const struct savesave *c = data;
 
 	return 0;
 }
 
-static FILE_ITER_CALLBACK(backup_file_copy)
-{
-	const struct savesave *c = data;
+// static void format_backup_name(const char *dirname, )
+// {
+// }
 
-	// puts(src->absname);
-	// copy_file(src, fd, st, c->backup);
+static FILEITER_CALLBACK(backup_file_copy)
+{
+	struct backup_callback_ctx *c = data;
+	int err;
+
+	// strbuf_concatat_base(&c->name, c->conf);
+
+	// int destfd = creat(destname, 0664);
+	// if (destfd == -1)
+	// 	return error_errno(_(ERRMAS_CREAT_FILE), destname);
+	puts(src->basname);
+	// my_mkdir();
+	// copyfile(src->relname, src->fd, src->st, c->backup);
 	return 0;
 }
 
 static int do_backup(struct savesave *c)
 {
 	int ret;
-	struct file_iter ctx;
+	struct fileiter iter;
+	struct backup_callback_ctx data = {
+		.conf = c,
+		.name = strbuf_from2(c->backup_prefix, 0, PATH_MAX),
+	};
+
 	if (c->use_compress)
-		file_iter_init(&ctx, c->save_prefix, backup_file_compress, c);
+		fileiter_init(&iter, c->save_prefix,
+			      backup_file_compress, &data);
 	else
-		file_iter_init(&ctx, c->save_prefix, backup_file_copy, c);
+		fileiter_init(&iter, c->save_prefix, backup_file_copy, &data);
 
-	ret = file_iter_exec(&ctx);
-	file_iter_destroy(&ctx);
+	ret = fileiter_exec(&iter);
 
+	fileiter_destroy(&iter);
+	strbuf_destroy(&data.name);
 	return ret;
 }
 

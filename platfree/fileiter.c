@@ -10,8 +10,8 @@
 #include "strbuf.h"
 #include "strlist.h"
 
-void file_iter_init(struct file_iter *ctx, const char *root,
-		    file_iterator_cb_t cb, void *data)
+void fileiter_init(struct fileiter *ctx, const char *root,
+		    fileiter_callback cb, void *data)
 {
 	memset(ctx, 0, sizeof(*ctx));
 
@@ -27,7 +27,7 @@ void file_iter_init(struct file_iter *ctx, const char *root,
 	ctx->data = data;
 }
 
-void file_iter_destroy(struct file_iter *ctx)
+void fileiter_destroy(struct fileiter *ctx)
 {
 	strbuf_destroy(ctx->sb);
 	strlist_destroy(ctx->sl);
@@ -36,21 +36,19 @@ void file_iter_destroy(struct file_iter *ctx)
 	free(ctx->sl);
 }
 
-int file_iter_do_exec(struct file_iter *ctx);
+int fileiter_do_exec(struct fileiter *ctx);
 
-int file_iter_exec(struct file_iter *ctx)
+int fileiter_exec(struct fileiter *ctx)
 {
 	int ret;
 	const char *dir = ctx->root;
 
 	do {
-		strbuf_concat(ctx->sb, dir);
+		strbuf_reset2base(ctx->sb, dir);
 
-		ret = file_iter_do_exec(ctx);
+		ret = fileiter_do_exec(ctx);
 		if (ret)
 			return 1;
-
-		strbuf_zerolen(ctx->sb);
 	} while ((dir = strlist_pop2(ctx->sl, 0)));
 
 	return 0;
