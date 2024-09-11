@@ -16,6 +16,10 @@ ssize_t robread(int fd, void *buf, size_t n);
 
 ssize_t robwrite(int fd, const void *buf, size_t n);
 
+ssize_t robread_all(int fd, void *buf, size_t n);
+
+ssize_t robwrite_all(int fd, const void *buf, size_t n);
+
 int robcreat(const char *file, mode_t mode);
 
 int robopen2(const char *file, int oflag);

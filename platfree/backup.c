@@ -311,7 +311,7 @@ int backup_routine(struct savesave *c)
 	char *temp = tmpdir_of_backup(c->backup_prefix);
 
 	DEBUG_RUN() {
-		printf(_("next backup name\n\t%s\n"), dest);
+		printf(_("next backup name\n\t%s\n\n"), dest);
 		fflush(stdout);
 	}
 

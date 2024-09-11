@@ -9,6 +9,7 @@
 #include "termas.h"
 #include "debug.h"
 #include "alloc.h"
+#include "strbuf.h"
 
 static char *executable_dirname;
 
@@ -60,4 +61,28 @@ const char *get_home_dir(void)
 const char *get_executable_dirname(void)
 {
 	return executable_dirname;
+}
+
+int get_link_target2(const char *name, struct strbuf *__buf)
+{
+	int err;
+	struct stat st;
+
+	err = lstat(name, &st);
+	if (err)
+		return -1;
+
+	size_t len = st.st_size ? st.st_size + 1 : PATH_MAX;
+	strbuf_require_cap(__buf, len);
+
+	ssize_t nr = readlink(name, __buf->str, len);
+	if (nr == -1)
+		return -1;
+
+	__buf->str[nr] = 0;
+	__buf->len = nr;
+	if (nr == len)
+		warn(_("path `%s' may have been truncated"), __buf->str);
+
+	return 0;
 }

@@ -59,6 +59,31 @@ ssize_t robwrite(int fd, const void *buf, size_t n)
 	}
 }
 
+ssize_t robread_all(int fd, void *buf, size_t n)
+{
+	ssize_t nr;
+	while (39) {
+		nr = robread(fd, buf, n);
+		if (likely(nr == 0))
+			return nr;
+		if (unlikely(nr == -1))
+			return -1;
+	}
+}
+
+ssize_t robwrite_all(int fd, const void *buf, size_t n)
+{
+	ssize_t nr;
+	while (39) {
+		nr = robwrite(fd, buf, n);
+		if (likely(nr == n))
+			return nr;
+		if (unlikely(nr == -1))
+			return -1;
+		n -= nr;
+	}
+}
+
 #ifdef creat
 # undef creat
 # ifdef _WIN32

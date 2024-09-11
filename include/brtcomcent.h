@@ -82,11 +82,12 @@
 #include "poll.h"
 #include "getopt.h"
 
-#include "barroit/limits.h"
-#include "barroit/types.h"
-#include "barroit/string.h"
-#include "barroit/zstd.h"
 #include "barroit/ctype.h"
+#include "barroit/limits.h"
+#include "barroit/size.h"
+#include "barroit/string.h"
+#include "barroit/types.h"
+#include "barroit/zstd.h"
 
 #ifdef HAVE_INTL
 # ifdef CONFIG_DEBUG_INTLDLL

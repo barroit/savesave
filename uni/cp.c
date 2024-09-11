@@ -6,8 +6,25 @@
  */
 
 #include "cp.h"
-#include "strbuf.h"
-#include "termas.h"
+#include "robio.h"
+
+// static char buf[SZ_512K];
+
+// int copyfile(int src, int dest, off_t len)
+// {
+// 	ssize_t nr, nw;
+// 	do {
+// 		nr = robread_all(src, buf, sizeof(buf));
+// 		if (unlikely(nr == -1))
+// 			return -1;
+
+// 		nw = robwrite_all(dest, buf, nr);
+// 		if (unlikely(nw == -1))
+// 			return -1;
+// 	} while (nr > 0);
+
+// 	return 0;
+// }
 
 int copyfile(int src, int dest, off_t len)
 {
@@ -19,30 +36,6 @@ int copyfile(int src, int dest, off_t len)
 
 		len -= copied;
 	} while (len > 0 && copied > 0);
-
-	return 0;
-}
-
-int get_link_target2(const char *name, struct strbuf *__buf)
-{
-	int err;
-	struct stat st;
-
-	err = lstat(name, &st);
-	if (err)
-		return -1;
-
-	size_t len = st.st_size ? st.st_size + 1 : PATH_MAX;
-	strbuf_require_cap(__buf, len);
-
-	ssize_t nr = readlink(name, __buf->str, len);
-	if (nr == -1)
-		return -1;
-
-	__buf->str[nr] = 0;
-	__buf->len = nr;
-	if (nr == len)
-		warn(_("path `%s' may have been truncated"), __buf->str);
 
 	return 0;
 }
