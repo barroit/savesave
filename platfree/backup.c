@@ -13,12 +13,8 @@
 #include "termas.h"
 #include "fileiter.h"
 #include "alloc.h"
+#include "cp.h"
 
-struct backup_callback_ctx {
-	struct savesave *conf;
-	struct strbuf name;
-};
-	
 static char stru8_map[UINT8_MAX + 1][STRU8_MAX];
 
 CONSTRUCTOR(init_u8tstr_table)
@@ -66,7 +62,7 @@ err_rename_file:
 	return warn_errno(_("failed to rename file `%s' to `%s'"),
 			  src->str, dest->str);
 err_access_file:
-	return warn_errno(_(ERRMAS_ACCESS_FILE), src->str);
+	return warn_errno(_("failed to access file `%s'"), src->str);
 }
 
 static int drop_deprecated_backup(struct strbuf *path)
@@ -94,11 +90,13 @@ static int find_next_room(struct strbuf *next, u8 stack)
 			strbuf_concatat_base(next, stru8_map[i + 1]);
 			return 0;
 		} else if (errno != ENOENT) {
-			return warn_errno(_(ERRMAS_ACCESS_FILE), next->str);
+			return warn_errno(_("failed to access file `%s'"),
+					  next->str);
 		}
 	}
 
-	BUG_ON(1);
+	strbuf_concatat_base(next, stru8_map[0]);
+	return 0;
 }
 
 static char *get_next_backup_name(const struct savesave *c)
@@ -125,18 +123,18 @@ static char *get_next_backup_name(const struct savesave *c)
 	if (ret)
 		goto err_find_next;
 
-	ERROR_HANDLE(err_drop_backup, {
+	HANDLE_ERROR(err_drop_backup, {
 		error(_("unable to drop deprecated backup of configuration `%s'"),
 		      c->name);
 	});
 
-	ERROR_HANDLE(err_sort_backup, {
+	HANDLE_ERROR(err_sort_backup, {
 		strbuf_concatat_base(&src, "*");
 		error(_("unable to sort backup `%s' of configuration `%s'"),
 		      src.str, c->name);
 	});
 
-	ERROR_HANDLE(err_find_next, {
+	HANDLE_ERROR(err_find_next, {
 		error(_("unable to determine next backup file name of configuration `%s'"),
 		      c->name);
 	});
@@ -151,55 +149,6 @@ static char *get_next_backup_name(const struct savesave *c)
 	return dest.str;
 }
 
-static FILEITER_CALLBACK(backup_file_compress)
-{
-	const struct savesave *c = data;
-
-	return 0;
-}
-
-// static void format_backup_name(const char *dirname, )
-// {
-// }
-
-static FILEITER_CALLBACK(backup_file_copy)
-{
-	struct backup_callback_ctx *c = data;
-	int err;
-
-	// strbuf_concatat_base(&c->name, c->conf);
-
-	// int destfd = creat(destname, 0664);
-	// if (destfd == -1)
-	// 	return error_errno(_(ERRMAS_CREAT_FILE), destname);
-	puts(src->basname);
-	// my_mkdir();
-	// copyfile(src->relname, src->fd, src->st, c->backup);
-	return 0;
-}
-
-static int do_backup(struct savesave *c)
-{
-	int ret;
-	struct fileiter iter;
-	struct backup_callback_ctx data = {
-		.conf = c,
-		.name = strbuf_from2(c->backup_prefix, 0, PATH_MAX),
-	};
-
-	if (c->use_compress)
-		fileiter_init(&iter, c->save_prefix,
-			      backup_file_compress, &data);
-	else
-		fileiter_init(&iter, c->save_prefix, backup_file_copy, &data);
-
-	ret = fileiter_exec(&iter);
-
-	fileiter_destroy(&iter);
-	strbuf_destroy(&data.name);
-	return ret;
-}
-
 static char *tmpdir_of_backup(const char *backup)
 {
 	struct strbuf sb = strbuf_from2(backup, 0,
@@ -207,6 +156,148 @@ static char *tmpdir_of_backup(const char *backup)
 
 	strbuf_concat(&sb, CONFIG_TMPFILE_EXTENTION);
 	return sb.str;
+}
+
+static FILEITER_CALLBACK(backup_file_compress)
+{
+	return 0;
+}
+
+static int make_backup_dir(struct strbuf *sb)
+{
+	int err;
+	char *name = sb->str;
+	char *next = &sb->str[sb->baslen + 1];
+
+	while (39) {
+		next = strchr(next, '/');
+		if (!next)
+			return 0;
+
+		*next = 0;
+		err = MKDIR(name);
+		if (err && errno != EEXIST)
+			return err;
+
+		*next = '/';
+		next += 1;
+	}
+}
+
+static int backup_copy_regfile(struct fileiter_file *src, struct strbuf *dest)
+{
+	int ret;
+	int destfd = creat(dest->str, 0664);
+
+	if (destfd == -1) {
+		if (errno != ENOENT)
+			goto err_create_file;
+
+		ret = make_backup_dir(dest);
+		if (ret)
+			goto err_make_dir;
+
+		destfd = creat(dest->str, 0664);
+		if (destfd == -1)
+			goto err_create_file;
+	}
+
+	ret = copyfile(src->fd, destfd, src->st->st_size);
+	if (ret)
+		warn_errno(_("unable to copy file from `%s' to `%s'"),
+			   src->absname, dest->str);
+
+	close(destfd);
+	return ret;
+
+err_create_file:
+	BUG_ON(errno == ENOENT);
+	return warn_errno(_("unable to create file at `%s'"), dest->str);
+err_make_dir:
+	return warn_errno(_("unable to make directory `%s'"), dest->str);
+}
+
+static int backup_copy_symlink(const char *src,
+			       struct strbuf *dest, struct strbuf *__buf)
+{
+	int ret;
+
+	ret = get_link_target2(src, __buf);
+	if (ret)
+		goto err_read_link;
+
+	ret = SYMLINK(__buf->str, dest->str);
+	if (ret) {
+		if (errno != ENOENT)
+			goto err_make_link;
+
+		ret = make_backup_dir(dest);
+		if (ret)
+			goto err_make_dir;
+
+		ret = SYMLINK(__buf->str, dest->str);
+		if (ret)
+			goto err_make_link;
+	}
+
+	return 0;
+
+err_read_link:
+	return warn_errno(_("unable to real link `%s'"), src);
+err_make_dir:
+	return warn_errno(_("unable to make directory `%s'"), dest->str);
+err_make_link:
+	BUG_ON(errno == ENOENT);
+	return warn_errno(_("unable to make symbolic link `%s'"), src);
+}
+
+static FILEITER_CALLBACK(backup_file_copy)
+{
+	struct strbuf *path = &((struct strbuf *)data)[0];
+	struct strbuf *__buf = &((struct strbuf *)data)[1];
+
+	strbuf_concatat_base(path, src->dymname);
+
+	if (src->st != NULL)
+		return backup_copy_regfile(src, path);
+	else
+		return backup_copy_symlink(src->absname, path, __buf);
+}
+
+static int do_backup(const char *dest, const char *temp,
+		     const char *save, int use_compress)
+{
+	int ret;
+	fileiter_callback cb;
+
+	if (use_compress) {
+		cb = backup_file_compress;
+	} else {
+		cb = backup_file_copy;
+
+		ret = MKDIR(dest);
+		if (ret && errno != EEXIST)
+			goto err_make_dir;
+	}
+
+	struct fileiter iter;
+	struct strbuf data[2] = {
+		[0] = strbuf_from2(dest, 0, PATH_MAX),
+		[1] = strbuf_from2("", 0, PATH_MAX),
+	};
+
+	fileiter_init(&iter, save, cb, data);
+	ret = fileiter_exec(&iter);
+	if (ret)
+		error(_("failed to backup save `%s' to `%s'"), save, dest);
+
+	fileiter_destroy(&iter);
+	strbuf_destroy(&data[0]);
+	strbuf_destroy(&data[1]);
+	return ret;
+
+err_make_dir:
+	return error_errno(_("failed to make directory `%s'"), dest);
 }
 
 int backup_routine(struct savesave *c)
@@ -228,7 +319,7 @@ int backup_routine(struct savesave *c)
 		/* create snapshot here */
 	}
 
-	ret = do_backup(c);
+	ret = do_backup(dest, temp, c->save_prefix, c->use_compress);
 
 	free(dest);
 	free(temp);

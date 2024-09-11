@@ -18,7 +18,7 @@ static int dispatch_lnkfile(const char *absname, const char *relname,
 {
 	struct fileiter_file file = {
 		.absname = absname,
-		.relname = relname,
+		.dymname = relname,
 		.basname = basname,
 		.fd      = -1,
 		.st      = NULL,
@@ -35,18 +35,19 @@ static int dispatch_regfile(const char *absname, const char *relname,
 
 	int fd = open(absname, O_RDONLY);
 	if (fd == -1)
-		return warn_errno(_(ERRMAS_OPEN_FILE), absname);
+		return warn_errno(_("failed to open file `%s'"), absname);
 
 	struct stat st;
 	ret = fstat(fd, &st);
 	if (ret) {
 		close(fd);
-		return warn_errno(_(ERRMAS_STAT_FILE), absname);
+		return warn_errno(_("failed to retrieve information for file `%s'"),
+				  absname);
 	}
 
 	struct fileiter_file file = {
 		.absname = absname,
-		.relname = relname,
+		.dymname = relname,
 		.basname = basname,
 		.fd      = fd,
 		.st      = &st,
@@ -100,17 +101,22 @@ int fileiter_do_exec(struct fileiter *ctx)
 		return warn_errno(_("failed to open directory `%s'"), dname);
 
 	int ret;
+	int errnum;
 	struct dirent *ent;
 
 	errno = 0;
 	while ((ent = readdir(dir)) != NULL) {
 		ret = dispatch_file(ctx, ent);
-		if (ret)
+		if (ret) {
+			errnum = errno;
 			break;
+		}
 
 		strbuf_reset(ctx->sb);
 	}
 
 	closedir(dir);
+
+	errno = errnum;
 	return ret;
 }

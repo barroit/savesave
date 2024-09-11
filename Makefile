@@ -30,7 +30,7 @@ menuconfig:
 	@MENUCONFIG_STYLE=aquatic menuconfig
 
 scripts := $(notdir $(wildcard scripts/*.sh))
-args    := $(filter-out $(scripts),$(MAKECMDGOALS))
+args    := $(wordlist 2, $(words $(MAKECMDGOALS)), $(MAKECMDGOALS))
 
 .PHONY: $(args)
 

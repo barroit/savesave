@@ -29,11 +29,11 @@ static int read_savconf(const char *name, char **text)
 {
 	int fd = open(name, O_RDONLY);
 	if (fd == -1)
-		return error_errno("failed to open savconf `%s'", name);
+		return error_errno(_("failed to open `%s'"), name);
 
 	struct stat st;
 	if (fstat(fd, &st) == -1) {
-		error_errno("failed to retrieve information for savconf `%s'",
+		error_errno(_("failed to retrieve information for file `%s'"),
 			    name);
 		goto err_stat_fd;
 	}
@@ -42,7 +42,7 @@ static int read_savconf(const char *name, char **text)
 	buf[st.st_size] = 0;
 
 	if (robread(fd, buf, st.st_size) == -1) {
-		error_errno("failed to read savconf `%s'", name);
+		error_errno(_("failed to read `%s'"), name);
 		goto err_read_file;
 	}
 
@@ -180,7 +180,7 @@ static int prepare_backup(void *__backup, struct savesave *_)
 	const char *backup = *(const char **)__backup;
 	int err;
 
-	err = my_mkdir(backup);
+	err = MKDIR(backup);
 	if (err && errno != EEXIST)
 		return error_errno(_("failed to create backup directory `%s'"),
 				   backup);
@@ -188,8 +188,8 @@ static int prepare_backup(void *__backup, struct savesave *_)
 	struct stat st;
 	err = stat(backup, &st);
 	if (err)
-		return error_errno(
-_("unable to get metadata for backup directory `%s'"), backup);
+		return error_errno(_("unable to get metadata for backup directory `%s'"),
+				   backup);
 	if (!S_ISDIR(st.st_mode))
 		return error(_("file `%s' is not a directory"), backup);
 

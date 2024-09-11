@@ -146,7 +146,6 @@ menu "Debugging"
 config SOURCE_NDEBUG
 	bool "define NDEBUG"
 
-
 config SUPPRESS_ANNOTATED_LEAKS
 	bool "suppress annotated leaks"
 

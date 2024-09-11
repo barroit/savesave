@@ -16,7 +16,7 @@ int redirect_stdio(const char *name)
 	char *tmp = xstrdup(name);
 	const char *dir = dirname(tmp);
 
-	err = my_mkdir(dir);
+	err = MKDIR(dir);
 	free(tmp);
 
 	if (err && errno != EEXIST)
@@ -25,7 +25,7 @@ _("failed to create directory for log file `%s'"), name);
 
 	int fd = creat(name, 0664);
 	if (fd == -1) {
-		error_errno(_(ERRMAS_CREAT_FILE), name);
+		error_errno(_("failed to create file at `%s'"), name);
 		goto err_open_file;
 	}
 

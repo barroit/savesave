@@ -27,12 +27,14 @@ struct strbuf {
 
 void strbuf_init(struct strbuf *sb, flag_t flags);
 
-struct strbuf strbuf_from2(const char *str, flag_t flags, size_t extalloc);
+struct strbuf strbuf_from2(const char *base, flag_t flags, size_t extalloc);
 
-static inline struct strbuf strbuf_from(const char *str, flag_t flags)
+static inline struct strbuf strbuf_from(const char *base, flag_t flags)
 {
-	return strbuf_from2(str, flags, 0);
+	return strbuf_from2(base, flags, 0);
 }
+
+void strbuf_require_cap(struct strbuf *sb, size_t n);
 
 /*
  * A destroyed strbuf object can be re-initialised using strbuf_init();
@@ -76,7 +78,7 @@ size_t strbuf_cntchr(struct strbuf *sb, int c);
 
 void strbuf_normalize_path(struct strbuf *sb);
 
-void strbuf_reset2base(struct strbuf *sb, const char *base);
+void strbuf_reset_from(struct strbuf *sb, const char *base);
 
 #ifdef __cplusplus
 }

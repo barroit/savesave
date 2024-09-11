@@ -5,19 +5,21 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef BACKUP_H
-#define BACKUP_H
+#ifndef CP_H
+#define CP_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct savesave;
+struct strbuf;
 
-int backup_routine(struct savesave *c);
+int copyfile(int src, int dest, off_t len);
+
+int get_link_target2(const char *name, struct strbuf *__buf);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BACKUP_H */
+#endif /* CP_H */

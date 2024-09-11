@@ -41,12 +41,6 @@ NORETURN bug_routine(const char *file, int line,
 
 #define bug(...) bug_routine(__FILE__, __LINE__, __VA_ARGS__)
 
-/* common error messages */
-#define ERRMAS_OPEN_FILE   "failed to open file ‘%s’"
-#define ERRMAS_CREAT_FILE  "failed to create file at ‘%s’"
-#define ERRMAS_STAT_FILE   "failed to retrieve information for file ‘%s’"
-#define ERRMAS_ACCESS_FILE "failed to access file ‘%s’"
-
 #ifdef __cplusplus
 }
 #endif

@@ -14,7 +14,7 @@ extern "C" {
 
 struct fileiter_file {
 	const char *absname;
-	const char *relname;
+	const char *dymname; /* dynamic part of absname */
 	const char *basname;
 
 	int fd;

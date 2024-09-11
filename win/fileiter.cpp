@@ -37,7 +37,7 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 
 	struct fileiter_file src = {
 		.absname = absname,
-		.relname = relname,
+		.dymname = relname,
 		.fd      = -1,
 		.st      = NULL,
 	};
@@ -59,13 +59,15 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 
 	ret = stat(absname, &st);
 	if (ret)
-		return warn_errno(_(ERRMAS_STAT_FILE), absname);
+		return warn_errno(_("failed to retrieve information for file `%s'"),
+				  absname);
 
 	src.st = &st;
 	if (S_ISREG(st.st_mode)) {
 		int fd = open(absname, O_RDONLY);
 		if (fd == -1)
-			return warn_errno(_(ERRMAS_OPEN_FILE), absname);
+			return warn_errno(_("failed to open file `%s'"),
+					  absname);
 
 		src.fd = fd;
 		ret = ctx->cb(&src, ctx->data);

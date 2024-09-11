@@ -19,11 +19,11 @@ void strbuf_init(struct strbuf *sb, flag_t flags)
 		sb->is_const = 1;
 }
 
-struct strbuf strbuf_from2(const char *str, flag_t _, size_t extalloc)
+struct strbuf strbuf_from2(const char *base, flag_t _, size_t extalloc)
 {
 	struct strbuf sb = STRBUF_INIT;
 
-	sb.baslen = strbuf_concat2(&sb, str, extalloc);
+	sb.baslen = strbuf_concat2(&sb, base, extalloc);
 	return sb;
 }
 
@@ -32,6 +32,11 @@ void strbuf_destroy(struct strbuf *sb)
 	free(sb->str);
 	sb->str = STRBUF_POISON;
 	sb->cap = 0;
+}
+
+void strbuf_require_cap(struct strbuf *sb, size_t n)
+{
+	CAP_ALLOC(&sb->str, n, &sb->cap);
 }
 
 /*
@@ -82,7 +87,7 @@ size_t strbuf_concatat(struct strbuf *sb, size_t idx, const char *str)
 		strbuf_growlen(sb, alloc);
 	}
 
-	memcpy(&sb->str[idx], str, nl);
+	memcpy(&sb->str[idx], str, nl + 1);
 	sb->len += alloc;
 	return nl;
 }
@@ -159,7 +164,7 @@ void strbuf_normalize_path(struct strbuf *sb)
 			sb->str[i] = '/';
 }
 
-void strbuf_reset2base(struct strbuf *sb, const char *base)
+void strbuf_reset_from(struct strbuf *sb, const char *base)
 {
 	strbuf_zerolen(sb);
 	sb->baslen = strbuf_concat(sb, base);

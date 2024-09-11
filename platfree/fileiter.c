@@ -44,11 +44,12 @@ int fileiter_exec(struct fileiter *ctx)
 	const char *dir = ctx->root;
 
 	do {
-		strbuf_reset2base(ctx->sb, dir);
+		strbuf_reset_from(ctx->sb, dir);
 
 		ret = fileiter_do_exec(ctx);
 		if (ret)
-			return 1;
+			return -1;
+
 	} while ((dir = strlist_pop2(ctx->sl, 0)));
 
 	return 0;

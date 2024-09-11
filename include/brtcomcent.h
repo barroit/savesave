@@ -143,11 +143,16 @@ int setenv(const char *name, const char *value, int overwrite);
 NORETURN winexit(int code);
 #define exit winexit
 
-#define my_mkdir mkdir
+#define MKDIR mkdir
+
+int my_symlink(const char *target, const char *linkname);
+#define SYMLINK my_symlink
 
 #else /* ---- linux ----- */
 
-#define my_mkdir(p) mkdir(p, 0775)
+#define MKDIR(path) mkdir(path, 0775)
+
+#define SYMLINK symlink
 
 #endif /* ---- _WIN32 ----- */
 

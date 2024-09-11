@@ -22,6 +22,8 @@ void *xrealloc(void *p, size_t size);
 
 void *xmalloc(size_t size);
 
+void *xmalloc_boundary(size_t size, size_t align);
+
 void *xcalloc(size_t nmemb, size_t size);
 
 void *xreallocarray(void *ptr, size_t nmemb, size_t size);
