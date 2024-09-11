@@ -35,7 +35,7 @@ static void report_positional_argument(int idx, int argc, char *const *argv)
 			strbuf_printf(&sb, "‘%s’, ", argv[idx]);
 	}
 
-	strbuf_truncate(&sb, 2);
+	strbuf_trunc(&sb, 2);
 	error(n > 1 ? _("positional arguments %s are not allowd") :
 	      _("positional argument %s is not allowd"), sb.str);
 

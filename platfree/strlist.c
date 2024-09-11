@@ -93,7 +93,7 @@ char *strlist_pop2(struct strlist *sl, int dup)
 	if (dup)
 		str = xstrdup(str);
 
-	strbuf_zerolen(sb);
+	strbuf_reset(sb);
 	return str;
 }
 

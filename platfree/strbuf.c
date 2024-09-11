@@ -19,8 +19,10 @@ void strbuf_init(struct strbuf *sb, flag_t flags)
 		sb->is_const = 1;
 }
 
-struct strbuf strbuf_from2(const char *base, flag_t _, size_t extalloc)
+struct strbuf strbuf_from2(const char *base, flag_t flags, size_t extalloc)
 {
+	BUG_ON(flags & STRBUF_CONSTANT);
+
 	struct strbuf sb = STRBUF_INIT;
 
 	sb.baslen = strbuf_concat2(&sb, base, extalloc);
@@ -112,7 +114,7 @@ size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...)
 	return nr;
 }
 
-void strbuf_truncate(struct strbuf *sb, size_t n)
+void strbuf_trunc(struct strbuf *sb, size_t n)
 {
 	sb->len -= n;
 	sb->str[sb->len] = 0;
@@ -121,7 +123,7 @@ void strbuf_truncate(struct strbuf *sb, size_t n)
 void strbuf_trim(struct strbuf *sb)
 {
 	char *h = sb->str;
-	while (*h == ' ')
+	while (isspace(*h))
 		h++;
 
 	if (*h == 0) {
@@ -131,7 +133,7 @@ void strbuf_trim(struct strbuf *sb)
 	}
 
 	char *t = &sb->str[sb->len];
-	while (*(t - 1) == ' ')
+	while (isspace(*(t - 1)))
 		t--;
 
 	if (h == sb->str && t == &sb->str[sb->len])
@@ -166,6 +168,6 @@ void strbuf_normalize_path(struct strbuf *sb)
 
 void strbuf_reset_from(struct strbuf *sb, const char *base)
 {
-	strbuf_zerolen(sb);
+	sb->len = 0;
 	sb->baslen = strbuf_concat(sb, base);
 }
