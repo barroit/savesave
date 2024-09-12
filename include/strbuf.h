@@ -65,6 +65,11 @@ static inline void strbuf_reset(struct strbuf *sb)
 }
 
 /**
+ * strbuf_reset_from - reset strbuf and its initial string to base
+ */
+void strbuf_reset_from(struct strbuf *sb, const char *base);
+
+/**
  * strbuf_move - store str reference instead of copy it
  * 
  * note: strbuf must initialized with STRBUF_CONSTANT
@@ -123,9 +128,18 @@ size_t strbuf_cntchr(struct strbuf *sb, int c);
 void strbuf_normalize_path(struct strbuf *sb);
 
 /**
- * strbuf_reset_from - reset strbuf and its initial string to base
+ * strbuf_strrsep - get the pointer points to the last path separator
  */
-void strbuf_reset_from(struct strbuf *sb, const char *base);
+static inline char *strbuf_strrsep(struct strbuf *sb)
+{
+	return strrchr(sb->str, '/');
+}
+
+/**
+ * strbuf_mkfdirp - make file directory as well as its parent directories,
+ * 		    starting from initial string
+ */
+int strbuf_mkfdirp(struct strbuf *sb);
 
 #ifdef __cplusplus
 }

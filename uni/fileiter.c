@@ -104,19 +104,17 @@ int fileiter_do_exec(struct fileiter *ctx)
 	int errnum;
 	struct dirent *ent;
 
-	errno = 0;
 	while ((ent = readdir(dir)) != NULL) {
 		ret = dispatch_file(ctx, ent);
-		if (ret) {
-			errnum = errno;
+		if (ret)
 			break;
-		}
 
 		strbuf_reset(ctx->sb);
 	}
 
+	errnum = errno;
 	closedir(dir);
-
 	errno = errnum;
+
 	return ret;
 }

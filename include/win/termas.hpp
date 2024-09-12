@@ -10,7 +10,11 @@
 
 #include "termas.h"
 
-const char *strwinerror();
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+const char *strwinerror(void);
 
 #define warn_winerr(...) \
 	__warn_routine("warning: ", strwinerror(), __VA_ARGS__)
@@ -19,5 +23,9 @@ const char *strwinerror();
 	__error_routine("error: ", strwinerror(), __VA_ARGS__)
 
 #define die_winerr(...) __die_routine("fatal: ", strwinerror(), __VA_ARGS__)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TERMAS_HPP */

@@ -2,7 +2,7 @@
 
 param (
 	[ValidateSet('build', 'distclean', 'menuconfig', `
-		     'install', 'uninstall')]
+		     'install', 'uninstall', 'mcheck')]
 	[string]$command = 'build'
 )
 
@@ -49,6 +49,10 @@ if ($command -eq 'distclean') {
 	exit 0
 } elseif ($command -eq 'uninstall') {
 	rm -Recurse -Force -ErrorAction SilentlyContinue "$install_dest"
+	exit 0
+} elseif ($command -eq 'mcheck') {
+	drmemory -check_uninit_blocklist "KERNELBASE.dll,ntdll.dll" `
+		 -suppress .suppress .\build\savesave.exe
 	exit 0
 }
 

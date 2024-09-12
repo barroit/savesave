@@ -12,8 +12,6 @@
 #include "list.h"
 #include "termas.h"
 #include "fileiter.h"
-#include "alloc.h"
-#include "cp.h"
 
 static char stru8_map[UINT8_MAX + 1][STRU8_MAX];
 
@@ -123,21 +121,24 @@ static char *get_next_backup_name(const struct savesave *c)
 	if (ret)
 		goto err_find_next;
 
-	HANDLE_ERROR(err_drop_backup, {
+	if (0) {
+	err_drop_backup:
 		error(_("unable to drop deprecated backup of configuration `%s'"),
 		      c->name);
-	});
+	}
 
-	HANDLE_ERROR(err_sort_backup, {
+	if (0) {
+	err_sort_backup:
 		strbuf_concatat_base(&src, "*");
 		error(_("unable to sort backup `%s' of configuration `%s'"),
 		      src.str, c->name);
-	});
+	}
 
-	HANDLE_ERROR(err_find_next, {
+	if (0) {
+	err_find_next:
 		error(_("unable to determine next backup file name of configuration `%s'"),
 		      c->name);
-	});
+	}
 
 	strbuf_destroy(&src);
 
@@ -163,105 +164,21 @@ static FILEITER_CALLBACK(backup_file_compress)
 	return 0;
 }
 
-static int make_backup_dir(struct strbuf *sb)
-{
-	int err;
-	char *name = sb->str;
-	char *next = &sb->str[sb->baslen + 1];
-
-	while (39) {
-		next = strchr(next, '/');
-		if (!next)
-			return 0;
-
-		*next = 0;
-		err = MKDIR(name);
-		if (err && errno != EEXIST)
-			return err;
-
-		*next = '/';
-		next += 1;
-	}
-}
-
-static int backup_copy_regfile(struct fileiter_file *src, struct strbuf *dest)
-{
-	int ret;
-	int destfd = creat(dest->str, 0664);
-
-	if (destfd == -1) {
-		if (errno != ENOENT)
-			goto err_create_file;
-
-		ret = make_backup_dir(dest);
-		if (ret)
-			goto err_make_dir;
-
-		destfd = creat(dest->str, 0664);
-		if (destfd == -1)
-			goto err_create_file;
-	}
-
-	ret = copyfile(src->fd, destfd, src->st->st_size);
-	if (ret)
-		warn_errno(_("unable to copy file from `%s' to `%s'"),
-			   src->absname, dest->str);
-
-	close(destfd);
-	return ret;
-
-err_create_file:
-	BUG_ON(errno == ENOENT);
-	return warn_errno(_("unable to create file at `%s'"), dest->str);
-err_make_dir:
-	return warn_errno(_("unable to make directory `%s'"), dest->str);
-}
-
-static int backup_copy_symlink(const char *src,
-			       struct strbuf *dest, struct strbuf *__buf)
-{
-	int ret;
-
-	ret = get_link_target2(src, __buf);
-	if (ret)
-		goto err_read_link;
-
-	ret = SYMLINK(__buf->str, dest->str);
-	if (ret) {
-		if (errno != ENOENT)
-			goto err_make_link;
-
-		ret = make_backup_dir(dest);
-		if (ret)
-			goto err_make_dir;
-
-		ret = SYMLINK(__buf->str, dest->str);
-		if (ret)
-			goto err_make_link;
-	}
-
-	return 0;
-
-err_read_link:
-	return warn_errno(_("unable to real link `%s'"), src);
-err_make_dir:
-	return warn_errno(_("unable to make directory `%s'"), dest->str);
-err_make_link:
-	BUG_ON(errno == ENOENT);
-	return warn_errno(_("unable to make symbolic link `%s'"), src);
-}
+extern int backup_copy_regfile(struct fileiter_file *src, struct strbuf *dest);
+extern int backup_copy_symlink(const char *src,
+			       struct strbuf *dest, struct strbuf *__buf);
 
 static FILEITER_CALLBACK(backup_file_copy)
 {
-	struct strbuf *path = &((struct strbuf *)data)[0];
+	struct strbuf *dest = &((struct strbuf *)data)[0];
 	struct strbuf *__buf = &((struct strbuf *)data)[1];
 
-	strbuf_concatat_base(path, src->dymname);
+	strbuf_concatat_base(dest, src->dymname);
 
 	if (src->st != NULL)
-		return backup_copy_regfile(src, path);
+		return backup_copy_regfile(src, dest);
 	else
-		return backup_copy_symlink(src->absname, path, __buf);
+		return backup_copy_symlink(src->absname, dest, __buf);
 }
 
 static int do_backup(const char *dest, const char *temp,

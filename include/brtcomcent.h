@@ -146,14 +146,9 @@ NORETURN winexit(int code);
 
 #define MKDIR mkdir
 
-int my_symlink(const char *target, const char *linkname);
-#define SYMLINK my_symlink
-
 #else /* ---- linux ----- */
 
 #define MKDIR(path) mkdir(path, 0775)
-
-#define SYMLINK symlink
 
 #endif /* ---- _WIN32 ----- */
 

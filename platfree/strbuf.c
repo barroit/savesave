@@ -10,6 +10,7 @@
 #include "debug.h"
 #include "poison.h"
 #include "list.h"
+#include "mkdir.h"
 
 void strbuf_init(struct strbuf *sb, flag_t flags)
 {
@@ -34,6 +35,12 @@ void strbuf_destroy(struct strbuf *sb)
 	free(sb->str);
 	sb->str = STRBUF_POISON;
 	sb->cap = 0;
+}
+
+void strbuf_reset_from(struct strbuf *sb, const char *base)
+{
+	sb->len = 0;
+	sb->baslen = strbuf_concat(sb, base);
 }
 
 void strbuf_require_cap(struct strbuf *sb, size_t n)
@@ -166,8 +173,16 @@ void strbuf_normalize_path(struct strbuf *sb)
 			sb->str[i] = '/';
 }
 
-void strbuf_reset_from(struct strbuf *sb, const char *base)
+int strbuf_mkfdirp(struct strbuf *sb)
 {
-	sb->len = 0;
-	sb->baslen = strbuf_concat(sb, base);
+	int err;
+	char *p = strbuf_strrsep(sb);
+
+	*p = 0;
+	err = mkdirp2(sb->str, sb->baslen);
+	if (err)
+		return err;
+
+	*p = '/';
+	return 0;
 }

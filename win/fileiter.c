@@ -15,10 +15,6 @@
 #include "debug.h"
 #include "path.h"
 
-extern "C"{
-int fileiter_do_exec(struct fileiter *ctx);
-}
-
 static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 {
 	const char *basname = ent->cFileName;
@@ -86,25 +82,26 @@ int fileiter_do_exec(struct fileiter *ctx)
 
 	int ret = 0;
 	WIN32_FIND_DATA ent;
-
-	const char *pattern = ctx->sb->str;
-	HANDLE dir = FindFirstFile(pattern, &ent);
+	HANDLE dir = FindFirstFile(ctx->sb->str, &ent);
 
 	if (dir == INVALID_HANDLE_VALUE)
 		goto err_find_file;
 
 	do {
+		strbuf_reset(ctx->sb);
 		ret = dispatch_file(ctx, &ent);
 		if (ret)
 			break;
+	} while (FindNextFile(dir, &ent));
 
-		strbuf_reset(ctx->sb);
-	} while (FindNextFile(dir, &ent) != NULL);
+	if (GetLastError() != ERROR_NO_MORE_FILES)
+		warn_winerr(_("failed to find next file of file `%s'"),
+			    ctx->sb->str);
 
 	FindClose(dir);
 	return ret;
 
 err_find_file:
 	return warn_winerr(_("failed to find first file from pattern `%s'"),
-			   pattern);
+			   ctx->sb->str);
 }

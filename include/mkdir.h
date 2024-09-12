@@ -5,21 +5,22 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef CP_H
-#define CP_H
+#ifndef MKDIR_H
+#define MKDIR_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct strbuf;
+int mkdirp2(char *name, size_t start);
 
-int copyfile(int src, int dest, off_t len);
-
-int get_link_target2(const char *name, struct strbuf *__buf);
+static inline int mkdirp(char *name)
+{
+	return mkdirp2(name, 0);
+}
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CP_H */
+#endif /* MKDIR_H */
