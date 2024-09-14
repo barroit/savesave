@@ -12,6 +12,8 @@
 #include "list.h"
 #include "termas.h"
 #include "fileiter.h"
+#include "mkdir.h"
+#include "alloc.h"
 
 static char stru8_map[UINT8_MAX + 1][STRU8_MAX];
 
@@ -161,7 +163,7 @@ static char *tmpdir_of_backup(const char *backup)
 
 static int backup_file_compress(struct fileiter_file *src, void *data)
 {
-	return 0;
+	return *(int *)ACCESS_POISON;
 }
 
 static int backup_file_copy(struct fileiter_file *src, void *data)
@@ -188,8 +190,10 @@ static int do_backup(const char *dest, const char *temp,
 	} else {
 		cb = backup_file_copy;
 
-		ret = MKDIR(dest);
-		if (ret && errno != EEXIST)
+		char *d = xstrdup(dest);
+		ret = mkdirp(d);
+		free(d);
+		if (ret)
 			goto err_make_dir;
 	}
 

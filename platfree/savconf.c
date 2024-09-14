@@ -157,32 +157,6 @@ static int parse_save(void *__save, struct savesave *conf)
 	return 0;
 }
 
-static int prepare_backup(void *__backup, struct savesave *_)
-{
-	const char *backup = *(const char **)__backup;
-	int err;
-
-	err = MKDIR(backup);
-	if (err && errno != EEXIST)
-		return error_errno(_("failed to create backup directory `%s'"),
-				   backup);
-
-	struct stat st;
-	err = stat(backup, &st);
-	if (err)
-		return error_errno(_("unable to get metadata for backup directory `%s'"),
-				   backup);
-	if (!S_ISDIR(st.st_mode))
-		return error(_("file `%s' is not a directory"), backup);
-
-	err = access(backup, W_OK | X_OK);
-	if (err)
-		return error_errno(_("unable to access backup directory `%s'"),
-				   backup);
-
-	return 0;
-}
-
 static int check_stack(void *__stack, struct savesave *_)
 {
 	u8 stack = *(u8 *)__stack;
@@ -229,8 +203,7 @@ static int assign_entry(const char *line, char **rest,
 	if (is_entry(line, "save", rest))
 		SETENT(ent, "save", &conf->save_prefix, parse_save, STRING);
 	else if (is_entry(line, "backup", rest))
-		SETENT(ent, "backup", &conf->backup_prefix,
-		       prepare_backup, STRING);
+		SETENT(ent, "backup", &conf->backup_prefix, NULL, STRING);
 	else if (is_entry(line, "period", rest))
 		SETENT(ent, "period", &conf->period, check_period, TIMESPAN);
 	else if (is_entry(line, "stack", rest))
