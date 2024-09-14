@@ -80,21 +80,16 @@ int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx)
 	if (dir == INVALID_HANDLE_VALUE)
 		goto err_find_file;
 
-	SetLastError(0);
 	do {
 		strbuf_reset(ctx->sb);
 		ret = dispatch_file(ctx, &ent);
 		if (ret)
 			break;
-
-		BUG_ON(GetLastError());
 	} while (FindNextFile(dir, &ent));
 
 	if (GetLastError() != ERROR_NO_MORE_FILES)
 		warn_winerr(_("failed to find next file of file `%s'"),
 			    ctx->sb->str);
-	else
-		SetLastError(0);
 
 	FindClose(dir);
 	return ret;

@@ -2,6 +2,3 @@
 
 ----
 drop backup can't handle directory
-
-----
-store and restore errno!!!

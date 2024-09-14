@@ -126,7 +126,6 @@ int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx)
 	int ret;
 	struct dirent *ent;
 
-	errno = 0;
 	while ((ent = readdir(dir)) != NULL) {
 		ret = dispatch_file(ctx, ent);
 		if (ret)
@@ -134,9 +133,6 @@ int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx)
 
 		strbuf_reset(ctx->sb);
 	}
-
-	/* A fucking strict check */
-	BUG_ON(!ent && errno != 0);
 
 	closedir(dir);
 	return ret;

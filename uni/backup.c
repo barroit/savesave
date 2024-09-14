@@ -48,15 +48,11 @@ int PLATSPECOF(backup_copy_regfile)(struct fileiter_file *src,
 				    struct strbuf *dest)
 {
 	int ret;
-	int errnum = errno;
 	int destfd = creat(dest->str, 0664);
 
 	if (destfd == -1) {
 		if (errno != ENOENT)
 			goto err_create_file;
-
-		/* DO NOT FORGET TO RESET ERRNO :-) */
-		errno = errnum;
 
 		ret = strbuf_mkfdirp(dest);
 		if (ret)
@@ -86,7 +82,6 @@ int PLATSPECOF(backup_copy_symlink)(struct fileiter_file *src,
 				    struct strbuf *dest, struct strbuf *__buf)
 {
 	int ret;
-	int errnum = errno;
 	size_t len = src->st->st_size ? src->st->st_size + 1 : PATH_MAX;
 
 	strbuf_require_cap(__buf, len);
@@ -103,7 +98,6 @@ int PLATSPECOF(backup_copy_symlink)(struct fileiter_file *src,
 	if (ret) {
 		if (errno != ENOENT)
 			goto err_make_link;
-		errno = errnum;
 
 		ret = strbuf_mkfdirp(dest);
 		if (ret)

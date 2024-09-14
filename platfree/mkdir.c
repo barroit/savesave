@@ -12,7 +12,6 @@
 int mkdirp2(char *name, size_t start)
 {
 	int err;
-	int errnum = errno;
 	char *next = &name[start];
 
 	if (is_absolute_path(name)) {
@@ -37,6 +36,5 @@ int mkdirp2(char *name, size_t start)
 		next += 1;
 	}
 
-	errno = errnum;
 	return 0;
 }
