@@ -29,11 +29,17 @@ CONSTRUCTOR(init_u8tstr_table)
 		
 }
 
-static int sort_backup(struct strbuf *src, struct strbuf *dest, u8 stack)
+/**
+ * sort_backup - sort backup files
+ *
+ * return: -1 on error, 0 on success, 1 if there is no room
+ */
+static int sort_backup(struct strbuf *src,
+		       struct strbuf *dest, u8 stack, int *n)
 {
 	int err;
 	u8 i;
-	int room = -1;
+	int room = -1, base;
 
 	for_each_idx(i, stack) {
 		strbuf_concatat_base(src, stru8_map[i]);
@@ -52,11 +58,20 @@ static int sort_backup(struct strbuf *src, struct strbuf *dest, u8 stack)
 			goto err_access_file;
 		}
 
-		if (room == -1)
+		if (room == -1) {
 			room = i;
+			base = i;
+		}
 	}
 
-	return room != -1;
+	if (room != -1 && n)
+		*n = room - base;
+
+	/*
+	 * You may think this is shit, it is!
+	 * And hooray for semantics!
+	 */
+	return room == -1 ? 1 : 0;
 
 err_rename_file:
 	return warn_errno(_("failed to rename file `%s' to `%s'"),
@@ -105,16 +120,16 @@ static char *get_next_backup_name(const struct savesave *c)
 	struct strbuf src = strbuf_from2(c->backup_prefix, 0, STRU8_MAX);
 	struct strbuf dest = strbuf_from2(c->backup_prefix, 0, STRU8_MAX);
 
-	ret = sort_backup(&src, &dest, c->stack);
+	ret = sort_backup(&src, &dest, c->stack, NULL);
 	if (ret == -1)
 		goto err_sort_backup;
 
-	if (!ret) {
+	if (ret == 1) {
 		ret = drop_deprecated_backup(&dest);
 		if (ret)
 			goto err_drop_backup;
 
-		ret = sort_backup(&src, &dest, c->stack);
+		ret = sort_backup(&src, &dest, c->stack, NULL);
 		if (ret == -1)
 			goto err_sort_backup;
 	}
@@ -127,16 +142,12 @@ static char *get_next_backup_name(const struct savesave *c)
 	err_drop_backup:
 		error(_("unable to drop deprecated backup of configuration `%s'"),
 		      c->name);
-	}
-
-	if (0) {
+	} else if (0) {
 	err_sort_backup:
 		strbuf_concatat_base(&src, "*");
 		error(_("unable to sort backup `%s' of configuration `%s'"),
 		      src.str, c->name);
-	}
-
-	if (0) {
+	} else if (0) {
 	err_find_next:
 		error(_("unable to determine next backup file name of configuration `%s'"),
 		      c->name);
