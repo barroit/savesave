@@ -57,11 +57,20 @@ void strbuf_require_cap(struct strbuf *sb, size_t n);
 void strbuf_destroy(struct strbuf *sb);
 
 /**
+ * strbuf_reset_length - reset length of strbuf to its initializing status
+ */
+static inline void strbuf_reset_length(struct strbuf *sb)
+{
+	sb->len = sb->baslen;
+}
+
+/**
  * strbuf_reset - reset strbuf object to its initializing status
  */
 static inline void strbuf_reset(struct strbuf *sb)
 {
-	sb->len = sb->baslen;
+	strbuf_reset_length(sb);
+	sb->str[sb->len] = 0;
 }
 
 /**
@@ -110,7 +119,11 @@ size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...);
 /**
  * strbuf_trunc - truncate strbuf
  */
-void strbuf_trunc(struct strbuf *sb, size_t n);
+static inline void strbuf_trunc(struct strbuf *sb, size_t n)
+{
+	sb->len -= n;
+	sb->str[sb->len] = 0;
+}
 
 /**
  * strbuf_trim - remove space character from both ends of strbuf
@@ -140,6 +153,11 @@ static inline char *strbuf_strrsep(struct strbuf *sb)
  * 		    starting from initial string
  */
 int strbuf_mkfdirp(struct strbuf *sb);
+
+/**
+ * strbuf_to_dirname - make strbuf become its parent name
+ */
+void strbuf_to_dirname(struct strbuf *sb);
 
 #ifdef __cplusplus
 }

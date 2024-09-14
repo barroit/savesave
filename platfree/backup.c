@@ -194,7 +194,7 @@ static int do_backup(const char *dest, const char *temp,
 		     const char *save, int use_compress)
 {
 	int ret;
-	fileiter_callback cb;
+	fileiter_callback_t cb;
 
 	if (use_compress) {
 		cb = backup_file_compress;

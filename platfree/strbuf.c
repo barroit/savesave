@@ -120,12 +120,6 @@ size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...)
 	return nr;
 }
 
-void strbuf_trunc(struct strbuf *sb, size_t n)
-{
-	sb->len -= n;
-	sb->str[sb->len] = 0;
-}
-
 void strbuf_trim(struct strbuf *sb)
 {
 	char *h = sb->str;
@@ -184,4 +178,12 @@ int strbuf_mkfdirp(struct strbuf *sb)
 
 	*p = '/';
 	return 0;
+}
+
+void strbuf_to_dirname(struct strbuf *sb)
+{
+	char *dirsep = strbuf_strrsep(sb);
+	size_t dirlen = dirsep - sb->str;
+
+	strbuf_trunc(sb, sb->len - dirlen);
 }

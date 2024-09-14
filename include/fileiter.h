@@ -24,6 +24,7 @@ struct fileiter_file {
 	struct stat *st;
 
 	int is_lnk;
+	int is_dir;
 
 	/*
 	 * not available when
@@ -33,7 +34,7 @@ struct fileiter_file {
 	int fd;
 };
 
-typedef int (*fileiter_callback)(struct fileiter_file *file, void *data);
+typedef int (*fileiter_callback_t)(struct fileiter_file *file, void *data);
 
 struct fileiter {
 	const char *root;
@@ -41,7 +42,7 @@ struct fileiter {
 	struct strbuf *sb;
 	struct strlist *sl;
 
-	fileiter_callback cb;
+	fileiter_callback_t cb;
 	void *data;
 
 	flag_t flags;
@@ -49,9 +50,10 @@ struct fileiter {
 
 #define FI_USE_STAT (1 << 0)
 #define FI_USE_FD   (1 << 1)
+#define FI_LIST_DIR (1 << 2)
 
 void fileiter_init(struct fileiter *ctx, const char *root,
-		   fileiter_callback cb, void *data, flag_t flags);
+		   fileiter_callback_t cb, void *data, flag_t flags);
 
 void fileiter_destroy(struct fileiter *ctx);
 

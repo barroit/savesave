@@ -92,7 +92,7 @@ char *strlist_pop2(struct strlist *sl, int dup)
 	if (dup)
 		str = xstrdup(str);
 
-	strbuf_reset(sb);
+	strbuf_reset_length(sb);
 	return str;
 }
 

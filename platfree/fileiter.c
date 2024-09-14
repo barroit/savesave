@@ -11,7 +11,7 @@
 #include "strlist.h"
 
 void fileiter_init(struct fileiter *ctx, const char *root,
-		   fileiter_callback cb, void *data, flag_t flags)
+		   fileiter_callback_t cb, void *data, flag_t flags)
 {
 	memset(ctx, 0, sizeof(*ctx));
 
@@ -38,19 +38,88 @@ void fileiter_destroy(struct fileiter *ctx)
 	free(ctx->sl);
 }
 
+static int dispatch_directory(struct fileiter *ctx)
+{
+	struct fileiter_file file = {
+		.absname = ctx->sb->str,
+		.dymname = straftr(file.absname, ctx->root),
+		.is_dir  = 1,
+		.fd      = -1,
+	};
+
+	return ctx->cb(&file, ctx->data);
+}
+
 int fileiter_exec(struct fileiter *ctx)
 {
-	int ret;
+	int err;
 	const char *dir = ctx->root;
+	size_t baslen = strlen(dir);
 
-	do {
+	while (39) {
 		strbuf_reset_from(ctx->sb, dir);
 
-		ret = PLATSPECOF(fileiter_do_exec)(ctx);
-		if (ret)
+		err = PLATSPECOF(fileiter_do_exec)(ctx);
+		if (err)
 			return -1;
 
-	} while ((dir = strlist_pop2(ctx->sl, 0)));
+		dir = strlist_pop2(ctx->sl, 0);
+		if (!dir)
+			goto iter_done;
 
-	return 0;
+		if (!(ctx->flags & FI_LIST_DIR))
+			continue;
+		strbuf_reset(ctx->sb);
+
+		const char *prev = ctx->sb->str, *next = dir;
+		size_t pdrlen, ndrlen = strrchr(next, '/') - next;
+
+		/*
+		 * If previous name is the prefix of next name, we skip it
+		 *
+		 * Just comparing their length is enough, since we can never
+		 * get something like
+		 *   esp_coex/CMakeFiles/__idf_esp_coex.dir/esp32
+		 * followed by
+		 *   esp_wifi/CMakeFiles/__idf_esp_wifi.dir/src
+		 * due to our pretty badass hierarchy traverse strategy :-)
+		 */
+		if (strlen(prev) == ndrlen)
+			continue;
+		pdrlen = strrchr(prev, '/') - prev;
+
+		/*
+		 * Previous name has the same parent as next name
+		 */
+		if (pdrlen == ndrlen) {
+			err = dispatch_directory(ctx);
+			if (err)
+				return -1;
+			continue;
+		}
+
+		if (0) {
+		iter_done:
+			if (!(ctx->flags & FI_LIST_DIR))
+				return 0;
+			ndrlen = baslen;
+		}
+
+		/*
+		 * Previous branch is done
+		 */
+		while (39) {
+			err = dispatch_directory(ctx);
+			if (err)
+				return -1;
+
+			strbuf_to_dirname(ctx->sb);
+			if (ctx->sb->len == ndrlen) {
+				if (!dir)
+					return dispatch_directory(ctx);
+				else
+					break;
+			}
+		}
+	}
 }
