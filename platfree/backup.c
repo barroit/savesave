@@ -26,7 +26,6 @@ CONSTRUCTOR(init_u8tstr_table)
 		n = snprintf(stru8_map[i], sizeof(*stru8_map), "%u", (u8)i);
 		BUG_ON(n < 0);
 	}
-		
 }
 
 /**
@@ -82,14 +81,23 @@ err_access_file:
 
 static int drop_deprecated_backup(struct strbuf *path)
 {
-	int err;
+	int ret;
 
 	strbuf_concatat_base(path, "0");
-	err = remove(path->str);
-	if (err)
-		return warn_errno(_("failed to remove file `%s'"), path->str);
+	const char *name = path->str;
 
-	return 0;
+	ret = unlink(name);
+	if (!ret)
+		return 0;
+	else if (errno == EISDIR)
+		ret = rmdirr(path->str);
+	else
+		goto err_remove_file;
+
+	return ret;
+
+err_remove_file:
+	return warn_errno(_("failed to remove file `%s'"), name);
 }
 
 static int find_next_room(struct strbuf *next, u8 stack)
