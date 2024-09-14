@@ -114,38 +114,20 @@ static inline int is_entry(const char *line, const char *prefix, char **ret)
 	return skip_prefix(line, prefix, ret) == 0 && isspace(**ret);
 }
 
-static FILEITER_CALLBACK(sizeof_file)
-{
-	off64_t size;
-
-	if (!src->st)
-		/*
-		 * we don't handle symbolic links; a constant is given that is
-		 * large enough for most symbolic link files
-		 */
-		size = 64;
-	else
-		size = src->st->st_size;
-
-	*((off64_t *)data) += size;
-	return 0;
-}
-
-int calc_dir_size(const char *base, off64_t *size)
+int calc_dir_size(const char *base, off_t *size)
 {
 	int ret;
 	struct fileiter ctx;
 
-	fileiter_init(&ctx, base, sizeof_file, size);
+	fileiter_init(&ctx, base, PLATSPECOF(sizeof_file), size, FI_USE_STAT);
 
 	ret = fileiter_exec(&ctx);
-	fileiter_destroy(&ctx);
-
 	if (ret)
-		return error("unable to calculate directory size for `%s'",
+		return error(_("unable to calculate size for directory `%s'"),
 			     base);
 
-	return 0;
+	fileiter_destroy(&ctx);
+	return ret;
 }
 
 static int parse_save(void *__save, struct savesave *conf)
@@ -482,8 +464,10 @@ char *get_default_savconf_path(void)
 		strbuf_printf(&sb, "%s/%s", home, CONFIG_SAVCONF_BASENAME);
 	}
 
-	if (access(sb.str, R_OK) == 0)
+	if (access(sb.str, R_OK) == 0) {
+		strbuf_normalize_path(&sb);
 		return sb.str;
+	}
 
 	strbuf_destroy(&sb);
 	return NULL;

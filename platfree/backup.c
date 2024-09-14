@@ -159,26 +159,22 @@ static char *tmpdir_of_backup(const char *backup)
 	return sb.str;
 }
 
-static FILEITER_CALLBACK(backup_file_compress)
+static int backup_file_compress(struct fileiter_file *src, void *data)
 {
 	return 0;
 }
 
-extern int backup_copy_regfile(struct fileiter_file *src, struct strbuf *dest);
-extern int backup_copy_symlink(const char *src,
-			       struct strbuf *dest, struct strbuf *__buf);
-
-static FILEITER_CALLBACK(backup_file_copy)
+static int backup_file_copy(struct fileiter_file *src, void *data)
 {
 	struct strbuf *dest = &((struct strbuf *)data)[0];
 	struct strbuf *__buf = &((struct strbuf *)data)[1];
 
 	strbuf_concatat_base(dest, src->dymname);
 
-	if (src->st != NULL)
-		return backup_copy_regfile(src, dest);
+	if (src->is_lnk)
+		return PLATSPECOF(backup_copy_symlink)(src, dest, __buf);
 	else
-		return backup_copy_symlink(src->absname, dest, __buf);
+		return PLATSPECOF(backup_copy_regfile)(src, dest);
 }
 
 static int do_backup(const char *dest, const char *temp,
@@ -203,7 +199,7 @@ static int do_backup(const char *dest, const char *temp,
 		[1] = strbuf_from2("", 0, PATH_MAX),
 	};
 
-	fileiter_init(&iter, save, cb, data);
+	fileiter_init(&iter, save, cb, data, FI_USE_STAT | FI_USE_FD);
 	ret = fileiter_exec(&iter);
 	if (ret)
 		error(_("failed to backup save `%s' to `%s'"), save, dest);
@@ -217,7 +213,7 @@ err_make_dir:
 	return error_errno(_("failed to make directory `%s'"), dest);
 }
 
-int backup_routine(struct savesave *c)
+int backup(struct savesave *c)
 {
 	int ret;
 

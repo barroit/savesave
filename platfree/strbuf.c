@@ -8,7 +8,6 @@
 #include "strbuf.h"
 #include "alloc.h"
 #include "debug.h"
-#include "poison.h"
 #include "list.h"
 #include "mkdir.h"
 

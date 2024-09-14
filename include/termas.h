@@ -41,6 +41,23 @@ NORETURN bug_routine(const char *file, int line,
 
 #define bug(...) bug_routine(__FILE__, __LINE__, __VA_ARGS__)
 
+/*
+ * Extended termas functions for Windows
+ */
+#ifdef _WIN32
+
+const char *strwinerror(void);
+
+#define warn_winerr(...) \
+	__warn_routine("warning: ", strwinerror(), __VA_ARGS__)
+
+#define error_winerr(...) \
+	__error_routine("error: ", strwinerror(), __VA_ARGS__)
+
+#define die_winerr(...) __die_routine("fatal: ", strwinerror(), __VA_ARGS__)
+
+#endif /* _WIN32 */
+
 #ifdef __cplusplus
 }
 #endif

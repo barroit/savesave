@@ -8,6 +8,8 @@
 #ifndef BACKUP_HPP
 #define BACKUP_HPP
 
+#include "backup.h"
+
 struct savesave;
 
 class backup {

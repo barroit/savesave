@@ -7,8 +7,7 @@
 
 #include "win/backup.hpp"
 #include "savconf.h"
-#include "win/termas.hpp"
-#include "backup.h"
+#include "termas.h"
 #include "strbuf.h"
 #include "debug.h"
 #include "fileiter.h"
@@ -20,8 +19,7 @@ backup::backup(size_t nl)
 
 	use_defque = !queue;
 	if (use_defque)
-		warn_winerr(
-_("failed to create timer queue (fallback to default timer queue)"));
+		warn_winerr(_("failed to create timer queue, fallback to default one"));
 }
 
 backup::~backup()
@@ -37,56 +35,60 @@ static void do_backup(void *conf, unsigned char)
 	int err;
 	struct savesave *c = (struct savesave *)conf;
 
-	err = backup_routine(c);
-	if (err)
-		error(
-_("an error occurred while making backup for configuration `%s'"), c->name);
+	err = backup(c);
+	if (!err)
+		error(_("cannot make backup for configuration `%s'"), c->name);
 }
 
 void backup::create_backup_task(const struct savesave *conf)
 {
-	int pass;
-
+	int err;
 	HANDLE *p = timer;
-	DWORD countdown;
-	ULONG flag;
-	while (conf->name != NULL) {
-		countdown = conf->period * 1000;
-		if (conf->save_size > CONFIG_COMPRESSING_THRESHOLD)
-			flag = WT_EXECUTELONGFUNCTION;
-		else
-			flag = WT_EXECUTEDEFAULT;
 
-		pass = CreateTimerQueueTimer(p++, queue, do_backup,
+	while (conf->name != NULL) {
+		DWORD countdown = conf->period * 1000;
+		ULONG flag = conf->save_size > CONFIG_COMPRESSING_THRESHOLD ?
+				WT_EXECUTELONGFUNCTION : WT_EXECUTEDEFAULT;
+
+		err = !CreateTimerQueueTimer(p++, queue, do_backup,
 					     (void *)conf++, countdown,
 					     countdown, flag);
-		if (!pass)
-			die_winerr(
-_("failed to create a timer for configuration `%s'"), conf->name);
+		if (err)
+			goto err_create_timer;
 	}
+
+err_create_timer:
+	die_winerr(_("failed to create timer for configuration `%s'"),
+		   conf->name);
 }
 
-extern "C" {
-int backup_copy_regfile(struct fileiter_file *src, struct strbuf *dest);
-int backup_copy_symlink(const char *src,
-			struct strbuf *dest, struct strbuf *__buf);
-}
-
-int backup_copy_regfile(struct fileiter_file *src, struct strbuf *dest)
+static int backup_copy_routine(struct fileiter_file *src,
+			       struct strbuf *dest, int is_symlink)
 {
 	int err;
+	int errnum = GetLastError();
 
-	ERROR_PATH_NOT_FOUND;
-	err = !CopyFile(src->absname, dest->str, false);
+	if (is_symlink)
+		err = !CopyFileEx(src->absname, dest->str, NULL, NULL,
+				  NULL, COPY_FILE_COPY_SYMLINK);
+	else
+		err = !CopyFile(src->absname, dest->str, false);
+
 	if (err) {
 		if (GetLastError() != ERROR_PATH_NOT_FOUND)
 			goto err_copy_file;
+		SetLastError(errnum);
 
 		err = strbuf_mkfdirp(dest);
 		if (err)
 			goto err_make_dir;
 
-		err = !CopyFile(src->absname, dest->str, false);
+		if (is_symlink)
+			err = !CopyFileEx(src->absname, dest->str, NULL, NULL,
+					  NULL, COPY_FILE_COPY_SYMLINK);
+		else
+			err = !CopyFile(src->absname, dest->str, false);
+
 		if (err)
 			goto err_copy_file;
 	}
@@ -99,35 +101,17 @@ err_copy_file:
 			  src->absname, dest->str);
 err_make_dir:
 	return warn_errno(_("unable to make directory `%s'"), dest->str);
+	
 }
 
-int backup_copy_symlink(const char *src,
-			struct strbuf *dest, struct strbuf *__buf)
+int PLATSPECOF(backup_copy_regfile)(struct fileiter_file *src,
+				    struct strbuf *dest)
 {
-	int err;
+	return backup_copy_routine(src, dest, 0);
+}
 
-	err = !CopyFileEx(src, dest->str, NULL, NULL,
-			  NULL, COPY_FILE_COPY_SYMLINK);
-	if (err) {
-		if (GetLastError() != ERROR_PATH_NOT_FOUND)
-			goto err_copy_file;
-
-		err = strbuf_mkfdirp(dest);
-		if (err)
-			goto err_make_dir;
-
-		err = !CopyFileEx(src, dest->str, NULL, NULL,
-				  NULL, COPY_FILE_COPY_SYMLINK);
-		if (err)
-			goto err_copy_file;
-	}
-
-	return 0;
-
-err_copy_file:
-	BUG_ON(GetLastError() == ERROR_PATH_NOT_FOUND);
-	return warn_errno(_("unable to copy file from `%s' to `%s'"),
-			  src, dest->str);
-err_make_dir:
-	return warn_errno(_("unable to make directory `%s'"), dest->str);
+int PLATSPECOF(backup_copy_symlink)(struct fileiter_file *src,
+				    struct strbuf *dest, struct strbuf *)
+{
+	return backup_copy_routine(src, dest, 1);
 }

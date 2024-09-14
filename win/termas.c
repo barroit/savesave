@@ -5,12 +5,11 @@
  * Contact: barroit@linux.com
  */
 
-#include "win/termas.hpp"
-
-static char errbuf[256];
+#include "termas.h"
 
 const char *strwinerror(void)
 {
+	static char errbuf[256];
 	int errnum = GetLastError();
 	int langid = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
 

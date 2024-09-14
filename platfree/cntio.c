@@ -50,6 +50,7 @@ int cntopen3(const char *file, int oflag, mode_t mode)
 
 int cntclose(int fd)
 {
+	BUG_ON(fd == -1);
 	int ret;
 
 	ret = robclose(fd);

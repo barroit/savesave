@@ -17,14 +17,23 @@ struct fileiter_file {
 	const char *dymname; /* dynamic part of absname */
 	const char *basname;
 
-	int fd;
+	/*
+	 * not available when
+	 *  - absname points to symlink on windows
+	 */
 	struct stat *st;
+
+	int is_lnk;
+
+	/*
+	 * not available when
+	 *  - on windows, due to the significant performance impact
+	 *  - absname points to symlink
+	 */
+	int fd;
 };
 
-typedef int (*fileiter_callback)(struct fileiter_file *src, void *data);
-
-#define FILEITER_CALLBACK(name) \
-	int name(struct fileiter_file *src, void *data)
+typedef int (*fileiter_callback)(struct fileiter_file *file, void *data);
 
 struct fileiter {
 	const char *root;
@@ -34,12 +43,19 @@ struct fileiter {
 
 	fileiter_callback cb;
 	void *data;
+
+	flag_t flags;
 };
 
-void fileiter_init(struct fileiter *ctx, const char *head,
-		   fileiter_callback cb, void *data);
+#define FI_USE_STAT (1 << 0)
+#define FI_USE_FD   (1 << 1)
+
+void fileiter_init(struct fileiter *ctx, const char *root,
+		   fileiter_callback cb, void *data, flag_t flags);
 
 void fileiter_destroy(struct fileiter *ctx);
+
+int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx);
 
 int fileiter_exec(struct fileiter *ctx);
 

@@ -10,7 +10,6 @@
 #include "termas.h"
 #include "debug.h"
 #include "ioop.h"
-#include "poison.h"
 
 static HANDLE create_conhand()
 {
@@ -82,7 +81,7 @@ void console::redirect_stdio(const char *output)
 {
 	int err;
 
-	window = (HWND)GENERIC_POISON;
+	window = (HWND)ACCESS_POISON;
 	is_live = false;
 
 	/*
@@ -92,7 +91,7 @@ void console::redirect_stdio(const char *output)
 	if (err)
 		die(_("unable to redirect standard io"));
 
-	stream = (FILE *)GENERIC_POISON;
+	stream = (FILE *)ACCESS_POISON;
 	FreeConsole();
 }
 

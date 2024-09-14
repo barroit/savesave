@@ -16,63 +16,109 @@ msgstr  "Report-Msgid-Bugs-To: barroit@linux.com\n"
         "Content-Transfer-Encoding: 8bit\n"
         "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: uni/fileiter.c:81
+#: uni/backup.c:72 win/backup.cpp:100
+#, c-format
+msgid   "unable to copy file from `%s' to `%s'"
+msgstr  ""
+
+#: uni/backup.c:80
+#, c-format
+msgid   "unable to create file at `%s'"
+msgstr  ""
+
+#: uni/backup.c:82 uni/backup.c:126 win/backup.cpp:103
+#, c-format
+msgid   "unable to make directory `%s'"
+msgstr  ""
+
+#: uni/backup.c:100
+#, c-format
+msgid   "path `%s' may have been truncated"
+msgstr  ""
+
+#: uni/backup.c:120
+#, c-format
+msgid   "unable to real link `%s'"
+msgstr  ""
+
+#: uni/backup.c:123
+#, c-format
+msgid   "unable to make symbolic link `%s'"
+msgstr  ""
+
+#: uni/fileiter.c:27 uni/fileiter.c:66 win/fileiter.c:68 platfree/savconf.c:36
+#, c-format
+msgid   "failed to retrieve information for file `%s'"
+msgstr  ""
+
+#: uni/fileiter.c:64
+#, c-format
+msgid   "failed to open file `%s'"
+msgstr  ""
+
+#: uni/fileiter.c:93
 #, c-format
 msgid   "can't determine file type for `%s'"
 msgstr  ""
 
-#: uni/fileiter.c:83
+#: uni/fileiter.c:95
 #, c-format
 msgid   "`%s' has unsupported file type `%d', skipped"
 msgstr  ""
 
-#: uni/fileiter.c:94 win/fileiter.cpp:91
+#: uni/fileiter.c:123
 #, c-format
 msgid   "failed to open directory `%s'"
 msgstr  ""
 
-#: uni/path.c:40
+#: uni/path.c:41
 #, c-format
 msgid   "can't get home directory for sudo user `%s'"
 msgstr  ""
 
-#: uni/path.c:55
+#: uni/path.c:56
 msgid   "your $HOME corrupted"
 msgstr  ""
 
-#: uni/robio.c:23
+#: win/fileiter.c:63
 #, c-format
-msgid   "failed to copy file from `%s' to `%s'"
+msgid   "`%s' has unsupported st_mode `%ud', skipped"
+msgstr  ""
+
+#: win/fileiter.c:94
+#, c-format
+msgid   "failed to find next file of file `%s'"
+msgstr  ""
+
+#: win/fileiter.c:103
+#, c-format
+msgid   "failed to find first file from pattern `%s'"
 msgstr  ""
 
 #: win/atenter.cpp:28
 msgid   "unsupported windows version (at least win7)"
 msgstr  ""
 
-#: win/backup.cpp:21
-msgid   "failed to create timer queue (fallback to default timer queue)"
+#: win/backup.cpp:22
+msgid   "failed to create timer queue, fallback to default one"
 msgstr  ""
 
 #: win/backup.cpp:40
 #, c-format
-msgid   "an error occurred while making backup for configuration `%s'"
+msgid   "cannot make backup for configuration `%s'"
 msgstr  ""
 
-#: win/backup.cpp:62
+#: win/backup.cpp:61
 #, c-format
-msgid   "failed to create a timer for configuration `%s'"
+msgid   "failed to create timer for configuration `%s'"
 msgstr  ""
 
-#: win/cmdline.cpp:43 entry/savesave.c:30
-msgid   "no savconf was provided"
-msgstr  ""
-
-#: win/console.cpp:76
-msgid   "failed to set console code page to utf-8"
-msgstr  ""
-
-#: win/console.cpp:97
+#: win/console.cpp:92
 msgid   "unable to redirect standard io"
+msgstr  ""
+
+#: win/console.cpp:106
+msgid   "failed to set console output codepage to 65001"
 msgstr  ""
 
 #: win/dumpstack.cpp:28
@@ -81,11 +127,6 @@ msgstr  ""
 
 #: win/dumpstack.cpp:52
 msgid   "failed to retrieve symbol for 0x<PRIxMAX>"
-msgstr  ""
-
-#: win/fileiter.cpp:75
-#, c-format
-msgid   "`%s' has unsupported st_mode `%ud', skipped"
 msgstr  ""
 
 #: win/menu.cpp:22
@@ -122,30 +163,51 @@ msgstr  ""
 msgid   "failed to duplicate string"
 msgstr  ""
 
-#: platfree/backup.c:52
+#: platfree/backup.c:60
 #, c-format
 msgid   "failed to rename file `%s' to `%s'"
 msgstr  ""
 
-#: platfree/backup.c:72
+#: platfree/backup.c:63 platfree/backup.c:91
+#, c-format
+msgid   "failed to access file `%s'"
+msgstr  ""
+
+#: platfree/backup.c:73
 #, c-format
 msgid   "failed to remove file `%s'"
 msgstr  ""
 
-#: platfree/backup.c:115
+#: platfree/backup.c:126
 #, c-format
 msgid   "unable to drop deprecated backup of configuration `%s'"
 msgstr  ""
 
-#: platfree/backup.c:130
+#: platfree/backup.c:133
+#, c-format
+msgid   "unable to sort backup `%s' of configuration `%s'"
+msgstr  ""
+
+#: platfree/backup.c:139
 #, c-format
 msgid   "unable to determine next backup file name of configuration `%s'"
 msgstr  ""
 
-#: platfree/backup.c:196
+#: platfree/backup.c:205
+#, c-format
+msgid   "failed to backup save `%s' to `%s'"
+msgstr  ""
+
+#: platfree/backup.c:213
+#, c-format
+msgid   "failed to make directory `%s'"
+msgstr  ""
+
+#: platfree/backup.c:227
 #, c-format
 msgid   "next backup name\n"
         "\t%s\n"
+        "\n"
 msgstr  ""
 
 #: platfree/compress.c:24
@@ -212,6 +274,11 @@ msgstr  ""
 msgid   "failed to create directory for log file `%s'"
 msgstr  ""
 
+#: platfree/ioop.c:28
+#, c-format
+msgid   "failed to create file at `%s'"
+msgstr  ""
+
 #: platfree/ioop.c:33
 #, c-format
 msgid   "cannot redirect stdout to `%s'"
@@ -248,89 +315,104 @@ msgstr  "使用法: savesave.exe [--version] [--help] [--config <path>]\n"
         "    --help               ヘルプメッセージを表示\n"
         "    -f, --config <file>  設定ファイルのパスを指定\n"
 
-#: platfree/savconf.c:158
+#: platfree/savconf.c:32
+#, c-format
+msgid   "failed to open `%s'"
+msgstr  ""
+
+#: platfree/savconf.c:45
+#, c-format
+msgid   "failed to read `%s'"
+msgstr  ""
+
+#: platfree/savconf.c:126
+#, c-format
+msgid   "unable to calculate size for directory `%s'"
+msgstr  ""
+
+#: platfree/savconf.c:140
 #, c-format
 msgid   "save path `%s' must be an absolute path"
 msgstr  ""
 
-#: platfree/savconf.c:163
+#: platfree/savconf.c:145
 #, c-format
 msgid   "save path `%s' does not exist"
 msgstr  ""
 
-#: platfree/savconf.c:172
+#: platfree/savconf.c:154
 #, c-format
 msgid   "unsupported save file mode `%d'"
 msgstr  ""
 
-#: platfree/savconf.c:185
+#: platfree/savconf.c:167
 #, c-format
 msgid   "failed to create backup directory `%s'"
 msgstr  ""
 
-#: platfree/savconf.c:192
+#: platfree/savconf.c:173
 #, c-format
 msgid   "unable to get metadata for backup directory `%s'"
 msgstr  ""
 
-#: platfree/savconf.c:194
+#: platfree/savconf.c:176
 #, c-format
 msgid   "file `%s' is not a directory"
 msgstr  ""
 
-#: platfree/savconf.c:198
+#: platfree/savconf.c:180
 #, c-format
 msgid   "unable to access backup directory `%s'"
 msgstr  ""
 
-#: platfree/savconf.c:208
+#: platfree/savconf.c:190
 msgid   "stack cannot be 0"
 msgstr  ""
 
-#: platfree/savconf.c:216
+#: platfree/savconf.c:198
 msgid   "period cannot be 0"
 msgstr  ""
 
-#: platfree/savconf.c:271
+#: platfree/savconf.c:253
 #, c-format
 msgid   "name '%s' must have a value"
 msgstr  ""
 
-#: platfree/savconf.c:302
+#: platfree/savconf.c:284
 #, c-format
 msgid   "unrecognized name found in `%s'"
 msgstr  ""
 
-#: platfree/savconf.c:327
+#: platfree/savconf.c:309
 msgid   "encountered an unknown line"
 msgstr  ""
 
-#: platfree/savconf.c:349
+#: platfree/savconf.c:331
 #, c-format
 msgid   "configuration `%s' missing the following fields\n"
         "\n"
         "%s"
 msgstr  ""
 
-#: platfree/savconf.c:350
+#: platfree/savconf.c:332
 #, c-format
 msgid   "configuration `%s' missing the following field\n"
         "\n"
         "%s"
 msgstr  ""
 
-#: platfree/savconf.c:402
+#: platfree/savconf.c:384
 #, c-format
 msgid   "failed to parse savesave configuration\n"
         "%7<PRIuMAX>:%s"
 msgstr  ""
 
-#: platfree/savconf.c:424
+#: platfree/savconf.c:406
 #, c-format
 msgid   "an error occurred while reading savconf `%s'"
 msgstr  ""
 
-#: platfree/savconf.c:427
+#: platfree/savconf.c:409
 #, c-format
 msgid   "file `%s' is empty"
 msgstr  ""
@@ -375,14 +457,27 @@ msgstr  ""
 msgid   "unknown bool value `%s'"
 msgstr  ""
 
+#: entry/savesave.c:30
+msgid   "no savconf was provided"
+msgstr  ""
+
 #: entry/savesave.c:34
 #, c-format
 msgid   "`%s' must contain at least one configuration"
 msgstr  ""
 
-#: entry/savesave.cpp:38
-msgid   "test"
-msgstr  "テスト"
+#: entry/savesave.cpp:58
+msgid   "no configuration file was provided"
+msgstr  ""
+
+#: entry/savesave.cpp:64
+#, c-format
+msgid   "no configuration was found in `%s'"
+msgstr  ""
+
+#: entry/savesave.cpp:80
+msgid   "unable to initialize main window"
+msgstr  ""
 
 #: include/calc.h:36 include/calc.h:46 include/termas.h:38 include/termas.h:40
 msgid   "fatal: "
@@ -398,7 +493,7 @@ msgstr  ""
 msgid   "size overflow: %<PRIuMAX> + %<PRIuMAX>"
 msgstr  ""
 
-#: include/compiler.h:62
+#: include/compiler.h:61
 msgid   "pointer type mismatch in containerof()"
 msgstr  ""
 
@@ -409,3 +504,6 @@ msgstr  ""
 #: include/termas.h:33 include/termas.h:35
 msgid   "error: "
 msgstr  "エラー: "
+
+#~ msgid        "test"
+#~ msgstr       "テスト"

@@ -7,20 +7,56 @@
 
 #include "fileiter.h"
 #include "strbuf.h"
-#include "uni/cp.h"
 #include "termas.h"
 #include "debug.h"
 #include "path.h"
+#include "robio.h"
 
-int backup_copy_regfile(struct fileiter_file *src,
-			struct strbuf *dest, struct strbuf *_)
+// static char buf[SZ_512K];
+
+// int copyfile(int src, int dest, off_t len)
+// {
+// 	ssize_t nr, nw;
+// 	do {
+// 		nr = robread_all(src, buf, sizeof(buf));
+// 		if (unlikely(nr == -1))
+// 			return -1;
+
+// 		nw = robwrite_all(dest, buf, nr);
+// 		if (unlikely(nw == -1))
+// 			return -1;
+// 	} while (nr > 0);
+
+// 	return 0;
+// }
+
+static int copyfile(int src, int dest, off_t len)
+{
+	ssize_t copied;
+	do {
+		copied = copy_file_range(src, NULL, dest, NULL, len, 0);
+		if (copied == -1)
+			return -1;
+
+		len -= copied;
+	} while (len > 0 && copied > 0);
+
+	return 0;
+}
+
+int PLATSPECOF(backup_copy_regfile)(struct fileiter_file *src,
+				    struct strbuf *dest)
 {
 	int ret;
+	int errnum = errno;
 	int destfd = creat(dest->str, 0664);
 
 	if (destfd == -1) {
 		if (errno != ENOENT)
 			goto err_create_file;
+
+		/* DO NOT FORGET TO RESET ERRNO :-) */
+		errno = errnum;
 
 		ret = strbuf_mkfdirp(dest);
 		if (ret)
@@ -46,43 +82,28 @@ err_make_dir:
 	return warn_errno(_("unable to make directory `%s'"), dest->str);
 }
 
-static int readlink3(const char *name, struct strbuf *__buf)
+int PLATSPECOF(backup_copy_symlink)(struct fileiter_file *src,
+				    struct strbuf *dest, struct strbuf *__buf)
 {
-	int err;
-	struct stat st;
+	int ret;
+	int errnum = errno;
+	size_t len = src->st->st_size ? src->st->st_size + 1 : PATH_MAX;
 
-	err = lstat(name, &st);
-	if (err)
-		return -1;
-
-	size_t len = st.st_size ? st.st_size + 1 : PATH_MAX;
 	strbuf_require_cap(__buf, len);
-
-	ssize_t nr = readlink(name, __buf->str, len);
+	ssize_t nr = readlink(src->absname, __buf->str, len);
 	if (nr == -1)
-		return -1;
+		goto err_read_link;
 
 	__buf->str[nr] = 0;
 	__buf->len = nr;
 	if (nr == len)
 		warn(_("path `%s' may have been truncated"), __buf->str);
 
-	return 0;
-}
-
-int backup_copy_symlink(const char *src,
-			struct strbuf *dest, struct strbuf *__buf)
-{
-	int ret;
-
-	ret = readlink3(src, __buf);
-	if (ret)
-		goto err_read_link;
-
 	ret = symlink(__buf->str, dest->str);
 	if (ret) {
 		if (errno != ENOENT)
 			goto err_make_link;
+		errno = errnum;
 
 		ret = strbuf_mkfdirp(dest);
 		if (ret)
@@ -96,10 +117,11 @@ int backup_copy_symlink(const char *src,
 	return 0;
 
 err_read_link:
-	return warn_errno(_("unable to real link `%s'"), src);
+	return warn_errno(_("unable to real link `%s'"), src->absname);
 err_make_link:
 	BUG_ON(errno == ENOENT);
-	return warn_errno(_("unable to make symbolic link `%s'"), src);
+	return warn_errno(_("unable to make symbolic link `%s'"),
+			  src->absname);
 err_make_dir:
 	return warn_errno(_("unable to make directory `%s'"), dest->str);
 }

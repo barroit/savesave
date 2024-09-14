@@ -7,7 +7,7 @@
 
 #undef exit
 
-#include "win/termas.hpp"
+#include "termas.h"
 #include "win/console.hpp"
 
 static void waiting_user()

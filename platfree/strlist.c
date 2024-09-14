@@ -9,7 +9,6 @@
 #include "alloc.h"
 #include "list.h"
 #include "debug.h"
-#include "poison.h"
 
 void strlist_init(struct strlist *sl, flag_t flags)
 {

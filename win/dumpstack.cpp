@@ -8,7 +8,7 @@
 #pragma GCC diagnostic ignored "-Wreturn-type"
 
 #include "win/dumpstack.hpp"
-#include "win/termas.hpp"
+#include "termas.h"
 #include "strlist.h"
 #include "list.h"
 #include "alloc.h"

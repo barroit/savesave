@@ -11,7 +11,7 @@
 #include "strlist.h"
 
 void fileiter_init(struct fileiter *ctx, const char *root,
-		    fileiter_callback cb, void *data)
+		   fileiter_callback cb, void *data, flag_t flags)
 {
 	memset(ctx, 0, sizeof(*ctx));
 
@@ -25,6 +25,8 @@ void fileiter_init(struct fileiter *ctx, const char *root,
 
 	ctx->cb = cb;
 	ctx->data = data;
+
+	ctx->flags = flags;
 }
 
 void fileiter_destroy(struct fileiter *ctx)
@@ -36,8 +38,6 @@ void fileiter_destroy(struct fileiter *ctx)
 	free(ctx->sl);
 }
 
-int fileiter_do_exec(struct fileiter *ctx);
-
 int fileiter_exec(struct fileiter *ctx)
 {
 	int ret;
@@ -46,7 +46,7 @@ int fileiter_exec(struct fileiter *ctx)
 	do {
 		strbuf_reset_from(ctx->sb, dir);
 
-		ret = fileiter_do_exec(ctx);
+		ret = PLATSPECOF(fileiter_do_exec)(ctx);
 		if (ret)
 			return -1;
 

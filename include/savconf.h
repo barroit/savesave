@@ -18,7 +18,7 @@ struct savesave {
 	char *save_prefix;
 	char *backup_prefix;
 
-	off64_t save_size;
+	off_t save_size;
 	int is_dir_save;
 
 	int use_compress;
@@ -30,9 +30,16 @@ struct savesave {
 
 char *get_default_savconf_path(void);
 
+struct fileiter_file;
+int PLATSPECOF(sizeof_file)(struct fileiter_file *file, void *data);
+
 size_t parse_savconf(const char *path, struct savesave **conf);
 
 void print_savconf(const struct savesave *conf, size_t nl);
+
+#ifdef _WIN32
+void format_savconf(struct savesave *savconf, size_t n);
+#endif
 
 #ifdef __cplusplus
 }

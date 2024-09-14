@@ -1,6 +1,16 @@
                                   TODO LIST
 
 ----
+add debug run to validate path sep in strbuf_mkfdirp()
+
+----
+use mkdirp() to prepare backup directory
+
+
+
+
+LOW PRIORITY
+----
 replace getopt with parse_option (more robust)
 
 ----
@@ -9,5 +19,3 @@ implement console app version savesave
 ----
 add performance trace
 
-----
-document strbuf

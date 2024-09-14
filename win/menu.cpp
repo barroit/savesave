@@ -6,7 +6,7 @@
  */
 
 #include "win/ui.hpp"
-#include "win/termas.hpp"
+#include "termas.h"
 #include "alloc.h"
 
 static int setup_menu(HMENU menu)

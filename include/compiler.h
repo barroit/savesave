@@ -28,17 +28,16 @@ extern "C" {
 # define CONSTRUCTOR(name) static void __attribute__((constructor)) name(void)
 #endif
 
-#define __CONCAT2(a, b)	a##b
 #define CONCAT2(a, b)	__CONCAT2(a, b)
-
-#define UNIQUE_ID(n) CONCAT2(CONCAT2(__local_, n), __COUNTER__)
-
-#define __SELECT_FUNCTION3(a, b, c, n, ...)	n
+#define __CONCAT2(a, b)	a##b
 
 /*
  * Call function by arguments count; tailing number indicates the max arguments
  * it can handle
+ * 
+ * A piece of shit
  */
+#define __SELECT_FUNCTION3(a, b, c, n, ...)	n
 #define FLEXCALL_FUNCTION3(prefix, ...)				\
 	__SELECT_FUNCTION3(__VA_ARGS__,				\
 			   CONCAT2(prefix, 3),			\
@@ -66,9 +65,19 @@ extern "C" {
 #define __ARG_PLACEHOLDER_1 0,
 #define __take_second_arg(fir, sec, ...) sec
 
-#define ___IS_DEFINED(arg) __take_second_arg(arg 1, 0)
-#define __IS_DEFINED(val)  ___IS_DEFINED(__ARG_PLACEHOLDER_##val)
 #define IS_DEFINED(x)      __IS_DEFINED(x)
+#define __IS_DEFINED(val)  ___IS_DEFINED(__ARG_PLACEHOLDER_##val)
+#define ___IS_DEFINED(arg) __take_second_arg(arg 1, 0)
+
+#ifdef __linux
+# define __PLATSPEC_NAME uni
+#else
+# define __PLATSPEC_NAME win
+#endif
+
+#define PLATSPECOF(name)	 __PLATSPECOF(__PLATSPEC_NAME, name)
+#define __PLATSPECOF(suf, name)  ___PLATSPECOF(suf, name)
+#define ___PLATSPECOF(suf, name) __platspec_##suf##_##name
 
 #ifdef __cplusplus
 }

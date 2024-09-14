@@ -77,6 +77,7 @@
 #endif
 
 #include "compiler.h"
+#include "poison.h"
 
 #include "ansidecl.h"
 #include "poll.h"

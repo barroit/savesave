@@ -13,8 +13,14 @@ extern "C" {
 #endif
 
 struct savesave;
+int backup(struct savesave *c);
 
-int backup_routine(struct savesave *c);
+struct strbuf;
+struct fileiter_file;
+int PLATSPECOF(backup_copy_regfile)(struct fileiter_file *src,
+				    struct strbuf *dest);
+int PLATSPECOF(backup_copy_symlink)(struct fileiter_file *src,
+				    struct strbuf *dest, struct strbuf *__buf);
 
 #ifdef __cplusplus
 }

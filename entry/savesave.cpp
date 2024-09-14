@@ -7,14 +7,13 @@
 
 #include "win/console.hpp"
 #include "win/ui.hpp"
-#include "win/termas.hpp"
+#include "termas.h"
 #include "robio.h"
 #include "win/cmdline.hpp"
 #include "win/backup.hpp"
 #include "savconf.h"
 #include "debug.h"
 #include "win/atenter.hpp"
-#include "win/savconf.hpp"
 #include "runopt.h"
 #include "strlist.h"
 
@@ -56,18 +55,19 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	if (!args.savconf)
 		args.savconf = get_default_savconf_path();
 	if (!args.savconf)
-		die(_("no savconf was provided"));
+		die(_("no configuration file was provided"));
 	if (args.output)
 		appcon.redirect_stdio(args.output);
 
 	size_t nl = parse_savconf(args.savconf, &savconf);
 	if (!nl)
-		die(_("`%s' must have at least one configuration"),
-		    args.savconf);
+		die(_("no configuration was found in `%s'"), args.savconf);
 
 	format_savconf(savconf, nl);
 	DEBUG_RUN()
 		print_savconf(savconf, nl);
+
+	backup(savconf);
 
 #ifdef CONFIG_IS_CONSOLE_APP
 	exit(0); /* TODO LATER IMPL */

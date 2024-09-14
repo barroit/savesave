@@ -6,7 +6,7 @@
  */
 
 #include "win/ui.hpp"
-#include "win/termas.hpp"
+#include "termas.h"
 
 #define CLASS_ID SAVESAVE_NAME
 

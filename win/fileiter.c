@@ -11,15 +11,13 @@
 #include "fileiter.h"
 #include "strbuf.h"
 #include "strlist.h"
-#include "win/termas.hpp"
+#include "termas.h"
 #include "debug.h"
 #include "path.h"
 
 static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 {
 	const char *basname = ent->cFileName;
-	const char *absname, *relname;
-
 	if (is_dir_indicator(basname))
 		return 0;
 
@@ -27,15 +25,17 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 		strbuf_concat(ctx->sb, "/");
 	strbuf_concat(ctx->sb, basname);
 
-	absname = ctx->sb->str;
-	relname = straftr(absname, ctx->root);
+	const char *absname = ctx->sb->str;
+	const char *relname = straftr(absname, ctx->root);
 	BUG_ON(!relname);
 
-	struct fileiter_file src = {
+	struct fileiter_file file = {
 		.absname = absname,
 		.dymname = relname,
+		.basname = basname,
+		.st      = &(struct stat){ 0 },
+		.is_lnk  = 0,
 		.fd      = -1,
-		.st      = NULL,
 	};
 
 	/*
@@ -44,39 +44,32 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 	 * want to open/traverse files/directories pointed by a symlink
 	 */
 	if (ent->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
-		return ctx->cb(&src, ctx->data);
+		file.is_lnk = 1;
+		return ctx->cb(&file, ctx->data);
 	} else if (ent->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 		strlist_push2(ctx->sl, absname, 32);
 		return 0;
 	}
 
-	int ret;
-	struct stat st;
-
-	ret = stat(absname, &st);
-	if (ret)
-		return warn_errno(_("failed to retrieve information for file `%s'"),
-				  absname);
-
-	src.st = &st;
-	if (S_ISREG(st.st_mode)) {
-		int fd = open(absname, O_RDONLY);
-		if (fd == -1)
-			return warn_errno(_("failed to open file `%s'"),
-					  absname);
-
-		src.fd = fd;
-		ret = ctx->cb(&src, ctx->data);
-		close(fd);
-		return ret;
-	} else {
-		warn(_("`%s' has unsupported st_mode `%ud', skipped"),
-		     absname, st.st_mode);
-		return 0;
+	if (ctx->flags & FI_USE_STAT) {
+		int err = stat(absname, file.st);
+		if (err)
+			goto err_stat_file;
 	}
+
+	if (S_ISREG(file.st->st_mode))
+		return ctx->cb(&file, ctx->data);
+
+	warn(_("`%s' has unsupported st_mode `%ud', skipped"),
+	     absname, file.st->st_mode);
+	return 0;
+
+err_stat_file:
+	return warn_errno(_("failed to retrieve information for file `%s'"),
+			  absname);
 }
 
-int fileiter_do_exec(struct fileiter *ctx)
+int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx)
 {
 	strbuf_concat(ctx->sb, "/*");
 
@@ -87,16 +80,21 @@ int fileiter_do_exec(struct fileiter *ctx)
 	if (dir == INVALID_HANDLE_VALUE)
 		goto err_find_file;
 
+	SetLastError(0);
 	do {
 		strbuf_reset(ctx->sb);
 		ret = dispatch_file(ctx, &ent);
 		if (ret)
 			break;
+
+		BUG_ON(GetLastError());
 	} while (FindNextFile(dir, &ent));
 
 	if (GetLastError() != ERROR_NO_MORE_FILES)
 		warn_winerr(_("failed to find next file of file `%s'"),
 			    ctx->sb->str);
+	else
+		SetLastError(0);
 
 	FindClose(dir);
 	return ret;
