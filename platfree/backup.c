@@ -79,27 +79,6 @@ err_access_file:
 	return warn_errno(_("failed to access file `%s'"), src->str);
 }
 
-static int drop_deprecated_backup(struct strbuf *path)
-{
-	int ret;
-
-	strbuf_concatat_base(path, "0");
-	const char *name = path->str;
-
-	ret = unlink(name);
-	if (!ret)
-		return 0;
-	else if (errno == EISDIR)
-		ret = rmdirr(path->str);
-	else
-		goto err_remove_file;
-
-	return ret;
-
-err_remove_file:
-	return warn_errno(_("failed to remove file `%s'"), name);
-}
-
 static int find_next_room(struct strbuf *next, u8 stack)
 {
 	int err;
@@ -133,7 +112,8 @@ static char *get_next_backup_name(const struct savesave *c)
 		goto err_sort_backup;
 
 	if (ret == 1) {
-		ret = drop_deprecated_backup(&dest);
+		strbuf_concatat_base(&dest, "0");
+		ret = FLEXREMOVE(dest.str);
 		if (ret)
 			goto err_drop_backup;
 

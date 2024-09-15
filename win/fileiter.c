@@ -60,7 +60,14 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 	if (S_ISREG(file.st->st_mode))
 		return ctx->cb(&file, ctx->data);
 
-	warn(_("`%s' has unsupported st_mode `%ud', skipped"),
+	DWORD attr = GetFileAttributes(absname);
+
+	if (attr & FILE_ATTRIBUTE_ARCHIVE) {
+		file.st->st_mode = _S_IFREG;
+		return ctx->cb(&file, ctx->data);
+	}
+
+	warn(_("`%s' has unsupported st_mode `%u', skipped"),
 	     absname, file.st->st_mode);
 	return 0;
 

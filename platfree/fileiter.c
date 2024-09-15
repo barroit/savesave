@@ -54,25 +54,31 @@ int fileiter_exec(struct fileiter *ctx)
 {
 	int err;
 	const char *dir = ctx->root;
-	size_t baslen = strlen(dir);
+	size_t baslen = strlen(dir), ndrlen;
 
 	while (39) {
 		strbuf_reset_from(ctx->sb, dir);
 
 		err = PLATSPECOF(fileiter_do_exec)(ctx);
-		if (err)
+		if (unlikely(err))
 			return -1;
 
 		dir = strlist_pop2(ctx->sl, 0);
-		if (!dir)
+		if (unlikely(!dir)) {
+			if (!(ctx->flags & FI_LIST_DIR))
+				return 0;
+
+			strbuf_reset(ctx->sb);
+			ndrlen = baslen;
 			goto iter_done;
+		}
 
 		if (!(ctx->flags & FI_LIST_DIR))
 			continue;
 		strbuf_reset(ctx->sb);
 
 		const char *prev = ctx->sb->str, *next = dir;
-		size_t pdrlen, ndrlen = strrchr(next, '/') - next;
+		ndrlen = strrchr(next, '/') - next;
 
 		/*
 		 * If previous name is the prefix of next name, we skip it
@@ -86,7 +92,7 @@ int fileiter_exec(struct fileiter *ctx)
 		 */
 		if (strlen(prev) == ndrlen)
 			continue;
-		pdrlen = strrchr(prev, '/') - prev;
+		size_t pdrlen = strrchr(prev, '/') - prev;
 
 		/*
 		 * Previous name has the same parent as next name
@@ -98,27 +104,22 @@ int fileiter_exec(struct fileiter *ctx)
 			continue;
 		}
 
-		if (0) {
-		iter_done:
-			if (!(ctx->flags & FI_LIST_DIR))
-				return 0;
-			ndrlen = baslen;
-		}
 
 		/*
 		 * Previous branch is done
 		 */
 		while (39) {
+iter_done:
 			err = dispatch_directory(ctx);
-			if (err)
+			if (unlikely(err))
 				return -1;
 
 			strbuf_to_dirname(ctx->sb);
 			if (ctx->sb->len == ndrlen) {
-				if (!dir)
-					return dispatch_directory(ctx);
-				else
+				if (likely(dir))
 					break;
+				else
+					return dispatch_directory(ctx);
 			}
 		}
 	}

@@ -31,6 +31,10 @@ static inline int mkdirp(char *name)
  */
 int rmdirr(const char *name);
 
+int PLATSPECOF(flexremove)(const char *name);
+
+#define FLEXREMOVE PLATSPECOF(flexremove)
+
 #ifdef __cplusplus
 }
 #endif

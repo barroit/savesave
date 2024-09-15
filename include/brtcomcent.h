@@ -116,6 +116,8 @@ extern "C" {
 #define fileno _fileno
 #define mkdir  _mkdir
 #define putenv _putenv
+#define unlink _unlink
+#define rmdir  _rmdir
 
 #define F_OK 00
 #define W_OK 02

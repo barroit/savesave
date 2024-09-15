@@ -5,6 +5,3 @@ replace getopt with parse_option (more robust)
 
 ----
 implement console app version savesave
-
-----
-add performance trace
