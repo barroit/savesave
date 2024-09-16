@@ -87,6 +87,7 @@
 #include "barroit/limits.h"
 #include "barroit/size.h"
 #include "barroit/string.h"
+#include "barroit/time.h"
 #include "barroit/types.h"
 #include "barroit/zstd.h"
 
