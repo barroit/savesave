@@ -13,17 +13,20 @@
 
 CONSTRUCTOR(check_libzstd_mt)
 {
-	int res;
+	int ret;
 
 	ZSTD_CCtx *ctx = ZSTD_createCCtx();
 	BUG_ON(!ctx);
 
-	res = ZSTD_CCtx_setParameter(ctx, ZSTD_c_nbWorkers, 400);
-	if (ZSTD_isError(res))
-		die(
-_("savesave requires a multithreading supported version of libzstd"));
+	ret = ZSTD_CCtx_setParameter(ctx, ZSTD_c_nbWorkers, 400);
+	if (ZSTD_isError(ret))
+		goto err_no_mt;
 
 	ZSTD_freeCCtx(ctx);
+	return;
+
+err_no_mt:
+	die(_("savesave requires a multithreading supported version of libzstd"));
 }
 
 int make_zip(const char *dest, const char *src, int is_dir)

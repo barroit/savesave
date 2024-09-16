@@ -13,10 +13,9 @@ timestamp_t gettimestamp(void)
 	static uint64_t hns, lns;
 	static int scale;
 
-
 	if (!scale) {
 		LARGE_INTEGER freq;
-		err = !QueryPerformanceFrequency(&freq)
+		err = !QueryPerformanceFrequency(&freq);
 		BUG_ON(err);
 
 		hns = (1000000000ULL << 32) / (uint64_t)freq.QuadPart;
@@ -31,6 +30,7 @@ timestamp_t gettimestamp(void)
 
 	LARGE_INTEGER tick;
 	err = !QueryPerformanceCounter(&tick);
+	BUG_ON(err);
 
 	return (hns * tick.HighPart) + ((lns * tick.LowPart) >> scale);
 }

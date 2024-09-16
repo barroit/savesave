@@ -7,7 +7,7 @@
   <assemblyIdentity
     type="win32"
     name="@CMAKE_PROJECT_NAME@"
-    version="0.@SAVESAVE_VERSION@"/>
+    version="0.@SAVESAVE_VERSION_CMAKE@"/>
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
     <maxversiontested Id="10.0.22621.1778"/>
     <!-- Windows 10 and Windows 11 -->

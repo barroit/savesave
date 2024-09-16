@@ -82,13 +82,6 @@ int fileiter_exec(struct fileiter *ctx)
 
 		/*
 		 * If previous name is the prefix of next name, we skip it
-		 *
-		 * Just comparing their length is enough, since we can never
-		 * get something like
-		 *   esp_coex/CMakeFiles/__idf_esp_coex.dir/esp32
-		 * followed by
-		 *   esp_wifi/CMakeFiles/__idf_esp_wifi.dir/src
-		 * due to our pretty badass hierarchy traverse strategy :-)
 		 */
 		if (strlen(prev) == ndrlen)
 			continue;
@@ -103,7 +96,6 @@ int fileiter_exec(struct fileiter *ctx)
 				return -1;
 			continue;
 		}
-
 
 		/*
 		 * Previous branch is done

@@ -63,9 +63,11 @@ endif()
 
 set(SAVESAVE_NAME savesave)
 set(SAVESAVE_VERSION $ENV{SAVESAVE_VERSION})
+string(REPLACE -rc . SAVESAVE_VERSION_CMAKE ${SAVESAVE_VERSION})
 
-string(REPLACE -rc . __SAVESAVE_VERSION ${SAVESAVE_VERSION})
-project(${SAVESAVE_NAME} VERSION ${__SAVESAVE_VERSION} LANGUAGES ${languages})
+project(${SAVESAVE_NAME}
+	VERSION ${SAVESAVE_VERSION_CMAKE}
+	LANGUAGES ${languages})
 
 # -------------------------------- include ---------------------------------
 # By specifying a SHELL and quoting our options, we can disable Option
