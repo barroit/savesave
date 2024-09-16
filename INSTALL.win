@@ -1,7 +1,7 @@
 
-                            Savesave installation
+                             Savesave installation
 
-Before install SaveSave, the following requirements need to be met
+Before installing Savesave, the following requirements must be met
 
 	Kconfiglib (install via pip, tested with version 14.1)
 
