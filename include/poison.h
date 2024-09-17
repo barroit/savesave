@@ -21,6 +21,9 @@ extern "C" {
 
 #define STRLIST_POISON ((void *) 0x400)
 
+#define CALLBACK_MAP_POISON1 ((void *) 0x500)
+#define CALLBACK_MAP_POISON2 ((void *) 0x600)
+
 #ifdef __cplusplus
 }
 #endif

@@ -17,12 +17,12 @@ static struct cmdarg args;
 static struct savesave *savesave_list;
 static size_t savesave_nr;
 
-int main(int argc, char *const *argv)
+int main(int argc, const char **argv)
 {
 	setup_message_translation();
 
 	if (argc > 1)
-		parse_option(argc, argv, &args);
+		parse_option(argc, (char *const *)argv, &args);
 
 	if (!args.savconf)
 		args.savconf = get_default_savconf_path();

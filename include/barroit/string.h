@@ -25,6 +25,13 @@ void strrepl(char *str, int c, int r);
  */
 char *straftr(const char *str, const char *pref);
 
+/**
+ * strskip - Advance the pointer ‘str’ past the prefix ‘pref’
+ *
+ * return  - 0 on success, -1 if 'pref' is not a prefix of 'str'
+ */
+int strskip(const char *str, const char *pref, const char **rest);
+
 #ifdef __cplusplus
 }
 #endif

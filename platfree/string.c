@@ -21,3 +21,13 @@ char *straftr(const char *str, const char *pref)
 	return NULL;
 }
 
+int strskip(const char *str, const char *pref, const char **rest)
+{
+	char *p = straftr(str, pref);
+	if (!p)
+		return -1;
+
+	*rest = p;
+	return 0;
+}
+
