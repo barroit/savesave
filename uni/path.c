@@ -11,7 +11,7 @@
 #include "alloc.h"
 #include "strbuf.h"
 
-static char *executable_dirname;
+static const char *executable_dirname;
 
 CONSTRUCTOR(populate_executable_dir)
 {

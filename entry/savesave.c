@@ -44,26 +44,9 @@ parse_command:
 		goto parse_command;
 	}
 
-	argupar_subcommand_t handle;
-	struct arguopt commands[] = APOPT_MAIN_COMMAND_INIT(&handle);
+	argupar_subcommand_t runcmd;
+	struct arguopt commands[] = APOPT_MAIN_COMMAND_INIT(&runcmd);
 
 	argc = argupar_parse(&ap, commands, NULL, ARGUPAR_COMMAND_MODE);
-	handle(argc, argv);
-	exit(0);
-
-	if (!dotsav_path)
-		dotsav_path = get_dotsav_defpath();
-	if (!dotsav_path)
-		die(_("no dotsav (.savesave) was provided"));
-
-	struct savesave *savv;
-	size_t savc = parse_dotsav(dotsav_path, &savv);
-	if (!savc)
-		die(_("dotsav `%s' must contain at least one configuration"),
-		    dotsav_path);
-	DEBUG_RUN()
-		print_dotsav(savv, savc);
-
-	backup(savv);
-	exit(0);
+	return runcmd(argc, argv);
 }
