@@ -5,22 +5,19 @@
  * Contact: barroit@linux.com
  */
 
-#pragma GCC diagnostic ignored "-Wswitch"
-
 #include "argupar.h"
 #include "debug.h"
 #include "termas.h"
 #include "text2num.h"
 
-#define OPTARG_APPLICATOR(type) \
-int apply_##type##_optarg(struct arguopt *opt, const char *arg, int unset)
+#define OPTARG_APPLICATOR(type)					\
+	int apply_##type##_optarg(struct arguopt *opt,		\
+				  const char *arg, int unset)
 
 enum arguret {
-	AP_ERROR = -1,	/* error */
-	AP_SUCCESS = 0,	/* success */
-	AP_SHRTHELP,	/* -h */
-	AP_LONGHELP,	/* --help */
-	AP_DONE,	/* no more options to be parsed */
+	AP_ERROR   = -1, /* error */
+	AP_SUCCESS = 0,	 /* success */
+	AP_DONE,	 /* no more options to be parsed */
 };
 
 void argupar_init(struct argupar *ctx, int argc, const char **argv)
@@ -35,36 +32,44 @@ void argupar_init(struct argupar *ctx, int argc, const char **argv)
 static void debug_check_argupar(struct argupar *ctx)
 {
 	struct arguopt *opt = ctx->option;
-	int is_subcmd = ctx->flag & ARGUPAR_SUBCOMMAND;
+	int is_subcmd = ctx->flag & ARGUPAR_COMMAND_MODE;
 
-	while (opt->type != ARGUOPT_END) {
-		if (is_subcmd &&
-		    opt->type != ARGUOPT_SUBCOMMAND &&
-		    opt->type != ARGUOPT_GROUP)
-			goto err_incompat_type;
+	BUG_ON((ctx->flag & ARGUPAR_STOPAT_NONOPT) &&
+	       (ctx->flag & ARGUPAR_COMMAND_MODE));
 
-		if ((opt->flag & ARGUOPT_NOARG) &&
-		    (opt->flag & ARGUOPT_OPTARG))
-			goto err_incompat_argflag;
+	for_each_option(opt) {
+		if (opt->type == ARGUOPT_GROUP)
+			continue;
 
-		if (opt->type == ARGUOPT_STRING)
-			if ((opt->flag & ARGUOPT_OPTARG) && !opt->defval)
-				goto err_missing_defval;
+		BUG_ON(is_subcmd && opt->type != ARGUOPT_SUBCOMMAND);
 
-		opt++;
+		BUG_ON((opt->flag & ARGUOPT_NOARG) &&
+		       (opt->flag & ARGUOPT_OPTARG));
+
+		BUG_ON(opt->type == ARGUOPT_STRING &&
+		       (opt->flag & ARGUOPT_OPTARG) && !opt->defval);
+	}
+}
+
+static enum arguret parse_subcommand(struct argupar *ctx, const char *cmd)
+{
+	struct arguopt *opt = ctx->option;
+
+	for_each_option(opt) {
+		if (opt->type == ARGUOPT_GROUP)
+			continue;
+
+		if (strcmp(opt->longname, cmd))
+			continue;
+
+		*(argupar_subcommand_t *)opt->value = opt->subcmd;
+
+		ctx->argc--;
+		ctx->argv++;
+		return AP_DONE;
 	}
 
-	return;
-
-err_incompat_type:
-	bug("parser is set to 'ARGUPAR_SUBCOMMAND' but arguopt `%s` has type `%d`",
-	    opt->longname, opt->type);
-err_incompat_argflag:
-	bug("flag of arguopt `%s` contains an illegal combination of 'ARGUOPT_NOARG' and 'ARGUOPT_OPTARG'",
-	    opt->longname);
-err_missing_defval:
-	bug("arguopt `%s` has flag 'ARGUOPT_OPTARG' but lacks a 'defval'",
-	    opt->longname);
+	return error("no matching subcommand found for `%s'", cmd);
 }
 
 static OPTARG_APPLICATOR(subcommand)
@@ -143,7 +148,7 @@ static int do_parse_shrtopt(struct argupar *ctx, const char **next)
 	const char *str = *next;
 	const char *arg;
 
-	for (; opt->type != ARGUOPT_END; opt++) {
+	for_each_option(opt) {
 		if (opt->shrtname != *str)
 			continue;
 
@@ -211,7 +216,7 @@ static int parse_longopt(struct argupar *ctx)
 	int arg_unset = strskip(argstr, "no-", &argstr) == 0;
 	struct arguopt_dupopt abbrev = { 0 }, ambiguous = { 0 };
 
-	for (; opt->type != ARGUOPT_END; opt++) {
+	for_each_option(opt) {
 		const char *optname = opt->longname;
 		if (!optname || opt->type == ARGUOPT_SUBCOMMAND)
 			continue;
@@ -273,24 +278,38 @@ err_ambiguous_opt:
 		     abbrev.unset ? "no-" : "", abbrev.opt->longname);
 }
 
+static NORETURN exit_with_short_help(struct argupar *ctx)
+{
+	puts("help!");
+	exit(128);
+}
+
+static NORETURN exit_with_long_help(struct argupar *ctx)
+{
+	/* manpage? pdf? */
+	exit_with_short_help(ctx);
+}
+
 static enum arguret do_parse(struct argupar *ctx)
 {
 	const char *str = *ctx->argv;
 
 	/* non option (argument) */
 	if (str[0] != '-') {
-		if (ctx->flag & ARGUPAR_STOPAT_NONOPT) {
-			ctx->outv[ctx->outc++] = str;
+		if (ctx->flag & ARGUPAR_STOPAT_NONOPT)
 			return AP_DONE;
-		}
-		return error(_("unknown argument `%s'"), *ctx->argv);
+		else if (ctx->flag & ARGUPAR_COMMAND_MODE)
+			return parse_subcommand(ctx, str);
+
+		ctx->outv[ctx->outc++] = str;
+		return AP_SUCCESS;
 
 	/* short option */
 	} else if (str[1] != '-') {
 		str += 1;
 
 		if (str[0] == 'h' && str[1] == 0)
-			return AP_SHRTHELP;
+			exit_with_short_help(ctx);
 
 		*ctx->argv = str;
 		return parse_shrtopt(ctx);
@@ -306,7 +325,7 @@ static enum arguret do_parse(struct argupar *ctx)
 		}
 
 		if (strcmp(str, "help") == 0)
-			return AP_LONGHELP;
+			exit_with_long_help(ctx);
 
 		*ctx->argv = str;
 		return parse_longopt(ctx);
@@ -324,7 +343,6 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 		debug_check_argupar(ctx);
 
 	enum arguret ret;
-
 	while (ctx->argc) {
 		ret = do_parse(ctx);
 		switch (ret) {
@@ -334,10 +352,6 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 			exit(128);
 		case AP_DONE:
 			goto parse_done;
-		case AP_SHRTHELP:
-			//
-		case AP_LONGHELP:
-			//
 		}
 
 		ctx->argc--;
@@ -351,5 +365,6 @@ parse_done:
 
 	int nl = ctx->outc + ctx->argc;
 	ctx->outv[nl] = NULL;
+	ctx->outc = 0;
 	return nl;
 }

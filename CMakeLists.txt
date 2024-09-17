@@ -121,7 +121,8 @@ endif()
 add_library(platspec OBJECT ${platspec_src})
 
 # -------------------------------- platfree --------------------------------
-file(GLOB platfree_src LIST_DIRECTORIES false platfree/*.c)
+file(GLOB platfree_src LIST_DIRECTORIES false
+     platfree/*.c platfree/command/*.c)
 add_library(platfree OBJECT ${platfree_src})
 
 # -------------------------------- savesave --------------------------------

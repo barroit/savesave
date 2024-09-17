@@ -18,7 +18,7 @@ enum arguopt_type {
 	ARGUOPT_END,		/* end of arguopt */
 	ARGUOPT_GROUP,		/* start a new group (visual) */
 
-	ARGUOPT_SUBCOMMAND,	/* subcommand */
+	ARGUOPT_SUBCOMMAND,	/* subcmd */
 	ARGUOPT_CALLBACK,	/* callback */
 
 	ARGUOPT_COUNTUP,	/* count up */
@@ -49,7 +49,7 @@ struct arguopt {
 	flag_t flag;		/* option flag */
 
 	int (*callback)(const struct arguopt *, const char *);	/* (3) */
-	int (*subcommand)(int, const char **);			/* (4) */
+	int (*subcmd)(int, const char **);			/* (4) */
 
 	/*
 	 * (1)	the way the value be interpreted can vary depending
@@ -63,8 +63,10 @@ struct arguopt {
 	 */
 };
 
+typedef typeof(((struct arguopt *)0)->subcmd) argupar_subcommand_t;
+
 #define ARGUPAR_STOPAT_NONOPT (1 << 0) /* stop at non-option */
-#define ARGUPAR_SUBCOMMAND    (1 << 1) /* parse in subcommand mode */
+#define ARGUPAR_COMMAND_MODE  (1 << 1) /* parse in command mode (oneshot) */
 
 struct argupar {
 	int argc;
@@ -78,6 +80,10 @@ struct argupar {
 	int outc;
 	const char **outv;
 };
+
+#define for_each_option(opt) for (; opt->type != ARGUOPT_END; opt++)
+
+typedef struct argupar argupar_t;
 
 void argupar_init(struct argupar *ctx, int argc, const char **argv);
 
@@ -124,6 +130,16 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 	.usage    = (h),			\
 	.flag     = (f),			\
 }
+
+#define APOPT_SUBCOMMAND(l, v, c)		\
+{						\
+	.type     = ARGUOPT_SUBCOMMAND,		\
+	.longname = (l),			\
+	.value    = (v),			\
+	.subcmd   = (c),			\
+}
+
+#include "command.h"
 
 #ifdef __cplusplus
 }
