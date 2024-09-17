@@ -79,9 +79,7 @@
 #include "compiler.h"
 #include "poison.h"
 
-#include "ansidecl.h"
 #include "poll.h"
-#include "getopt.h"
 
 #include "barroit/ctype.h"
 #include "barroit/limits.h"
