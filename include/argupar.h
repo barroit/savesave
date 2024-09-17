@@ -25,7 +25,6 @@ enum arguopt_type {
 	ARGUOPT_UNSIGNED,	/* unsigned integer */
 
 	ARGUOPT_STRING,		/* string */
-	ARGUOPT_FILE,		/* file name */
 
 	ARGUOPT_TYPEMAX,
 };
@@ -113,6 +112,7 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 	.flag     = (f),			\
 }
 
+#define APOPT_FILENAME(s, l, v, h) __APOPT_STRING(s, l, v, "path", h, 0)
 #define APOPT_STRING(s, l, v, a, h) __APOPT_STRING(s, l, v, a, h, 0)
 #define __APOPT_STRING(s, l, v, a, h, f)	\
 {						\

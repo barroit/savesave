@@ -9,5 +9,8 @@
 	"files.associations": {
 		".savesave*": "plaintext",
 		"DRAFT": "plaintext"
+	},
+	"search.exclude": {
+		"**/locale/**": true
 	}
 }

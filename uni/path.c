@@ -31,7 +31,7 @@ int is_absolute_path(const char *path)
 	return *path == '/';
 }
 
-static char *get_user_home_dir(const char *user)
+static char *get_homedir_of(const char *user)
 {
 	struct passwd *pw = getpwnam(user);
 
@@ -42,13 +42,13 @@ static char *get_user_home_dir(const char *user)
 	return NULL;
 }
 
-const char *get_home_dir(void)
+const char *get_home_dirname(void)
 {
 	const char *home;
 	const char *user = getenv("SUDO_USER");
 
 	if (user)
-		home = get_user_home_dir(user);
+		home = get_homedir_of(user);
 	else
 		home = getenv("HOME");
 

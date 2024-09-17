@@ -6,7 +6,7 @@
  */
 
 #include "win/backup.hpp"
-#include "savconf.h"
+#include "dotsav.h"
 #include "termas.h"
 #include "strbuf.h"
 #include "debug.h"

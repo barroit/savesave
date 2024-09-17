@@ -6,7 +6,7 @@
  */
 
 #include "backup.h"
-#include "savconf.h"
+#include "dotsav.h"
 #include "debug.h"
 #include "strbuf.h"
 #include "list.h"

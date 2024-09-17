@@ -31,7 +31,7 @@ int is_absolute_path(const char *path)
 	return !PathIsRelative(path);
 }
 
-const char *get_home_dir()
+const char *get_home_dirname()
 {
 	return getenv("USERPROFILE");
 }

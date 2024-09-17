@@ -19,7 +19,7 @@ static inline int is_dir_indicator(const char *name)
 	return strcmp(name, ".") == 0 || strcmp(name, "..") == 0;
 }
 
-const char *get_home_dir(void);
+const char *get_home_dirname(void);
 
 /*
  * return the directory name of executable path

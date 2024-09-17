@@ -28,17 +28,17 @@ struct savesave {
 	u8 stack;
 };
 
-char *get_default_savconf_path(void);
+char *get_dotsav_defpath(void);
 
 struct fileiter_file;
 int PLATSPECOF(sizeof_file)(struct fileiter_file *file, void *data);
 
-size_t parse_savconf(const char *path, struct savesave **conf);
+size_t parse_dotsav(const char *path, struct savesave **sav);
 
-void print_savconf(const struct savesave *conf, size_t nl);
+void print_dotsav(struct savesave *sav, size_t nl);
 
 #ifdef _WIN32
-void format_savconf(struct savesave *savconf, size_t n);
+void format_dotsav(struct savesave *dotsav, size_t n);
 #endif
 
 #ifdef __cplusplus

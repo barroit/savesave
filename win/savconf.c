@@ -5,15 +5,15 @@
  * Contact: barroit@linux.com
  */
 
-#include "savconf.h"
+#include "dotsav.h"
 #include "fileiter.h"
 #include "list.h"
 
-void format_savconf(struct savesave *savconf, size_t n)
+void format_dotsav(struct savesave *dotsav, size_t n)
 {
 	size_t i;
 	for_each_idx(i, n) {
-		struct savesave *c = &savconf[i];
+		struct savesave *c = &dotsav[i];
 
 		strrepl(c->save_prefix, '\\', '/');
 		strrepl(c->backup_prefix, '\\', '/');

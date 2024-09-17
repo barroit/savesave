@@ -11,7 +11,7 @@
 #include "robio.h"
 #include "win/cmdline.hpp"
 #include "win/backup.hpp"
-#include "savconf.h"
+#include "dotsav.h"
 #include "debug.h"
 #include "win/atenter.hpp"
 #include "runopt.h"
@@ -19,7 +19,7 @@
 
 static class console appcon;
 static struct cmdarg args;
-static struct savesave *savconf;
+static struct savesave *dotsav;
 
 #ifdef CONFIG_IS_CONSOLE_APP
 int main(int argc, char **argv)
@@ -52,22 +52,22 @@ int WINAPI WinMain(HINSTANCE app, HINSTANCE, char *cmdline, int)
 	destroy_dumped_strlist(argv);
 #endif
 
-	if (!args.savconf)
-		args.savconf = get_default_savconf_path();
-	if (!args.savconf)
+	if (!args.dotsav)
+		args.dotsav = get_dotsav_defpath();
+	if (!args.dotsav)
 		die(_("no configuration file was provided"));
 	if (args.output)
 		appcon.redirect_stdio(args.output);
 
-	size_t nl = parse_savconf(args.savconf, &savconf);
+	size_t nl = parse_dotsav(args.dotsav, &dotsav);
 	if (!nl)
-		die(_("no configuration was found in `%s'"), args.savconf);
+		die(_("no configuration was found in `%s'"), args.dotsav);
 
-	format_savconf(savconf, nl);
+	format_dotsav(dotsav, nl);
 	DEBUG_RUN()
-		print_savconf(savconf, nl);
+		print_dotsav(dotsav, nl);
 
-	backup(savconf);
+	backup(dotsav);
 
 #ifdef CONFIG_IS_CONSOLE_APP
 	exit(0); /* TODO LATER IMPL */

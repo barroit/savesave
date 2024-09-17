@@ -97,14 +97,6 @@ endmenu # "Console"
 
 menu "Filename"
 
-config SAVCONF_BASENAME
-	string "basename of savconf"
-	default ".savesave"
-
-config SAVCONF_ENVNAME
-	string "getenv name of savconf"
-	default "SAVESAVE"
-
 config ARCHIVE_EXTENTION
 	string "file extension for archive file (no dot)"
 	default "ss"

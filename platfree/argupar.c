@@ -47,7 +47,7 @@ static void debug_check_argupar(struct argupar *ctx)
 		    (opt->flag & ARGUOPT_OPTARG))
 			goto err_incompat_argflag;
 
-		if (opt->type == ARGUOPT_STRING || opt->type == ARGUOPT_FILE)
+		if (opt->type == ARGUOPT_STRING)
 			if ((opt->flag & ARGUOPT_OPTARG) && !opt->defval)
 				goto err_missing_defval;
 
@@ -112,11 +112,6 @@ static OPTARG_APPLICATOR(string)
 	return 0;
 }
 
-static OPTARG_APPLICATOR(file)
-{
-	BUG_ON("not implemented");
-}
-
 static int dispatch_optarg(struct arguopt *opt, const char *arg, int unset)
 {
 	BUG_ON(unset && arg);
@@ -132,7 +127,6 @@ static int dispatch_optarg(struct arguopt *opt, const char *arg, int unset)
 		[ARGUOPT_UNSIGNED]   = apply_unsigned_optarg,
 
 		[ARGUOPT_STRING]     = apply_string_optarg,
-		[ARGUOPT_FILE]       = apply_file_optarg,
 	};
 
 	int err = map[opt->type](opt, arg, unset);

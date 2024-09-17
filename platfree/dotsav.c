@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-#include "savconf.h"
+#include "dotsav.h"
 #include "robio.h"
 #include "termas.h"
 #include "strbuf.h"
@@ -20,7 +20,7 @@ struct savesave_context {
 	char *line;
 	char *stop;
 
-	struct savesave *conf;
+	struct savesave *sav;
 	size_t nl;
 	size_t cap;
 };
@@ -76,12 +76,12 @@ static int skip_prefix(const char *str, const char *prefix, char **ret)
 	return 1;
 }
 
-static int check_unique_savconf(const struct savesave *conf, size_t nr)
+static int check_unique_savconf(const struct savesave *sav, size_t nr)
 {
-	const char *name = conf[nr - 1].name;
+	const char *name = sav[nr - 1].name;
 	size_t i;
 	for_each_idx(i, nr - 1) {
-		if (likely(strcmp(conf[i].name, name)))
+		if (likely(strcmp(sav[i].name, name)))
 			continue;
 		return error("configuration name `%s' conflicts at config indexes %zd and %zd",
 			     name, i, nr - 1);
@@ -91,16 +91,16 @@ static int check_unique_savconf(const struct savesave *conf, size_t nr)
 }
 
 static int create_new_entry(const char *name,
-			    struct savesave **conf, size_t *nr, size_t *cap)
+			    struct savesave **sav, size_t *nr, size_t *cap)
 {
 	if (!*name)
 		return error("empty configuration name is not allowed");
 	else if (strchr(name, ' ') != NULL)
 		return error("space in configuration name is not allowed");
 
-	CAP_ALLOC(conf, *nr + 1, cap);
+	CAP_ALLOC(sav, *nr + 1, cap);
 
-	struct savesave *c = &(*conf)[(*nr)++];
+	struct savesave *c = &(*sav)[(*nr)++];
 	memset(c, 0, sizeof(*c));
 
 	c->name = xstrdup(name);
@@ -130,7 +130,7 @@ int calc_dir_size(const char *base, off_t *size)
 	return ret;
 }
 
-static int parse_save(void *__save, struct savesave *conf)
+static int parse_save(void *__save, struct savesave *sav)
 {
 	const char *save = *(const char **)__save;
 	int err;
@@ -145,11 +145,11 @@ static int parse_save(void *__save, struct savesave *conf)
 		return error(_("save path `%s' does not exist"), save);
 
 	if (S_ISREG(st.st_mode)) {
-		conf->save_size = st.st_size;
-		conf->is_dir_save = 0;
+		sav->save_size = st.st_size;
+		sav->is_dir_save = 0;
 	} else if (S_ISDIR(st.st_mode)) {
-		conf->is_dir_save = 1;
-		return calc_dir_size(save, &conf->save_size);
+		sav->is_dir_save = 1;
+		return calc_dir_size(save, &sav->save_size);
 	} else {
 		return error(_("unsupported save file mode `%d'"), st.st_mode);
 	}
@@ -198,27 +198,27 @@ do {					\
 } while (0)
 
 static int assign_entry(const char *line, char **rest,
-			const struct savesave *conf, struct confent *ent)
+			const struct savesave *sav, struct confent *ent)
 {
 	if (is_entry(line, "save", rest))
-		SETENT(ent, "save", &conf->save_prefix, parse_save, STRING);
+		SETENT(ent, "save", &sav->save_prefix, parse_save, STRING);
 	else if (is_entry(line, "backup", rest))
-		SETENT(ent, "backup", &conf->backup_prefix, NULL, STRING);
+		SETENT(ent, "backup", &sav->backup_prefix, NULL, STRING);
 	else if (is_entry(line, "period", rest))
-		SETENT(ent, "period", &conf->period, check_period, TIMESPAN);
+		SETENT(ent, "period", &sav->period, check_period, TIMESPAN);
 	else if (is_entry(line, "stack", rest))
-		SETENT(ent, "stack", &conf->stack, check_stack, U8);
+		SETENT(ent, "stack", &sav->stack, check_stack, U8);
 	else if (is_entry(line, "snapshot", rest))
-		SETENT(ent, "snapshot", &conf->use_snapshot, NULL, FLAG);
+		SETENT(ent, "snapshot", &sav->use_snapshot, NULL, FLAG);
 	else if (is_entry(line, "zip", rest))
-		SETENT(ent, "zip", &conf->use_compress, NULL, FLAG);
+		SETENT(ent, "zip", &sav->use_compress, NULL, FLAG);
 	else
 		return 1;
 
 	return 0;
 }
 
-static int parse_entry_value(const char *rest, struct savesave *conf,
+static int parse_entry_value(const char *rest, struct savesave *sav,
 			     const struct confent *entry)
 {
 	rest = skip_space(rest);
@@ -241,22 +241,22 @@ static int parse_entry_value(const char *rest, struct savesave *conf,
 	}
 
 	if (res == 0 && entry->cb)
-		res = entry->cb((void *)entry->val, conf);
+		res = entry->cb((void *)entry->val, sav);
 
 	return res;
 }
 
-static int parse_entry_line(const char *line, struct savesave *conf)
+static int parse_entry_line(const char *line, struct savesave *sav)
 {
 	int err;
 	char *rest;
 	struct confent entry;
 
-	err = assign_entry(line, &rest, conf, &entry);
+	err = assign_entry(line, &rest, sav, &entry);
 	if (err)
 		return error(_("unrecognized name found in `%s'"), line);
 
-	return parse_entry_value(rest, conf, &entry);
+	return parse_entry_value(rest, sav, &entry);
 }
 
 static int parse_savconf_line(struct savesave_context *ctx)
@@ -273,11 +273,11 @@ static int parse_savconf_line(struct savesave_context *ctx)
 		return 0;
 
 	if (skip_prefix(line, "config ", &str) == 0) {
-		if (ctx->nl && check_unique_savconf(ctx->conf, ctx->nl) != 0)
+		if (ctx->nl && check_unique_savconf(ctx->sav, ctx->nl) != 0)
 			return 1;
-		return create_new_entry(str, &ctx->conf, &ctx->nl, &ctx->cap);
+		return create_new_entry(str, &ctx->sav, &ctx->nl, &ctx->cap);
 	} else if (skip_prefix(line, "\t", &str) == 0 && isalpha(*str)) {
-		return parse_entry_line(str, &ctx->conf[ctx->nl - 1]);
+		return parse_entry_line(str, &ctx->sav[ctx->nl - 1]);
 	} else {
 		return error(_("encountered an unknown line"));
 	}
@@ -319,12 +319,12 @@ static void update_backup_prefix(struct savesave *c)
 	c->backup_prefix = sb.str;
 }
 
-static void post_parse_savconf(struct savesave *conf, size_t nl)
+static void post_parse_savconf(struct savesave *sav, size_t nl)
 {
 	size_t i;
 	struct savesave *c;
 	for_each_idx(i, nl) {
-		c = &conf[i];
+		c = &sav[i];
 		validate_savconf(c);
 
 		if (c->use_compress == -1 &&
@@ -363,23 +363,23 @@ static void do_parse_savconf(struct savesave_context *ctx)
 		ctx->line = ctx->stop + 1;
 	} while (39);
 
-	post_parse_savconf(ctx->conf, ctx->nl);
+	post_parse_savconf(ctx->sav, ctx->nl);
 
-	CAP_ALLOC(&ctx->conf, ctx->nl + 1, &ctx->cap);
-	memset(&ctx->conf[ctx->nl], 0, sizeof(*ctx->conf));
+	CAP_ALLOC(&ctx->sav, ctx->nl + 1, &ctx->cap);
+	memset(&ctx->sav[ctx->nl], 0, sizeof(*ctx->sav));
 }
 
-size_t parse_savconf(const char *path, struct savesave **conf)
+size_t parse_dotsav(const char *name, struct savesave **sav)
 {
 	int err;
 	char *txtconf;
 
-	err = read_savconf(path, &txtconf);
+	err = read_savconf(name, &txtconf);
 	if (err)
-		die_errno(_("an error occurred while reading savconf `%s'"),
-			  path);
+		die_errno(_("an error occurred while reading dotsav `%s'"),
+			  name);
 	else if (*txtconf == 0)
-		die(_("file `%s' is empty"), path);
+		die(_("file `%s' is empty"), name);
 
 	struct savesave_context ctx = {
 		.line  = txtconf,
@@ -388,11 +388,11 @@ size_t parse_savconf(const char *path, struct savesave **conf)
 	do_parse_savconf(&ctx);
 	free(txtconf);
 
-	*conf = ctx.conf;
+	*sav = ctx.sav;
 	return ctx.nl;
 }
 
-void print_savconf(const struct savesave *conf, size_t nl)
+void print_dotsav(struct savesave *sav, size_t nl)
 {
 	size_t i;
 	const struct savesave *c;
@@ -403,7 +403,7 @@ void print_savconf(const struct savesave *conf, size_t nl)
 	 */
 	ssize_t size;
 	for_each_idx(i, nl) {
-		c = &conf[i];
+		c = &sav[i];
 		size = c->save_size / 1000 / 1000;
 
 		printf("%s\n", c->name);
@@ -425,16 +425,16 @@ void print_savconf(const struct savesave *conf, size_t nl)
 	}
 }
 
-char *get_default_savconf_path(void)
+char *get_dotsav_defpath(void)
 {
 	struct strbuf sb = STRBUF_INIT;
-	char *path = getenv(CONFIG_SAVCONF_ENVNAME);
+	char *path = getenv("SAVESAVE");
 
 	if (path) {
 		strbuf_concat(&sb, path);
 	} else {
-		const char *home = get_home_dir();
-		strbuf_printf(&sb, "%s/%s", home, CONFIG_SAVCONF_BASENAME);
+		const char *home = get_home_dirname();
+		strbuf_printf(&sb, "%s/%s", home, ".savesave");
 	}
 
 	if (access(sb.str, R_OK) == 0) {
