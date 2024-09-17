@@ -15,37 +15,37 @@ msgstr  "Report-Msgid-Bugs-To: barroit@linux.com\n"
         "Content-Type: text/plain; charset=UTF-8\n"
         "Content-Transfer-Encoding: 8bit\n"
 
-#: uni/backup.c:72 win/backup.cpp:100
+#: uni/backup.c:68 win/backup.cpp:100
 #, c-format
 msgid   "unable to copy file from `%s' to `%s'"
 msgstr  ""
 
-#: uni/backup.c:80
+#: uni/backup.c:76
 #, c-format
 msgid   "unable to create file at `%s'"
 msgstr  ""
 
-#: uni/backup.c:82 uni/backup.c:126 win/backup.cpp:103
+#: uni/backup.c:78 uni/backup.c:120 win/backup.cpp:103
 #, c-format
 msgid   "unable to make directory `%s'"
 msgstr  ""
 
-#: uni/backup.c:100
+#: uni/backup.c:95
 #, c-format
 msgid   "path `%s' may have been truncated"
 msgstr  ""
 
-#: uni/backup.c:120
+#: uni/backup.c:114
 #, c-format
 msgid   "unable to real link `%s'"
 msgstr  ""
 
-#: uni/backup.c:123
+#: uni/backup.c:117
 #, c-format
 msgid   "unable to make symbolic link `%s'"
 msgstr  ""
 
-#: uni/fileiter.c:27 uni/fileiter.c:66 win/fileiter.c:68 platfree/savconf.c:36
+#: uni/fileiter.c:27 uni/fileiter.c:66 win/fileiter.c:75 platfree/dotsav.c:36
 #, c-format
 msgid   "failed to retrieve information for file `%s'"
 msgstr  ""
@@ -70,6 +70,11 @@ msgstr  ""
 msgid   "failed to open directory `%s'"
 msgstr  ""
 
+#: uni/mkdir.c:21 win/mkdir.c:25
+#, c-format
+msgid   "failed to remove file `%s'"
+msgstr  ""
+
 #: uni/path.c:41
 #, c-format
 msgid   "can't get home directory for sudo user `%s'"
@@ -79,17 +84,17 @@ msgstr  ""
 msgid   "your $HOME corrupted"
 msgstr  ""
 
-#: win/fileiter.c:63
+#: win/fileiter.c:70
 #, c-format
-msgid   "`%s' has unsupported st_mode `%ud', skipped"
+msgid   "`%s' has unsupported st_mode `%u', skipped"
 msgstr  ""
 
-#: win/fileiter.c:94
+#: win/fileiter.c:98
 #, c-format
 msgid   "failed to find next file of file `%s'"
 msgstr  ""
 
-#: win/fileiter.c:103
+#: win/fileiter.c:105
 #, c-format
 msgid   "failed to find first file from pattern `%s'"
 msgstr  ""
@@ -162,110 +167,162 @@ msgstr  ""
 msgid   "failed to duplicate string"
 msgstr  ""
 
-#: platfree/backup.c:60
+#: platfree/argupar.c:139
+#, c-format
+msgid   "failed to parse option `%s' with value `%s'"
+msgstr  ""
+
+#: platfree/argupar.c:173
+#, c-format
+msgid   "short option `%c' requires a value"
+msgstr  ""
+
+#: platfree/argupar.c:266
+#, c-format
+msgid   "unknown long option `%.*s'"
+msgstr  ""
+
+#: platfree/argupar.c:269
+#, c-format
+msgid   "long option `%s%s' requires a value"
+msgstr  ""
+
+#: platfree/argupar.c:272
+#, c-format
+msgid   "long option `%s%s' takes no value"
+msgstr  ""
+
+#: platfree/argupar.c:275
+#, c-format
+msgid   "long option `%.*s' is ambiguous (could be --%s%s or --%s%s)"
+msgstr  ""
+
+#: platfree/backup.c:76
 #, c-format
 msgid   "failed to rename file `%s' to `%s'"
 msgstr  ""
 
-#: platfree/backup.c:63 platfree/backup.c:91
+#: platfree/backup.c:79 platfree/backup.c:95
 #, c-format
 msgid   "failed to access file `%s'"
 msgstr  ""
 
-#: platfree/backup.c:73
-#, c-format
-msgid   "failed to remove file `%s'"
-msgstr  ""
-
-#: platfree/backup.c:126
+#: platfree/backup.c:131
 #, c-format
 msgid   "unable to drop deprecated backup of configuration `%s'"
 msgstr  ""
 
-#: platfree/backup.c:133
+#: platfree/backup.c:136
 #, c-format
 msgid   "unable to sort backup `%s' of configuration `%s'"
 msgstr  ""
 
-#: platfree/backup.c:139
+#: platfree/backup.c:140
 #, c-format
 msgid   "unable to determine next backup file name of configuration `%s'"
 msgstr  ""
 
-#: platfree/backup.c:205
+#: platfree/backup.c:208
 #, c-format
 msgid   "failed to backup save `%s' to `%s'"
 msgstr  ""
 
-#: platfree/backup.c:213
+#: platfree/backup.c:216
 #, c-format
 msgid   "failed to make directory `%s'"
 msgstr  ""
 
-#: platfree/backup.c:227
+#: platfree/backup.c:230
 #, c-format
 msgid   "next backup name\n"
         "\t%s\n"
         "\n"
 msgstr  ""
 
-#: platfree/compress.c:24
+#: platfree/compress.c:29
 msgid   "savesave requires a multithreading supported version of libzstd"
 msgstr  ""
 
-#: platfree/getopt.c:579
+#: platfree/dotsav.c:32
 #, c-format
-msgid   "%s: option `%s' is ambiguous\n"
+msgid   "failed to open `%s'"
 msgstr  ""
 
-#: platfree/getopt.c:604
+#: platfree/dotsav.c:45
 #, c-format
-msgid   "%s: option `--%s' doesn't allow an argument\n"
+msgid   "failed to read `%s'"
 msgstr  ""
 
-#: platfree/getopt.c:609
+#: platfree/dotsav.c:126
 #, c-format
-msgid   "%s: option `%c%s' doesn't allow an argument\n"
+msgid   "unable to calculate size for directory `%s'"
 msgstr  ""
 
-#: platfree/getopt.c:627 platfree/getopt.c:800
+#: platfree/dotsav.c:140
 #, c-format
-msgid   "%s: option `%s' requires an argument\n"
+msgid   "save path `%s' must be an absolute path"
 msgstr  ""
 
-#: platfree/getopt.c:656
+#: platfree/dotsav.c:145
 #, c-format
-msgid   "%s: unrecognized option `--%s'\n"
+msgid   "save path `%s' does not exist"
 msgstr  ""
 
-#: platfree/getopt.c:660
+#: platfree/dotsav.c:154
 #, c-format
-msgid   "%s: unrecognized option `%c%s'\n"
+msgid   "unsupported save file mode `%d'"
 msgstr  ""
 
-#: platfree/getopt.c:686
-#, c-format
-msgid   "%s: illegal option -- %c\n"
+#: platfree/dotsav.c:164
+msgid   "stack cannot be 0"
 msgstr  ""
 
-#: platfree/getopt.c:689
-#, c-format
-msgid   "%s: invalid option -- %c\n"
+#: platfree/dotsav.c:172
+msgid   "period cannot be 0"
 msgstr  ""
 
-#: platfree/getopt.c:719 platfree/getopt.c:849
+#: platfree/dotsav.c:226
 #, c-format
-msgid   "%s: option requires an argument -- %c\n"
+msgid   "name '%s' must have a value"
 msgstr  ""
 
-#: platfree/getopt.c:766
+#: platfree/dotsav.c:257
 #, c-format
-msgid   "%s: option `-W %s' is ambiguous\n"
+msgid   "unrecognized name found in `%s'"
 msgstr  ""
 
-#: platfree/getopt.c:784
+#: platfree/dotsav.c:282
+msgid   "encountered an unknown line"
+msgstr  ""
+
+#: platfree/dotsav.c:304
 #, c-format
-msgid   "%s: option `-W %s' doesn't allow an argument\n"
+msgid   "configuration `%s' missing the following fields\n"
+        "\n"
+        "%s"
+msgstr  ""
+
+#: platfree/dotsav.c:305
+#, c-format
+msgid   "configuration `%s' missing the following field\n"
+        "\n"
+        "%s"
+msgstr  ""
+
+#: platfree/dotsav.c:357
+#, c-format
+msgid   "failed to parse savesave configuration\n"
+        "%7<PRIuMAX>:%s"
+msgstr  ""
+
+#: platfree/dotsav.c:379
+#, c-format
+msgid   "an error occurred while reading dotsav `%s'"
+msgstr  ""
+
+#: platfree/dotsav.c:382
+#, c-format
+msgid   "file `%s' is empty"
 msgstr  ""
 
 #: platfree/ioop.c:24
@@ -288,130 +345,6 @@ msgstr  ""
 msgid   "cannot redirect stderr to `%s'"
 msgstr  ""
 
-#: platfree/runopt.c:39
-#, c-format
-msgid   "positional arguments %s are not allowd"
-msgstr  ""
-
-#: platfree/runopt.c:40
-#, c-format
-msgid   "positional argument %s is not allowd"
-msgstr  ""
-
-#: platfree/runopt.c:48
-msgid   "empty string is not allowed"
-msgstr  ""
-
-#: platfree/runopt.c:62
-msgid   "Usage: savesave.exe [--version] [--help] [--config <path>]\n"
-        "\n"
-        "    --version            print program version\n"
-        "    --help               get help message\n"
-        "    -f, --config <file>  specify config path\n"
-msgstr  ""
-
-#: platfree/savconf.c:32
-#, c-format
-msgid   "failed to open `%s'"
-msgstr  ""
-
-#: platfree/savconf.c:45
-#, c-format
-msgid   "failed to read `%s'"
-msgstr  ""
-
-#: platfree/savconf.c:126
-#, c-format
-msgid   "unable to calculate size for directory `%s'"
-msgstr  ""
-
-#: platfree/savconf.c:140
-#, c-format
-msgid   "save path `%s' must be an absolute path"
-msgstr  ""
-
-#: platfree/savconf.c:145
-#, c-format
-msgid   "save path `%s' does not exist"
-msgstr  ""
-
-#: platfree/savconf.c:154
-#, c-format
-msgid   "unsupported save file mode `%d'"
-msgstr  ""
-
-#: platfree/savconf.c:167
-#, c-format
-msgid   "failed to create backup directory `%s'"
-msgstr  ""
-
-#: platfree/savconf.c:173
-#, c-format
-msgid   "unable to get metadata for backup directory `%s'"
-msgstr  ""
-
-#: platfree/savconf.c:176
-#, c-format
-msgid   "file `%s' is not a directory"
-msgstr  ""
-
-#: platfree/savconf.c:180
-#, c-format
-msgid   "unable to access backup directory `%s'"
-msgstr  ""
-
-#: platfree/savconf.c:190
-msgid   "stack cannot be 0"
-msgstr  ""
-
-#: platfree/savconf.c:198
-msgid   "period cannot be 0"
-msgstr  ""
-
-#: platfree/savconf.c:253
-#, c-format
-msgid   "name '%s' must have a value"
-msgstr  ""
-
-#: platfree/savconf.c:284
-#, c-format
-msgid   "unrecognized name found in `%s'"
-msgstr  ""
-
-#: platfree/savconf.c:309
-msgid   "encountered an unknown line"
-msgstr  ""
-
-#: platfree/savconf.c:331
-#, c-format
-msgid   "configuration `%s' missing the following fields\n"
-        "\n"
-        "%s"
-msgstr  ""
-
-#: platfree/savconf.c:332
-#, c-format
-msgid   "configuration `%s' missing the following field\n"
-        "\n"
-        "%s"
-msgstr  ""
-
-#: platfree/savconf.c:384
-#, c-format
-msgid   "failed to parse savesave configuration\n"
-        "%7<PRIuMAX>:%s"
-msgstr  ""
-
-#: platfree/savconf.c:406
-#, c-format
-msgid   "an error occurred while reading savconf `%s'"
-msgstr  ""
-
-#: platfree/savconf.c:409
-#, c-format
-msgid   "file `%s' is empty"
-msgstr  ""
-
 #: platfree/termas.c:27
 #, c-format
 msgid   "too long a prefix `%.10s...'\n"
@@ -429,36 +362,40 @@ msgstr  ""
 
 #: platfree/text2num.c:24
 #, c-format
-msgid   "failed to convert `%s'"
+msgid   "cannot convert `%s' to unsigned value"
 msgstr  ""
 
-#: platfree/text2num.c:26
+#: platfree/text2num.c:27
 #, c-format
-msgid   "invalid char found in `%s'"
+msgid   "invalid char found in unsigned value `%s'"
 msgstr  ""
 
-#: platfree/text2num.c:28
+#: platfree/text2num.c:30
 #, c-format
-msgid   "`%s' is too big (up to %lu)"
+msgid   "unsigned value `%s' is too big (up to %lu)"
 msgstr  ""
 
-#: platfree/text2num.c:62
+#: platfree/text2num.c:65
 #, c-format
 msgid   "unknown time unit specifier `%c'"
 msgstr  ""
 
-#: platfree/text2num.c:89
+#: platfree/text2num.c:92
 #, c-format
 msgid   "unknown bool value `%s'"
 msgstr  ""
 
-#: entry/savesave.c:30
-msgid   "no savconf was provided"
+#: entry/savesave.c:41
+msgid   "no command specified"
 msgstr  ""
 
-#: entry/savesave.c:34
+#: entry/savesave.c:57
+msgid   "no dotsav (.savesave) was provided"
+msgstr  ""
+
+#: entry/savesave.c:62
 #, c-format
-msgid   "`%s' must contain at least one configuration"
+msgid   "dotsav `%s' must contain at least one configuration"
 msgstr  ""
 
 #: entry/savesave.cpp:58
@@ -472,6 +409,10 @@ msgstr  ""
 
 #: entry/savesave.cpp:80
 msgid   "unable to initialize main window"
+msgstr  ""
+
+#: include/argupar.h:116
+msgid   "n"
 msgstr  ""
 
 #: include/calc.h:36 include/calc.h:46 include/termas.h:38 include/termas.h:40
