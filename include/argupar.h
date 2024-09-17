@@ -85,6 +85,46 @@ void argupar_init(struct argupar *ctx, int argc, const char **argv);
 int argupar_parse(struct argupar *ctx, struct arguopt *option,
 		  const char *const *usage, flag_t flag);
 
+#define APOPT_END()		\
+{				\
+	.type = ARGUOPT_END,	\
+}
+
+#define APOPT_COUNTUP(s, l, v, h) __APOPT_COUNTUP(s, l, v, h, 0)
+#define __APOPT_COUNTUP(s, l, v, h, f)		\
+{						\
+	.type     = ARGUOPT_COUNTUP,		\
+	.shrtname = (s),			\
+	.longname = (l),			\
+	.value    = (v),			\
+	.usage    = (h),			\
+	.flag     = ARGUOPT_NOARG | (f),	\
+}
+
+#define APOPT_UNSIGNED(s, l, v, h) __APOPT_UNSIGNED(s, l, v, h, 0)
+#define __APOPT_UNSIGNED(s, l, v, h, f)		\
+{						\
+	.type     = ARGUOPT_UNSIGNED,		\
+	.shrtname = (s),			\
+	.longname = (l),			\
+	.value    = (v),			\
+	.argh     = N_("n"),			\
+	.usage    = (h),			\
+	.flag     = (f),			\
+}
+
+#define APOPT_STRING(s, l, v, a, h) __APOPT_STRING(s, l, v, a, h, 0)
+#define __APOPT_STRING(s, l, v, a, h, f)	\
+{						\
+	.type     = ARGUOPT_STRING,		\
+	.shrtname = (s),			\
+	.longname = (l),			\
+	.value    = (v),			\
+	.argh     = (a),			\
+	.usage    = (h),			\
+	.flag     = (f),			\
+}
+
 #ifdef __cplusplus
 }
 #endif

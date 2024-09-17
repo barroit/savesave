@@ -21,11 +21,14 @@ int str2ulong(const char *str, size_t len,
 	*val = strtoul(str, &tail, 10);
 
 	if (errno != 0)
-		return error_errno(_("failed to convert `%s'"), str);
+		return warn_errno(_("cannot convert `%s' to unsigned value"),
+				  str);
 	else if (tail - str != len)
-		return error(_("invalid char found in `%s'"), str);
+		return warn(_("invalid char found in unsigned value `%s'"),
+			    str);
 	else if (*val > max)
-		return error(_("`%s' is too big (up to %lu)"), str, max);
+		return warn(_("unsigned value `%s' is too big (up to %lu)"),
+			    str, max);
 
 	return 0;
 }

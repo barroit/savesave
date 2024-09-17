@@ -13,13 +13,11 @@
 #include "text2num.h"
 
 #define OPTARG_APPLICATOR(type) \
-	int apply_##type##_optarg(struct arguopt *opt, const char *arg)
+int apply_##type##_optarg(struct arguopt *opt, const char *arg, int unset)
 
 enum arguret {
 	AP_ERROR = -1,	/* error */
 	AP_SUCCESS = 0,	/* success */
-	AP_NONOPT,	/* non-option (argument) */
-	AP_UNKOPT,	/* unknown option */
 	AP_SHRTHELP,	/* -h */
 	AP_LONGHELP,	/* --help */
 	AP_DONE,	/* no more options to be parsed */
@@ -81,18 +79,36 @@ static OPTARG_APPLICATOR(callback)
 
 static OPTARG_APPLICATOR(countup)
 {
-	*(int *)opt->value += 1;
+	int *p = opt->value;
+
+	if (unset)
+		*p = 0;
+	else
+		*p += 1;
+
 	return 0;
 }
 
 static OPTARG_APPLICATOR(unsigned)
 {
-	return str2uint(arg, opt->value);
+	if (!unset)
+		return str2uint(arg, opt->value);
+
+	*(unsigned *)opt->value = 0;
+	return 0;
 }
 
 static OPTARG_APPLICATOR(string)
 {
-	*(const char **)opt->value = arg ? arg : (const char *)opt->defval;
+	const char **p = opt->value;
+
+	if (unset)
+		*p = NULL;
+	else if (arg)
+		*p = arg;
+	else
+		arg = (const char *)opt->defval;
+
 	return 0;
 }
 
@@ -101,9 +117,11 @@ static OPTARG_APPLICATOR(file)
 	BUG_ON("not implemented");
 }
 
-static int apply_optarg(struct arguopt *opt, const char *arg)
+static int dispatch_optarg(struct arguopt *opt, const char *arg, int unset)
 {
-	static typeof(apply_optarg) *map[ARGUOPT_TYPEMAX] = {
+	BUG_ON(unset && arg);
+
+	static typeof(dispatch_optarg) *map[ARGUOPT_TYPEMAX] = {
 		[ARGUOPT_END]        = CALLBACK_MAP_POISON1,
 		[ARGUOPT_GROUP]      = CALLBACK_MAP_POISON2,
 
@@ -117,40 +135,43 @@ static int apply_optarg(struct arguopt *opt, const char *arg)
 		[ARGUOPT_FILE]       = apply_file_optarg,
 	};
 
-	return map[opt->type](opt, arg);
+	int err = map[opt->type](opt, arg, unset);
+	if (err)
+		return error(_("failed to parse option `%s' with value `%s'"),
+			     opt->longname, arg); /* unset never fails */
+
+	return 0;
 }
 
 static int do_parse_shrtopt(struct argupar *ctx, const char **next)
 {
-	const char *str = *next;
-	const char *arg = NULL;
 	struct arguopt *opt = ctx->option;
+	const char *str = *next;
+	const char *arg;
 
-	while (opt->type != ARGUOPT_END) {
-		if (opt->shrtname != *str) {
-			opt++;
+	for (; opt->type != ARGUOPT_END; opt++) {
+		if (opt->shrtname != *str)
 			continue;
-		}
 
+		*next = str[1] ? &str[1] : NULL;
 		if (opt->flag & ARGUOPT_NOARG) {
-			*next = str[1] ? &str[1] : NULL;
+			arg = NULL;
 		} else if (str[1]) {
 			arg = &str[1];
-		} else if (ctx->argc) {
+			*next = NULL;
+		} else if (ctx->argc > 1) {
 			ctx->argc--;
 			arg = *(++ctx->argv);
 		} else if (!(opt->flag & ARGUOPT_OPTARG)) {
 			goto err_missing_arg;
 		}
 
-		return apply_optarg(opt, arg);
+		return dispatch_optarg(opt, arg, 0);
 	}
 
-	return AP_UNKOPT;
-
+	return error("unknown short option `%c'", *str);
 err_missing_arg:
-	return error(_("option `%c' requires a value"), *str);
-
+	return error(_("short option `%c' requires a value"), *str);
 }
 
 static int parse_shrtopt(struct argupar *ctx)
@@ -169,94 +190,93 @@ static int parse_shrtopt(struct argupar *ctx)
 
 struct arguopt_dupopt {
 	struct arguopt *opt;
-	int uset;
+	int unset;
 };
 
-static void register_abbrev(struct arguopt *opt, int uset,
+static void register_abbrev(struct arguopt *opt, int unset,
 			    struct arguopt_dupopt *abbrev,
 			    struct arguopt_dupopt *ambiguous)
 {
-	if (abbrev->opt && abbrev->uset != uset) {
+	if (abbrev->opt) {
 		ambiguous->opt = abbrev->opt;
-		ambiguous->uset = abbrev->uset;
+		ambiguous->unset = abbrev->unset;
 	}
 
 	abbrev->opt = opt;
-	abbrev->uset = uset;
+	abbrev->unset = unset;
 }
 
 static int parse_longopt(struct argupar *ctx)
 {
-	struct arguopt *opt = ctx->option;
+	const char *arg;
 	const char *argstr = *ctx->argv;
-	const char *arg = NULL;
-	int is_arguset = strskip(argstr, "no-", &argstr) == 0;
-	struct arguopt_dupopt abbrev, ambiguous;
+	const char *argsep = strchrnul(argstr, '=');
+	const char *argval;
 
-	while (opt->type != ARGUOPT_END) {
-		if (!opt->longname || opt->type == ARGUOPT_SUBCOMMAND)
+	struct arguopt *opt = ctx->option;
+	int arg_unset = strskip(argstr, "no-", &argstr) == 0;
+	struct arguopt_dupopt abbrev = { 0 }, ambiguous = { 0 };
+
+	for (; opt->type != ARGUOPT_END; opt++) {
+		const char *optname = opt->longname;
+		if (!optname || opt->type == ARGUOPT_SUBCOMMAND)
 			continue;
 
-		const char *optname = opt->longname;
-		const char *argval;
-		int is_optuset = strskip(optname, "no-", &optname) == 0;
-		int is_noarg = opt->flag & ARGUOPT_NOARG;
-		int is_useton = opt->flag & ARGUOPT_HASNEG;
+		int opt_unset = strskip(optname, "no-", &optname) == 0;
 
-		if (is_arguset != is_optuset && !is_useton)
+		if (arg_unset != opt_unset && !(opt->flag & ARGUOPT_HASNEG))
 			continue;
 
 		if (strskip(argstr, optname, &argval) == 0) {
 prepare_optarg:
 			if (argval[0] == '=') {
-				if (is_noarg)
+				if (opt->flag & ARGUOPT_NOARG || arg_unset)
 					goto err_extra_value;
 				arg = &argval[1];
 			} else if (*argval) {
 				continue;
-			} else if (is_noarg) {
-				return apply_optarg(opt, NULL);
-			} else if (ctx->argc) {
+			} else if ((opt->flag & ARGUOPT_NOARG) || arg_unset) {
+				arg = NULL;
+			} else if (ctx->argc > 1) {
 				ctx->argc--;
 				arg = *(++ctx->argv);
 			} else if (!(opt->flag & ARGUOPT_OPTARG)) {
 				goto err_missing_arg;
 			}
 
-			if (is_arguset && arg)
-				goto err_extra_value;
-
-			return apply_optarg(opt, arg);
+			return dispatch_optarg(opt, arg, arg_unset);
 		}
 
-		if (strncmp(optname, argstr, argval - argstr) == 0)
-			register_abbrev(opt, is_arguset != is_optuset,
+		if (strncmp(optname, argstr, argsep - argstr) == 0)
+			register_abbrev(opt, arg_unset != opt_unset,
 					&abbrev, &ambiguous);
 
-		if (is_useton && straftr("no-", argstr))
-			register_abbrev(opt, is_optuset,
-					&abbrev, &ambiguous);
+		if ((opt->flag & ARGUOPT_HASNEG) && straftr("no-", argstr))
+			register_abbrev(opt, !opt_unset, &abbrev, &ambiguous);
 	}
 
 	if (ambiguous.opt)
 		goto err_ambiguous_opt;
 
-	if (abbrev.opt)
-		goto prepare_optarg;
+	if (abbrev.opt) {
+		argval = argsep;
+		opt = abbrev.opt;
+		goto prepare_optarg; /* ah...... what a fucking mess */
+	}
 
-	return 0;
-
+	return error(_("unknown long option `%.*s'"),
+		     (int)(argsep - argstr), argstr);
 err_missing_arg:
-	return error(_("option `%s%s' requires a value"),
-		     is_arguset ? "no-" : "", opt->longname);
+	return error(_("long option `%s%s' requires a value"),
+		     arg_unset ? "no-" : "", opt->longname);
 err_extra_value:
-	return error(_("option `%s%s' takes no value"),
-		     is_arguset ? "no-" : "", opt->longname);
+	return error(_("long option `%s%s' takes no value"),
+		     arg_unset ? "no-" : "", opt->longname);
 err_ambiguous_opt:
-	return error(_("arguopt `%s' is ambiguous (could be --%s%s or --%s%s)"),
-		     opt->longname,
-		     ambiguous.uset ? "no-" : "", ambiguous.opt->longname,
-		     abbrev.uset ? "no-" : "", abbrev.opt->longname);
+	return error(_("long option `%.*s' is ambiguous (could be --%s%s or --%s%s)"),
+		     (int)(argsep - argstr), argstr,
+		     ambiguous.unset ? "no-" : "", ambiguous.opt->longname,
+		     abbrev.unset ? "no-" : "", abbrev.opt->longname);
 }
 
 static enum arguret do_parse(struct argupar *ctx)
@@ -269,8 +289,7 @@ static enum arguret do_parse(struct argupar *ctx)
 			ctx->outv[ctx->outc++] = str;
 			return AP_DONE;
 		}
-
-		return AP_NONOPT;
+		return error(_("unknown argument `%s'"), *ctx->argv);
 
 	/* short option */
 	} else if (str[1] != '-') {
@@ -312,20 +331,19 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 
 	enum arguret ret;
 
-	while (39) {
+	while (ctx->argc) {
 		ret = do_parse(ctx);
 		switch (ret) {
 		case AP_SUCCESS:
 			break;
-		case AP_NONOPT:
-			error(_("unknown argument `%s'"), *ctx->argv);
+		case AP_ERROR:
 			exit(128);
+		case AP_DONE:
+			goto parse_done;
 		case AP_SHRTHELP:
 			//
 		case AP_LONGHELP:
 			//
-		case AP_DONE:
-			goto parse_done;
 		}
 
 		ctx->argc--;
