@@ -76,6 +76,7 @@
 # include <sys/select.h>
 #endif
 
+#include "ansidecl.h"
 #include "compiler.h"
 #include "poison.h"
 
