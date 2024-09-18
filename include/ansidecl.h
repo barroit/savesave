@@ -29,10 +29,6 @@ Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA. 
 #ifndef	_ANSIDECL_H
 #define _ANSIDECL_H	1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Every source file includes this file,
    so they will all get the switch for lint.  */
 /* LINTLIBRARY */
@@ -302,18 +298,12 @@ So instead we use the macro below and test it against specific values.  */
    This is because the semantics of const are different in C and C++.
    "extern const" is permitted in C but it looks strange, and gcc
    warns about it when -Wc++-compat is not used.  */
-#ifdef __cplusplus
-#define EXPORTED_CONST extern const
-#else
 #define EXPORTED_CONST const
-#endif
 
 /* Be conservative and only use enum bitfields with C++ or GCC.
    FIXME: provide a complete autoconf test for buggy enum bitfields.  */
 
-#ifdef __cplusplus
-#define ENUM_BITFIELD(TYPE) enum TYPE
-#elif (GCC_VERSION > 2000)
+#if (GCC_VERSION > 2000)
 #define ENUM_BITFIELD(TYPE) __extension__ enum TYPE
 #else
 #define ENUM_BITFIELD(TYPE) unsigned int
@@ -350,9 +340,5 @@ So instead we use the macro below and test it against specific values.  */
   TYPE (const TYPE&);				\
   void operator= (const TYPE &)
 #endif /* __cplusplus >= 201103 */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif	/* ansidecl.h	*/

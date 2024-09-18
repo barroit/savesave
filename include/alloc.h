@@ -8,10 +8,6 @@
 #ifndef ALLOC_H
 #define ALLOC_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "calc.h"
 
 void alloc_limit_check(size_t n);
@@ -46,9 +42,4 @@ do {								\
 		*(p) = REALLOC_ARRAY(*(p), *(cap));		\
 	}							\
 } while (0)
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif /* ALLOC_H */

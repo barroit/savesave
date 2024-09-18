@@ -8,10 +8,6 @@
 #ifndef ROBIO_H
 #define ROBIO_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 ssize_t robread(int fd, void *buf, size_t n);
 
 ssize_t robwrite(int fd, const void *buf, size_t n);
@@ -29,9 +25,5 @@ int robopen3(const char *file, int oflag, mode_t mode);
 int robclose(int fd);
 
 int robdup2(int oldfd, int newfd);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* ROBIO_H */

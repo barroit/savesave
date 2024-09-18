@@ -8,10 +8,6 @@
 #ifndef FILEITER_H
 #define FILEITER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct fileiter_file {
 	const char *absname;
 	const char *dymname; /* dynamic part of absname */
@@ -61,9 +57,5 @@ void fileiter_destroy(struct fileiter *ctx);
 int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx);
 
 int fileiter_exec(struct fileiter *ctx);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* FILEITER_H */

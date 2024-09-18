@@ -23,14 +23,6 @@
 # define _ATOMIC_
 #endif
 
-#ifdef __cplusplus
-# include <new>
-# include <iomanip>
-# include <sstream>
-# include <iostream>
-# include <string>
-#endif
-
 #include <stddef.h>
 #include <stdint.h>
 #include <inttypes.h>
@@ -101,10 +93,6 @@
 
 #include "i18n.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifdef _WIN32
 
 #define STDOUT_FILENO ({ fileno(stdout); })
@@ -157,10 +145,6 @@ NORETURN winexit(int code);
 #define MKDIR(path) mkdir(path, 0775)
 
 #endif /* ---- _WIN32 ----- */
-
-#ifdef __cplusplus
-}
-#endif
 
 #include "cntio.h"
 

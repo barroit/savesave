@@ -8,10 +8,6 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define FORMAT(sta, fir) __attribute__((format(printf, sta, fir)))
 
 #define NORETURN void __attribute__((noreturn))
@@ -81,9 +77,5 @@ extern "C" {
 
 #define LONGRUNNING
 #define USESTDIO
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* COMPILER_H */

@@ -21,10 +21,6 @@
 #ifndef _GL_POLL_H
 #define _GL_POLL_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x600
 /* Vista has its own, socket-only poll() */
 #undef POLLIN
@@ -66,10 +62,6 @@ extern int poll (struct pollfd *pfd, nfds_t nfd, int timeout);
 /* Define INFTIM only if doing so conforms to POSIX.  */
 #if !defined (_POSIX_C_SOURCE) && !defined (_XOPEN_SOURCE)
 #define INFTIM (-1)
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif /* _GL_POLL_H */

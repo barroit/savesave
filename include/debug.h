@@ -8,10 +8,6 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifdef NDEBUG
 
 # define DEBUG_RUN() if (0)
@@ -24,10 +20,6 @@ extern "C" {
 
 # define BUG_ON(cond) assert(!(cond))
 
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif /* DEBUG_H */

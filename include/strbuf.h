@@ -8,10 +8,6 @@
 #ifndef STRBUF_H
 #define STRBUF_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct strbuf {
 	char *str;
 	size_t len;
@@ -158,9 +154,5 @@ int strbuf_mkfdirp(struct strbuf *sb);
  * strbuf_to_dirname - make strbuf become its parent name
  */
 void strbuf_to_dirname(struct strbuf *sb);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* STRBUF_H */

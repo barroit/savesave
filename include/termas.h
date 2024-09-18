@@ -8,10 +8,6 @@
 #ifndef TERMAS_H
 #define TERMAS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 int __warn_routine(const char *pref, const char *extr,
 		   const char *fmt, ...) FORMAT(3, 4);
 
@@ -58,9 +54,5 @@ const char *strwinerror(void);
 	__die_routine("fatal: ", strwinerror(), __VA_ARGS__)
 
 #endif /* _WIN32 */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* TERMAS_H */

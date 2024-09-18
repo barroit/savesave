@@ -24,21 +24,11 @@ file(MAKE_DIRECTORY ${GENERATED})
 include(${ROOT}/scripts/kconfig.cmake)
 
 # -------------------------------- compiler --------------------------------
-if(BUILD STREQUAL linux)
-  set(CMAKE_C_COMPILER ${CONFIG_CC_NAME})
-  # we do not use cpp on linux
-else()
-  set(CMAKE_C_COMPILER ${CONFIG_CC_NAME})
-  set(CMAKE_CXX_COMPILER ${CONFIG_CXX_NAME})
-endif()
+set(CMAKE_C_COMPILER ${CONFIG_CC_NAME})
 
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_EXTENSIONS true)
 set(CMAKE_C_STANDARD_REQUIRED ON)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_EXTENSIONS true)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(CONFIG_COMPILER_WARNING_ALL)
   add_compile_options(-Wall)
@@ -55,26 +45,17 @@ set_choiced_value(CONFIG_COMPILER_OPTIMIZE)
 add_compile_options(-O${CONFIG_COMPILER_OPTIMIZE})
 
 # ---------------------------- project profile -----------------------------
-list(APPEND languages C)
-
-if(HOST STREQUAL windows)
-  list(APPEND languages CXX)
-endif()
-
 set(SAVESAVE_NAME savesave)
 set(SAVESAVE_VERSION $ENV{SAVESAVE_VERSION})
 string(REPLACE -rc . SAVESAVE_VERSION_CMAKE ${SAVESAVE_VERSION})
 
-project(${SAVESAVE_NAME}
-	VERSION ${SAVESAVE_VERSION_CMAKE}
-	LANGUAGES ${languages})
+project(${SAVESAVE_NAME} VERSION ${SAVESAVE_VERSION_CMAKE} LANGUAGES C)
 
 # -------------------------------- include ---------------------------------
 # By specifying a SHELL and quoting our options, we can disable Option
 # De-duplication
 add_compile_options("SHELL:-include ${GENERATED}/autoconf.h")
 add_compile_options("SHELL:-include ${GENERATED}/appinfo.h")
-add_compile_options("SHELL:-include ${GENERATED}/apphelp.h")
 add_compile_options("SHELL:-include ${ROOT}/include/brtcomcent.h")
 
 include_directories(${ROOT}/include)
@@ -114,7 +95,7 @@ endif()
 if(HOST STREQUAL linux)
   file(GLOB platspec_src LIST_DIRECTORIES false uni/*.c)
 else()
-  file(GLOB platspec_src LIST_DIRECTORIES false win/*.cpp win/*.c)
+  file(GLOB platspec_src LIST_DIRECTORIES false win/*.c)
 endif()
 add_library(platspec OBJECT ${platspec_src})
 

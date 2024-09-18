@@ -10,10 +10,6 @@
 #ifndef ARGUPAR_H
 #define ARGUPAR_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 enum arguopt_type {
 	ARGUOPT_END,		/* end of arguopt */
 	ARGUOPT_GROUP,		/* start a new group (visual) */
@@ -142,9 +138,5 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 }
 
 #include "command.h"
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* ARGUPAR_H */

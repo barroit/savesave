@@ -10,10 +10,6 @@
 #ifndef CNTIO_H
 #define CNTIO_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 int cntcreat(const char *file, mode_t mode);
 #define creat cntcreat
 
@@ -38,9 +34,5 @@ int cntdup2(int oldfd, int newfd);
 #define dup2 cntdup2
 
 /* more over, dup, pipe... */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* CNTIO_H */

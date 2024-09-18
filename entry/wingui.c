@@ -28,6 +28,8 @@ int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int ___)
 	if (*cmdline)
 		argc = getargv(&argv);
 
+	setup_longrunning_command = NULL;
 	cmd_main(argc, argv);
+
 	exit(39);
 }

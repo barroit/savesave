@@ -16,7 +16,7 @@ msgstr  "Report-Msgid-Bugs-To: barroit@linux.com\n"
         "Content-Transfer-Encoding: 8bit\n"
         "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: uni/backup.c:68 win/backup.cpp:100
+#: uni/backup.c:68 win/backup.c:49
 #, c-format
 msgid   "unable to copy file from `%s' to `%s'"
 msgstr  ""
@@ -26,7 +26,7 @@ msgstr  ""
 msgid   "unable to create file at `%s'"
 msgstr  ""
 
-#: uni/backup.c:78 uni/backup.c:120 win/backup.cpp:103
+#: uni/backup.c:78 uni/backup.c:120 win/backup.c:52
 #, c-format
 msgid   "unable to make directory `%s'"
 msgstr  ""
@@ -46,7 +46,7 @@ msgstr  ""
 msgid   "unable to make symbolic link `%s'"
 msgstr  ""
 
-#: uni/fileiter.c:27 uni/fileiter.c:66 win/fileiter.c:75 platfree/dotsav.c:36
+#: uni/fileiter.c:27 uni/fileiter.c:66 win/fileiter.c:75 platfree/dotsav.c:37
 #, c-format
 msgid   "failed to retrieve information for file `%s'"
 msgstr  ""
@@ -61,17 +61,17 @@ msgstr  ""
 msgid   "can't determine file type for `%s'"
 msgstr  ""
 
-#: uni/fileiter.c:95
+#: uni/fileiter.c:97
 #, c-format
 msgid   "`%s' has unsupported file type `%d', skipped"
 msgstr  ""
 
-#: uni/fileiter.c:123
+#: uni/fileiter.c:121
 #, c-format
 msgid   "failed to open directory `%s'"
 msgstr  ""
 
-#: uni/mkdir.c:21 win/mkdir.c:25
+#: uni/mkdir.c:22 win/mkdir.c:26
 #, c-format
 msgid   "failed to remove file `%s'"
 msgstr  ""
@@ -83,6 +83,34 @@ msgstr  ""
 
 #: uni/path.c:56
 msgid   "your $HOME corrupted"
+msgstr  ""
+
+#: win/atenter.c:16
+msgid   "unsupported windows version (at least win7)"
+msgstr  ""
+
+#: win/console.c:51
+msgid   "failed to get console screen information"
+msgstr  ""
+
+#: win/console.c:54
+msgid   "failed to set console screen size"
+msgstr  ""
+
+#: win/console.c:57
+msgid   "failed to update console window"
+msgstr  ""
+
+#: win/console.c:71
+msgid   "failed to set console output codepage to UTF-8"
+msgstr  ""
+
+#: win/dumpstack.c:26
+msgid   "failed to initialize symbol handler"
+msgstr  ""
+
+#: win/dumpstack.c:56
+msgid   "failed to retrieve symbol for 0x<PRIxMAX>"
 msgstr  ""
 
 #: win/fileiter.c:70
@@ -100,57 +128,7 @@ msgstr  ""
 msgid   "failed to find first file from pattern `%s'"
 msgstr  ""
 
-#: win/atenter.cpp:28
-msgid   "unsupported windows version (at least win7)"
-msgstr  ""
-
-#: win/backup.cpp:22
-msgid   "failed to create timer queue, fallback to default one"
-msgstr  ""
-
-#: win/backup.cpp:40
-#, c-format
-msgid   "cannot make backup for configuration `%s'"
-msgstr  ""
-
-#: win/backup.cpp:61
-#, c-format
-msgid   "failed to create timer for configuration `%s'"
-msgstr  ""
-
-#: win/console.cpp:92
-msgid   "unable to redirect standard io"
-msgstr  ""
-
-#: win/console.cpp:106
-msgid   "failed to set console output codepage to 65001"
-msgstr  ""
-
-#: win/dumpstack.cpp:28
-msgid   "failed to initialize symbol handler"
-msgstr  ""
-
-#: win/dumpstack.cpp:52
-msgid   "failed to retrieve symbol for 0x<PRIxMAX>"
-msgstr  ""
-
-#: win/menu.cpp:22
-msgid   "failed to set menu infomation"
-msgstr  ""
-
-#: win/window.cpp:43
-msgid   "`About' feature is not available yet"
-msgstr  ""
-
-#: win/window.cpp:82
-msgid   "failed to register window class"
-msgstr  ""
-
-#: win/window.cpp:88
-msgid   "failed to create window"
-msgstr  ""
-
-#: win/winexit.cpp:15
+#: win/winexit.c:18
 msgid   "Press any key to continue..."
 msgstr  ""
 
@@ -168,32 +146,32 @@ msgstr  ""
 msgid   "failed to duplicate string"
 msgstr  ""
 
-#: platfree/argupar.c:139
+#: platfree/argupar.c:134
 #, c-format
 msgid   "failed to parse option `%s' with value `%s'"
 msgstr  ""
 
-#: platfree/argupar.c:173
+#: platfree/argupar.c:168
 #, c-format
 msgid   "short option `%c' requires a value"
 msgstr  ""
 
-#: platfree/argupar.c:266
+#: platfree/argupar.c:261
 #, c-format
 msgid   "unknown long option `%.*s'"
 msgstr  ""
 
-#: platfree/argupar.c:269
+#: platfree/argupar.c:264
 #, c-format
 msgid   "long option `%s%s' requires a value"
 msgstr  ""
 
-#: platfree/argupar.c:272
+#: platfree/argupar.c:267
 #, c-format
 msgid   "long option `%s%s' takes no value"
 msgstr  ""
 
-#: platfree/argupar.c:275
+#: platfree/argupar.c:270
 #, c-format
 msgid   "long option `%.*s' is ambiguous (could be --%s%s or --%s%s)"
 msgstr  ""
@@ -244,106 +222,86 @@ msgstr  ""
 msgid   "savesave requires a multithreading supported version of libzstd"
 msgstr  ""
 
-#: platfree/dotsav.c:32
+#: platfree/dotsav.c:33
 #, c-format
 msgid   "failed to open `%s'"
 msgstr  ""
 
-#: platfree/dotsav.c:45
+#: platfree/dotsav.c:46
 #, c-format
 msgid   "failed to read `%s'"
 msgstr  ""
 
-#: platfree/dotsav.c:126
-#, c-format
-msgid   "unable to calculate size for directory `%s'"
-msgstr  ""
-
-#: platfree/dotsav.c:140
+#: platfree/dotsav.c:125
 #, c-format
 msgid   "save path `%s' must be an absolute path"
 msgstr  ""
 
-#: platfree/dotsav.c:145
+#: platfree/dotsav.c:130
 #, c-format
 msgid   "save path `%s' does not exist"
 msgstr  ""
 
-#: platfree/dotsav.c:154
+#: platfree/dotsav.c:139
 #, c-format
 msgid   "unsupported save file mode `%d'"
 msgstr  ""
 
-#: platfree/dotsav.c:164
+#: platfree/dotsav.c:149
 msgid   "stack cannot be 0"
 msgstr  ""
 
-#: platfree/dotsav.c:172
+#: platfree/dotsav.c:157
 msgid   "period cannot be 0"
 msgstr  ""
 
-#: platfree/dotsav.c:226
+#: platfree/dotsav.c:211
 #, c-format
 msgid   "name '%s' must have a value"
 msgstr  ""
 
-#: platfree/dotsav.c:257
+#: platfree/dotsav.c:242
 #, c-format
 msgid   "unrecognized name found in `%s'"
 msgstr  ""
 
-#: platfree/dotsav.c:282
+#: platfree/dotsav.c:267
 msgid   "encountered an unknown line"
 msgstr  ""
 
-#: platfree/dotsav.c:304
+#: platfree/dotsav.c:289
 #, c-format
 msgid   "configuration `%s' missing the following fields\n"
         "\n"
         "%s"
 msgstr  ""
 
-#: platfree/dotsav.c:305
+#: platfree/dotsav.c:290
 #, c-format
 msgid   "configuration `%s' missing the following field\n"
         "\n"
         "%s"
 msgstr  ""
 
-#: platfree/dotsav.c:357
+#: platfree/dotsav.c:342
 #, c-format
 msgid   "failed to parse savesave configuration\n"
         "%7<PRIuMAX>:%s"
 msgstr  ""
 
-#: platfree/dotsav.c:379
+#: platfree/dotsav.c:364
 #, c-format
 msgid   "an error occurred while reading dotsav `%s'"
 msgstr  ""
 
-#: platfree/dotsav.c:382
+#: platfree/dotsav.c:367
 #, c-format
 msgid   "file `%s' is empty"
 msgstr  ""
 
-#: platfree/ioop.c:24
+#: platfree/mkdir.c:88
 #, c-format
-msgid   "failed to create directory for log file `%s'"
-msgstr  ""
-
-#: platfree/ioop.c:28
-#, c-format
-msgid   "failed to create file at `%s'"
-msgstr  ""
-
-#: platfree/ioop.c:33
-#, c-format
-msgid   "cannot redirect stdout to `%s'"
-msgstr  ""
-
-#: platfree/ioop.c:38
-#, c-format
-msgid   "cannot redirect stderr to `%s'"
+msgid   "unable to calculate size for directory `%s'"
 msgstr  ""
 
 #: platfree/termas.c:27
@@ -386,33 +344,15 @@ msgstr  ""
 msgid   "unknown bool value `%s'"
 msgstr  ""
 
-#: entry/savesave.c:41
+#: entry/savesave.c:22
+msgid   "Configuration file for savesave"
+msgstr  ""
+
+#: entry/savesave.c:38
 msgid   "no command specified"
 msgstr  ""
 
-#: entry/savesave.c:57
-msgid   "no dotsav (.savesave) was provided"
-msgstr  ""
-
-#: entry/savesave.c:62
-#, c-format
-msgid   "dotsav `%s' must contain at least one configuration"
-msgstr  ""
-
-#: entry/savesave.cpp:58
-msgid   "no configuration file was provided"
-msgstr  ""
-
-#: entry/savesave.cpp:64
-#, c-format
-msgid   "no configuration was found in `%s'"
-msgstr  ""
-
-#: entry/savesave.cpp:80
-msgid   "unable to initialize main window"
-msgstr  ""
-
-#: include/argupar.h:116
+#: include/argupar.h:118
 msgid   "n"
 msgstr  ""
 

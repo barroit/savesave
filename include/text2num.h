@@ -8,10 +8,6 @@
 #ifndef TEXT2NUM_H
 #define TEXT2NUM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 int str2ulong(const char *str, size_t len,
 	      unsigned long max, unsigned long *val);
 
@@ -37,9 +33,5 @@ static inline int str2uint(const char *str, unsigned *val)
 int str2period(const char *str, u32 *val);
 
 int str2bool(const char *str, int *val);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* TEXT2NUM_H */

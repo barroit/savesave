@@ -8,19 +8,11 @@
 #ifndef BRT_TYPES_H
 #define BRT_TYPES_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef uint8_t  u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
 
 typedef uintmax_t flag_t;
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* BRT_TYPES_H */

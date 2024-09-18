@@ -8,10 +8,6 @@
 #ifndef BRT_STRING_H
 #define BRT_STRING_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * strrepl - Replace all occurrences of ‘c’ in ‘str’ with ‘r’.
  */
@@ -31,9 +27,5 @@ char *straftr(const char *str, const char *pref);
  * return  - 0 on success, -1 if 'pref' is not a prefix of 'str'
  */
 int strskip(const char *str, const char *pref, const char **rest);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* BRT_STRING_H */

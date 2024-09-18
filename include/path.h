@@ -8,10 +8,6 @@
 #ifndef PATH_H
 #define PATH_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 int is_absolute_path(const char *path);
 
 static inline int is_dir_indicator(const char *name)
@@ -25,9 +21,5 @@ const char *get_home_dirname(void);
  * return the directory name of executable path
  */
 const char *get_executable_dirname(void);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* PATH_H */

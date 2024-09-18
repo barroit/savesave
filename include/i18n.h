@@ -8,10 +8,6 @@
 #ifndef I18N_H
 #define I18N_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifdef HAVE_INTL
 
 #define gettext_noop(masid) masid
@@ -32,9 +28,5 @@ void setup_message_translation(void);
 #define setup_message_i18n() do {} while (0)
 
 #endif /* HAVE_INTL */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* I18N_H */

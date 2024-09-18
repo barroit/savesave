@@ -8,10 +8,6 @@
 #ifndef LIST_H
 #define LIST_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "calc.h"
 
 struct list_head {
@@ -57,9 +53,5 @@ static inline void list_add_tail(struct list_head *list,
 #define for_each_idx_back(i, n) for (i = n; i != max_uint_valueof(i); i--)
 
 #define for_each_idx_from(i, n) for (; i < n; i++)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* LIST_H */

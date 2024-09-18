@@ -8,10 +8,6 @@
 #ifndef SAVCONF_H
 #define SAVCONF_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct savesave {
 	char *name;
 
@@ -36,10 +32,6 @@ void print_dotsav(struct savesave *sav, size_t nl);
 
 #ifdef _WIN32
 void format_dotsav(struct savesave *dotsav, size_t n);
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif /* GETCONF_H */

@@ -7,7 +7,7 @@ Before installing Savesave, the following requirements must be met
 
 	CMake => 3.21
 
-	Clang && Clang++ (tested with version 18.1)
+	Clang (tested with version 18.1)
 
 	Ninja build (tested with version 1.12)
 

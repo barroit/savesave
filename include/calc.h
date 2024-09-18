@@ -8,10 +8,6 @@
 #ifndef CALC_H
 #define CALC_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define fix_grow(x) (((x) + 16) * 3 / 2)
 
 #define bitsizeof(x) (CHAR_BIT * sizeof(x))
@@ -49,9 +45,5 @@ extern NORETURN __die_routine(const char *, const char *, const char *, ...);
 	}								\
 	((a) + (b));							\
 })
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* CALC_H */

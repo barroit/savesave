@@ -8,10 +8,6 @@
 #ifndef BRT_LIMIT_H
 #define BRT_LIMIT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*
  * Most functions use SSIZE_MAX as the portable maximum number of bytes they
  * can write.
@@ -34,9 +30,5 @@ extern "C" {
  * chars in a string uint8 number including nul
  */
 #define STRU8_MAX 4
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* BRT_LIMIT_H */

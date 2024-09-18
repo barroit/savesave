@@ -8,10 +8,6 @@
 #ifndef STRLIST_H
 #define STRLIST_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "strbuf.h"
 
 struct strlist {
@@ -63,9 +59,5 @@ void strlist_strsplt_every(struct strlist *sl, const char *str, size_t len);
  * same as strlist_strsplt_every but align to previous word boundary
  */
 void strlist_strsplt_every2(struct strlist *sl, const char *str, size_t len);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* STRLIST_H */

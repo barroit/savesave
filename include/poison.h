@@ -8,10 +8,6 @@
 #ifndef POSION_H
 #define POSION_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define ACCESS_POISON ((void *) 0xdeadbeef)
 
 #define LIST_POISON1 ((void *) 0x100)
@@ -23,9 +19,5 @@ extern "C" {
 
 #define CALLBACK_MAP_POISON1 ((void *) 0x500)
 #define CALLBACK_MAP_POISON2 ((void *) 0x600)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* POSION_H */

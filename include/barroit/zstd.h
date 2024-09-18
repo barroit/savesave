@@ -10,16 +10,8 @@
 #ifndef BRT_ZSTD_H
 #define BRT_ZSTD_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define zstd_init_cctx ZSTD_initStaticCCtx
 
 typedef ZSTD_CCtx zstd_cctx;
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* BRT_ZSTD_H */

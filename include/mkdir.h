@@ -8,10 +8,6 @@
 #ifndef MKDIR_H
 #define MKDIR_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 int mkdirp2(char *name, size_t start);
 
 /**
@@ -42,9 +38,5 @@ int PLATSPECOF(sizeof_file)(struct fileiter_file *file, void *data);
  * note: this function handles error
  */
 int calc_dir_size(const char *name, off_t *size);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* MKDIR_H */

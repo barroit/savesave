@@ -10,12 +10,12 @@ region=('ja_JP' 'zh_CN')
 
 case $1 in
 'update')
-	xgettext -k_ -kN_ -k -i --omit-header --from-code=UTF-8		\
-		 -o locale/generated.pot				\
-		 uni/*.c	win/*.c		win/*.cpp		\
-		 platfree/*.c						\
-		 entry/*.c	entry/*.cpp				\
-		 include/*.h	include/barroit/*.h	include/win/*.hpp
+	xgettext --from-code=UTF-8 --omit-header	\
+		 -k_ -kN_ -k -i -o locale/generated.pot	\
+		 uni/*.c	win/*.c			\
+		 platfree/*.c				\
+		 entry/*.c				\
+		 include/*.h	include/barroit/*.h
 
 	for r in ${region[@]}; do
 		msgmerge -i -U locale/$r.po locale/generated.pot
