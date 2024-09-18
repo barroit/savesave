@@ -18,35 +18,28 @@ int main(int argc, const char **argv)
 	setup_message_translation();
 
 	argupar_t ap;
-	const char *argb[3] = { "-h" };
-
-	argc--;
-	argv++;
-	if (argc == 0) {
-		argc = 1;
-		argv = argb;
-	}
-
 	struct arguopt options[] = {
 		APOPT_FILENAME(0, "dotsav", &dotsav_path,
-			       "Configuration file for savesave"),
+			       _("Configuration file for savesave")),
 		APOPT_END(),
 	};
 
-parse_command:
-	argupar_init(&ap, argc, argv);
-	argc = argupar_parse(&ap, options, NULL, ARGUPAR_STOPAT_NONOPT);
+	argc--;
+	argv++;
 
-	if (!argc) {
-		error(_("no command specified"));
-		argc = 1;
-		argv = argb;
-		goto parse_command;
-	}
+	argupar_init(&ap, argc, argv);
+	argc = argupar_parse(&ap, options, NULL,
+			     AP_STOPAT_NONOPT |
+			     AP_EXPECT_ARGS |
+			     AP_NO_ENDOFOPT);
 
 	argupar_subcommand_t runcmd;
 	struct arguopt commands[] = APOPT_MAIN_COMMAND_INIT(&runcmd);
 
-	argc = argupar_parse(&ap, commands, NULL, ARGUPAR_COMMAND_MODE);
+	if (!argc)
+		error(_("no command specified"));
+	argc = argupar_parse(&ap, commands, NULL,
+			     AP_COMMAND_MODE | AP_EXPECT_ARGS);
+
 	return runcmd(argc, argv);
 }

@@ -26,7 +26,7 @@ void fileiter_init(struct fileiter *ctx, const char *root,
 	ctx->cb = cb;
 	ctx->data = data;
 
-	ctx->flags = flags;
+	ctx->flag = flags;
 }
 
 void fileiter_destroy(struct fileiter *ctx)
@@ -65,7 +65,7 @@ int fileiter_exec(struct fileiter *ctx)
 
 		dir = strlist_pop2(ctx->sl, 0);
 		if (unlikely(!dir)) {
-			if (!(ctx->flags & FI_LIST_DIR))
+			if (!(ctx->flag & FI_LIST_DIR))
 				return 0;
 
 			strbuf_reset(ctx->sb);
@@ -73,7 +73,7 @@ int fileiter_exec(struct fileiter *ctx)
 			goto iter_done;
 		}
 
-		if (!(ctx->flags & FI_LIST_DIR))
+		if (!(ctx->flag & FI_LIST_DIR))
 			continue;
 		strbuf_reset(ctx->sb);
 

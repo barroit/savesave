@@ -32,10 +32,10 @@ void argupar_init(struct argupar *ctx, int argc, const char **argv)
 static void debug_check_argupar(struct argupar *ctx)
 {
 	struct arguopt *opt = ctx->option;
-	int is_subcmd = ctx->flag & ARGUPAR_COMMAND_MODE;
+	int is_subcmd = ctx->flag & AP_COMMAND_MODE;
 
-	BUG_ON((ctx->flag & ARGUPAR_STOPAT_NONOPT) &&
-	       (ctx->flag & ARGUPAR_COMMAND_MODE));
+	BUG_ON((ctx->flag & AP_STOPAT_NONOPT) &&
+	       (ctx->flag & AP_COMMAND_MODE));
 
 	for_each_option(opt) {
 		if (opt->type == ARGUOPT_GROUP)
@@ -296,9 +296,9 @@ static enum arguret do_parse(struct argupar *ctx)
 
 	/* non option (argument) */
 	if (str[0] != '-') {
-		if (ctx->flag & ARGUPAR_STOPAT_NONOPT)
+		if (ctx->flag & AP_STOPAT_NONOPT)
 			return AP_DONE;
-		else if (ctx->flag & ARGUPAR_COMMAND_MODE)
+		else if (ctx->flag & AP_COMMAND_MODE)
 			return parse_subcommand(ctx, str);
 
 		ctx->outv[ctx->outc++] = str;
@@ -319,6 +319,9 @@ static enum arguret do_parse(struct argupar *ctx)
 		str += 2;
 
 		if (str[0] == 0) {
+			if (ctx->flag & AP_NO_ENDOFOPT)
+				goto err_inv_eoo;
+
 			ctx->argc--;
 			ctx->argv++;
 			return AP_DONE;
@@ -330,6 +333,9 @@ static enum arguret do_parse(struct argupar *ctx)
 		*ctx->argv = str;
 		return parse_longopt(ctx);
 	}
+
+err_inv_eoo:
+	return error("end of options '--' is not allowed in this part");
 }
 
 int argupar_parse(struct argupar *ctx, struct arguopt *option,
@@ -338,6 +344,9 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 	ctx->option = option;
 	ctx->usage = usage;
 	ctx->flag = flag;
+
+	if ((ctx->flag & AP_EXPECT_ARGS) && !ctx->argc)
+		exit_with_short_help(ctx);
 
 	DEBUG_RUN()
 		debug_check_argupar(ctx);
@@ -364,7 +373,10 @@ parse_done:
 			sizeof(*ctx->argv) * ctx->argc);
 
 	int nl = ctx->outc + ctx->argc;
+
 	ctx->outv[nl] = NULL;
 	ctx->outc = 0;
+	ctx->argv = ctx->outv;
+
 	return nl;
 }

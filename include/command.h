@@ -16,10 +16,12 @@ extern "C" {
 #endif
 
 int cmd_help(int argc, const char **argv);
+int cmd_sizeof(int argc, const char **argv);
 int cmd_version(int argc, const char **argv);
 
 #define APOPT_MAIN_COMMAND_INIT(v) { \
 	APOPT_SUBCOMMAND("help", (v), cmd_help), \
+	APOPT_SUBCOMMAND("sizeof", (v), cmd_sizeof), \
 	APOPT_SUBCOMMAND("version", (v), cmd_version), \
 	APOPT_END(), \
 }

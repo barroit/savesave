@@ -31,9 +31,17 @@ static inline int mkdirp(char *name)
  */
 int rmdirr(const char *name);
 
-int PLATSPECOF(flexremove)(const char *name);
+int flexremove(const char *name);
 
-#define FLEXREMOVE PLATSPECOF(flexremove)
+struct fileiter_file;
+int PLATSPECOF(sizeof_file)(struct fileiter_file *file, void *data);
+
+/**
+ * calc_dir_size - calc. directory size
+ *
+ * note: this function handles error
+ */
+int calc_dir_size(const char *name, off_t *size);
 
 #ifdef __cplusplus
 }

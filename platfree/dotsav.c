@@ -15,6 +15,7 @@
 #include "debug.h"
 #include "path.h"
 #include "fileiter.h"
+#include "mkdir.h"
 
 struct savesave_context {
 	char *line;
@@ -112,22 +113,6 @@ static int create_new_entry(const char *name,
 static inline int is_entry(const char *line, const char *prefix, char **ret)
 {
 	return skip_prefix(line, prefix, ret) == 0 && isspace(**ret);
-}
-
-int calc_dir_size(const char *base, off_t *size)
-{
-	int ret;
-	struct fileiter ctx;
-
-	fileiter_init(&ctx, base, PLATSPECOF(sizeof_file), size, FI_USE_STAT);
-
-	ret = fileiter_exec(&ctx);
-	if (ret)
-		return error(_("unable to calculate size for directory `%s'"),
-			     base);
-
-	fileiter_destroy(&ctx);
-	return ret;
 }
 
 static int parse_save(void *__save, struct savesave *sav)

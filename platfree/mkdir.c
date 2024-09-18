@@ -68,3 +68,22 @@ int rmdirr(const char *name)
 
 	return ret;
 }
+
+int calc_dir_size(const char *name, off_t *size)
+{
+	int err;
+	struct fileiter ctx;
+
+	fileiter_init(&ctx, name, PLATSPECOF(sizeof_file), size,
+		      FI_USE_STAT | FI_LOOP_UNSUP);
+
+	err = fileiter_exec(&ctx);
+	if (err)
+		goto err_calc_size;
+
+	fileiter_destroy(&ctx);
+	return 0;
+
+err_calc_size:
+	return error(_("unable to calculate size for directory `%s'"), name);
+}

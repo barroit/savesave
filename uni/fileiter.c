@@ -15,7 +15,7 @@
 static inline int dispatch_lnkfile(struct fileiter_file *file,
 				   struct fileiter *ctx)
 {
-	if (ctx->flags & FI_USE_STAT) {
+	if (ctx->flag & FI_USE_STAT) {
 		int err = lstat(file->absname, file->st);
 		if (err)
 			goto err_stat_file;
@@ -32,14 +32,14 @@ static int dispatch_regfile(struct fileiter_file *file, struct fileiter *ctx)
 {
 	int ret;
 
-	if (ctx->flags & FI_USE_FD) {
+	if (ctx->flag & FI_USE_FD) {
 		file->fd = open(file->absname, O_RDONLY);
 		if (file->fd == -1)
 			goto err_open_file;
 	}
 
-	if (ctx->flags & FI_USE_STAT) {
-		if (ctx->flags & FI_USE_FD)
+	if (ctx->flag & FI_USE_STAT) {
+		if (ctx->flag & FI_USE_FD)
 			ret = fstat(file->fd, file->st);
 		else
 			ret = stat(file->absname, file->st);
@@ -55,7 +55,7 @@ static int dispatch_regfile(struct fileiter_file *file, struct fileiter *ctx)
 	}
 
 	ret = ctx->cb(file, ctx->data);
-	if (ctx->flags & FI_USE_FD)
+	if (ctx->flag & FI_USE_FD)
 		close(file->fd);
 
 	return ret;
@@ -92,6 +92,8 @@ static int dispatch_file(struct fileiter *ctx, struct dirent *ent)
 	case DT_UNKNOWN:
 		return warn(_("can't determine file type for `%s'"), absname);
 	default:
+		if (ctx->flag & FI_LOOP_UNSUP)
+			break;
 		warn(_("`%s' has unsupported file type `%d', skipped"),
 		     absname, ent->d_type);
 		return 0;
@@ -106,14 +108,10 @@ static int dispatch_file(struct fileiter *ctx, struct dirent *ent)
 		.fd      = -1,
 	};
 
-	switch (ent->d_type) {
-	case DT_REG:
-		return dispatch_regfile(&file, ctx);
-	case DT_LNK:
+	if (ent->d_type == DT_LNK)
 		return dispatch_lnkfile(&file, ctx);
-	}
 
-	BUG_ON(1);
+	return dispatch_regfile(&file, ctx);
 }
 
 int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx)

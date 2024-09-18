@@ -113,7 +113,7 @@ static char *get_next_backup_name(const struct savesave *c)
 
 	if (ret == 1) {
 		strbuf_concatat_base(&dest, "0");
-		ret = FLEXREMOVE(dest.str);
+		ret = flexremove(dest.str);
 		if (ret)
 			goto err_drop_backup;
 

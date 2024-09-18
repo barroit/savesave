@@ -30,9 +30,6 @@ struct savesave {
 
 char *get_dotsav_defpath(void);
 
-struct fileiter_file;
-int PLATSPECOF(sizeof_file)(struct fileiter_file *file, void *data);
-
 size_t parse_dotsav(const char *path, struct savesave **sav);
 
 void print_dotsav(struct savesave *sav, size_t nl);
