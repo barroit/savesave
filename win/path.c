@@ -15,7 +15,6 @@ CONSTRUCTOR(setup_executable_dirname)
 {
 	char exe[PATH_MAX];
 	DWORD len = GetModuleFileName(NULL, exe, sizeof(exe));
-
 	BUG_ON(len == 0);
 
 	char *dir = dirname(exe);

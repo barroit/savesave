@@ -10,17 +10,9 @@
 
 int cmdline2argv(const char *cmdline, char ***argv)
 {
-	std::string line = std::string(SAVESAVE_NAME) + " " +
-			   std::string(cmdline);
-	std::istringstream stream(std::move(line));
-	std::string opt;
-	struct strlist sl = STRLIST_INIT;
-
-	while (stream >> std::quoted(opt))
-		strlist_push(&sl, opt.c_str());
 
 	int argc = (int)sl.nl;
-	*argv = strlist_dump2arr(&sl);
+	*argv = strlist_dump(&sl);
 	strlist_destroy(&sl);
 
 	return argc;

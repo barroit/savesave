@@ -74,5 +74,5 @@ int cmd_sizeof(int argc, const char **argv)
 		}
 	}
 
-	exit(0);
+	return 0;
 }

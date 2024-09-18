@@ -52,9 +52,9 @@ static inline void list_add_tail(struct list_head *list,
 #define for_each_idx(i, n) for (i = 0; i < n; i++)
 
 /*
- * handle index up to max_uint_val_of_type(i) - 1
+ * handle index up to max_uint_valueof(i) - 1
  */
-#define for_each_idx_back(i, n) for (i = n; i != max_uint_val_of_type(i); i--)
+#define for_each_idx_back(i, n) for (i = n; i != max_uint_valueof(i); i--)
 
 #define for_each_idx_from(i, n) for (; i < n; i++)
 

@@ -19,7 +19,6 @@ CONSTRUCTOR(setup_crt_report_hook);
 CONSTRUCTOR(setup_executable_dirname);
 USESTDIO CONSTRUCTOR(check_libzstd_compat);
 USESTDIO CONSTRUCTOR(check_os_version);
-USESTDIO CONSTRUCTOR(setup_console_codepage);
 
 #define CONSTRUCTOR_LIST_INIT { \
 	init_u8tstr_table, \
@@ -30,7 +29,6 @@ USESTDIO CONSTRUCTOR(setup_console_codepage);
 #define CONSTRUCTOR_USESTDIO_LIST_INIT { \
 	check_libzstd_compat, \
 	check_os_version, \
-	setup_console_codepage, \
 }
 
 typedef typeof(&check_libzstd_compat) constructor_t;

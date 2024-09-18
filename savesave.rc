@@ -1,8 +1,4 @@
 // SPDX-License-Identifier: GPL-3.0-only
-#include "win/resid.hpp"
-
-#ifdef __MINGW64__
-APP_MANIFEST MANIFEST "savesave.manifest"
-#endif
+#include "resid.h"
 
 NOTIFY_ICON  ICON     "orange.ico"

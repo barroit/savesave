@@ -20,12 +20,12 @@ struct strlist {
 	size_t nl;
 	size_t cap;
 
-	int use_move;
+	int use_ref;
 };
 
 #define STRLIST_INIT { 0 }
 
-#define STRLIST_USEMOVE 1 << 0
+#define STRLIST_USEREF 1 << 0
 
 void strlist_init(struct strlist *sl, flag_t flags);
 
@@ -48,9 +48,14 @@ static inline char *strlist_pop(struct strlist *sl)
 	return strlist_pop2(sl, 1);
 }
 
-char **strlist_dump2arr(struct strlist *sl);
+char **strlist_dump2(struct strlist *sl, int copy);
 
-void destroy_dumped_strlist(char **arr);
+static inline char **strlist_dump(struct strlist *sl)
+{
+	return strlist_dump2(sl, 1);
+}
+
+void strlist_destory_dumped(char **arr);
 
 void strlist_strsplt_every(struct strlist *sl, const char *str, size_t len);
 

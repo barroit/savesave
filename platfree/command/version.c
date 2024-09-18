@@ -14,5 +14,5 @@ int cmd_version(int argc, const char **argv)
 	printf("   libzstd-%s\n", ZSTD_versionString());
 	printf("   gettext-%s\n", GETTEXT_VERSION);
 
-	exit(0);
+	return 0;
 }

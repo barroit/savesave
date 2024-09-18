@@ -48,6 +48,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdatomic.h>
+#include <wchar.h>
 
 #ifdef _WIN32
 # include <sdkddkver.h>

@@ -14,13 +14,13 @@ void strlist_init(struct strlist *sl, flag_t flags)
 {
 	memset(sl, 0, sizeof(*sl));
 
-	if (flags & STRLIST_USEMOVE)
-		sl->use_move = 1;
+	if (flags & STRLIST_USEREF)
+		sl->use_ref = 1;
 }
 
 void strlist_destroy(struct strlist *sl)
 {
-	if (!sl->use_move) {
+	if (!sl->use_ref) {
 		size_t i;
 		for_each_idx(i, sl->cap) {
 			struct strbuf *sb = &sl->list[i];
@@ -52,7 +52,7 @@ static void strlist_init_strbuf(struct strlist *sl, struct strbuf *sb)
 {
 	flag_t flag = 0;
 
-	if (sl->use_move)
+	if (sl->use_ref)
 		flag |= STRBUF_CONSTANT;
 
 	strbuf_init(sb, flag);
@@ -60,7 +60,7 @@ static void strlist_init_strbuf(struct strlist *sl, struct strbuf *sb)
 
 size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc)
 {
-	BUG_ON(sl->use_move && extalloc);
+	BUG_ON(sl->use_ref && extalloc);
 
 	if (strlist_need_grow(sl))
 		strlist_grow1(sl);
@@ -76,7 +76,7 @@ size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc)
 	if (sl->uninit <= sl->nl)
 		sl->uninit = sl->nl;
 
-	if (sl->use_move)
+	if (sl->use_ref)
 		return strbuf_move(sb, str);
 	else
 		return strbuf_concat2(sb, str, extalloc);
@@ -96,20 +96,23 @@ char *strlist_pop2(struct strlist *sl, int dup)
 	return str;
 }
 
-char **strlist_dump2arr(struct strlist *sl)
+char **strlist_dump2(struct strlist *sl, int copy)
 {
 	size_t i;
 	size_t nl = sl->nl;
 	char **arr = xreallocarray(NULL, sizeof((*sl->list).str), sl->nl + 1);
 
 	for_each_idx(i, nl)
-		arr[i] = xstrdup(sl->list[i].str);
+		if (copy)
+			arr[i] = xstrdup(sl->list[i].str);
+		else
+			arr[i] = sl->list[i].str;
 
 	arr[nl] = NULL;
 	return arr;
 }
 
-void destroy_dumped_strlist(char **arr)
+void strlist_destory_dumped(char **arr)
 {
 	char **p = arr;
 	while (*p != NULL)
