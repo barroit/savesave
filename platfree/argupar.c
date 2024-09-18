@@ -51,10 +51,8 @@ static void debug_check_argupar(struct argupar *ctx)
 	}
 }
 
-static enum arguret parse_subcommand(struct argupar *ctx, const char *cmd)
+static enum arguret parse_subcommand(struct arguopt *opt, const char *cmd)
 {
-	struct arguopt *opt = ctx->option;
-
 	for_each_option(opt) {
 		if (opt->type == ARGUOPT_GROUP)
 			continue;
@@ -63,9 +61,6 @@ static enum arguret parse_subcommand(struct argupar *ctx, const char *cmd)
 			continue;
 
 		*(argupar_subcommand_t *)opt->value = opt->subcmd;
-
-		ctx->argc--;
-		ctx->argv++;
 		return AP_DONE;
 	}
 
@@ -299,7 +294,7 @@ static enum arguret do_parse(struct argupar *ctx)
 		if (ctx->flag & AP_STOPAT_NONOPT)
 			return AP_DONE;
 		else if (ctx->flag & AP_COMMAND_MODE)
-			return parse_subcommand(ctx, str);
+			return parse_subcommand(ctx->option, str);
 
 		ctx->outv[ctx->outc++] = str;
 		return AP_SUCCESS;

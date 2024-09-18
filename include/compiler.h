@@ -79,6 +79,8 @@ extern "C" {
 #define __PLATSPECOF(suf, name)  ___PLATSPECOF(suf, name)
 #define ___PLATSPECOF(suf, name) __platspec_##suf##_##name
 
+#define LONGRUNNING
+
 #ifdef __cplusplus
 }
 #endif

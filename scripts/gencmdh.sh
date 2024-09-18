@@ -9,7 +9,7 @@ fi
 src=$(echo platfree/command/*.c)
 dest=include/command.h
 
-commands=$(grep -h '^int cmd_*' $src | awk -F '[_()]' '{ print $2 }')
+declare=$(grep -Eh '^(LONGRUNNING[[:space:]]+)?int cmd_*' $src)
 
 cat <<EOF > $dest
 /* SPDX-License-Identifier: GPL-3.0-only */
@@ -31,19 +31,30 @@ extern "C" {
 
 EOF
 
-printf 'int cmd_%s(int argc, const char **argv);\n' $commands >> $dest
+awk '{ print $0";" }' <<< $declare >> $dest
 
 cat <<EOF >> $dest
 
 #define APOPT_MAIN_COMMAND_INIT(v) { \\
 EOF
 
-for cmd in $commands; do
-	printf '\tAPOPT_SUBCOMMAND("%s", (v), cmd_%s), \\\n' $cmd $cmd
-done >> $dest
+name=$(awk -F '[_()]' '{ print $2 }' <<< $declare)
+awk '{ print "\tAPOPT_SUBCOMMAND(\""$0"\", (v), cmd_"$0"), \\" }' \
+    <<< $name >> $dest
 
 cat <<EOF >> $dest
 	APOPT_END(), \\
+}
+
+#define APOPT_LONGRUNNING_INIT { \\
+EOF
+
+longrun=$(grep -E '^LONGRUNNING' <<< $declare)
+name=$(awk -F '[_()]' '{ print $2 }' <<< $longrun)
+
+printf '\t"%s", \\\n' $name >> $dest
+
+cat <<EOF >> $dest
 }
 
 #ifdef __cplusplus

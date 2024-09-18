@@ -34,7 +34,7 @@ int cmd_sizeof(int argc, const char **argv)
 		const char *path = argv[i];
 
 		struct stat st;
-		err = lstat(path, &st);
+		err = stat(path, &st);
 		if (err)
 			goto err_stat_file;
 

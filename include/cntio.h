@@ -32,7 +32,7 @@ DIR *cntopendir(const char *name);
 int cntclosedir(DIR *dirp);
 #define closedir cntclosedir
 
-#endif
+#endif /* __linux__ */
 
 int cntdup2(int oldfd, int newfd);
 #define dup2 cntdup2
