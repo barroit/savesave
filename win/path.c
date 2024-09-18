@@ -11,11 +11,7 @@
 
 static char *executable_dirname;
 
-extern "C" {
-CONSTRUCTOR(populate_executable_dir);
-}
-
-CONSTRUCTOR(populate_executable_dir)
+CONSTRUCTOR(setup_executable_dirname)
 {
 	char exe[PATH_MAX];
 	DWORD len = GetModuleFileName(NULL, exe, sizeof(exe));
@@ -31,7 +27,7 @@ int is_absolute_path(const char *path)
 	return !PathIsRelative(path);
 }
 
-const char *get_home_dirname()
+const char *get_home_dirname(void)
 {
 	return getenv("USERPROFILE");
 }

@@ -13,7 +13,7 @@
 
 static const char *executable_dirname;
 
-CONSTRUCTOR(populate_executable_dir)
+CONSTRUCTOR(setup_executable_dirname)
 {
 	char exe[PATH_MAX];
 	ssize_t nr = readlink("/proc/self/exe", exe, sizeof(exe) - 1);

@@ -144,8 +144,10 @@ char *strchrnul(const char *s, int c);
 char *dirname(char *path);
 int setenv(const char *name, const char *value, int overwrite);
 
+#ifndef CONFIG_IS_CONSOLE_APP
 NORETURN winexit(int code);
-#define exit winexit
+# define exit winexit
+#endif
 
 #define MKDIR mkdir
 

@@ -8,7 +8,6 @@
 #include "argupar.h"
 #include "termas.h"
 #include "dotsav.h"
-#include "debug.h"
 #include "list.h"
 
 static const char *dotsav_path;
@@ -33,7 +32,7 @@ int cmd_main(int argc, const char **argv)
 			     AP_NO_ENDOFOPT);
 
 	argupar_subcommand_t runcmd;
-	struct arguopt commands[] = APOPT_MAIN_COMMAND_INIT(&runcmd);
+	struct arguopt commands[] = MAINCOMMAND_LIST_INIT(&runcmd);
 
 	if (!argc)
 		error(_("no command specified"));
@@ -42,7 +41,7 @@ int cmd_main(int argc, const char **argv)
 
 	if (setup_longrunning_command) {
 		size_t i;
-		const char *longrun[] = APOPT_LONGRUNNING_INIT;
+		const char *longrun[] = LONGRUNNING_LIST_INIT;
 
 		for_each_idx(i, sizeof_array(longrun)) {
 			if (strcmp(*argv, longrun[i]) == 0) {

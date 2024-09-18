@@ -11,7 +11,7 @@
 #include "termas.h"
 #include "debug.h"
 
-CONSTRUCTOR(check_libzstd_mt)
+USESTDIO CONSTRUCTOR(check_libzstd_compat)
 {
 	int ret;
 

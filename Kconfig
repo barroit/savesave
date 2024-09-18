@@ -83,19 +83,18 @@ config LINK_LIBZSTD_STATIC
 
 endmenu # "Compiling"
 
-menu "Console"
+menu "Feature"
 
-config CNTRL_REPLACEMENT
-	string "control char replacement"
-	default "�"
+menu "Windows"
+	depends on $(BUILD) = "windows"
 
 config DISABLE_CONSOLE_OUTPUT
 	bool "disable console output"
-	depends on $(BUILD) = "windows"
 
-endmenu # "Console"
+config IS_CONSOLE_APP
+	bool "build console version of savesave"
 
-menu "Filename"
+endmenu # "Windows"
 
 config ARCHIVE_EXTENTION
 	string "file extension for archive file (no dot)"
@@ -104,10 +103,6 @@ config ARCHIVE_EXTENTION
 config TMPFILE_EXTENTION
 	string "file extension for temporary directory (no dot)"
 	default "tmp"
-
-endmenu # "Filename"
-
-menu "Threshld"
 
 config COMPRESSING_THRESHOLD
 	int "size threshold for compression (in KiB)"
@@ -121,7 +116,7 @@ config LINEWRAP_THRESHOLD
 	int "character threshold for line wrap"
 	default 80
 
-endmenu # "Threshld"
+endmenu # "Feature"
 
 menu "Gettext"
 
@@ -143,9 +138,6 @@ config SUPPRESS_ANNOTATED_LEAKS
 
 menu "Windows"
 	depends on $(BUILD) = "windows"
-
-config IS_CONSOLE_APP
-	bool "build console version of savesave (not link against WinMain)"
 
 config DEBUG_INTLDLL
 	bool "debug libintl"

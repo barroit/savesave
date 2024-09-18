@@ -80,6 +80,7 @@ extern "C" {
 #define ___PLATSPECOF(suf, name) __platspec_##suf##_##name
 
 #define LONGRUNNING
+#define USESTDIO
 
 #ifdef __cplusplus
 }

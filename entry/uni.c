@@ -13,7 +13,7 @@ extern void (*setup_longrunning_command)(void);
 int main(int argc, const char **argv)
 {
 	setup_message_translation();
-	setup_longrunning_command = NULL;
 
+	setup_longrunning_command = NULL;
 	return cmd_main(argc, argv);
 }

@@ -7,14 +7,12 @@
 
 #pragma GCC diagnostic ignored "-Wreturn-type"
 
-#include "win/dumpstack.hpp"
 #include "termas.h"
 #include "strlist.h"
 #include "list.h"
-#include "alloc.h"
 #include "debug.h"
 
-static void assert_failure_routine()
+static void assert_failure_routine(void)
 {
 	BUG_ON(CONFIG_MAX_DUMP_STACK > USHRT_MAX);
 
@@ -48,17 +46,21 @@ static void assert_failure_routine()
 
 		err = !SymFromAddr(proc, addr, 0, symbol);
 		if (err)
-			die_winerr(
-_("failed to retrieve symbol for 0x" PRIxMAX ""), addr);
+			goto err_get_sym;
 
 		printf("%5d: 0x%" PRIxMAX " - %s\n",
 		       frames - i - 1, symbol->Address, symbol->Name);
+		continue;
+
+err_get_sym:
+		warn_winerr(_("failed to retrieve symbol for 0x" PRIxMAX),
+			    addr);
 	}
 
 	exit(128);
 }
 
-static int savesave_report_hook(int type, char *message, int *)
+static int savesave_report_hook(int type, char *message, int *_)
 {
 	size_t i;
 	struct strlist sl = STRLIST_INIT;
@@ -77,7 +79,7 @@ static int savesave_report_hook(int type, char *message, int *)
 	return 0;
 }
 
-void setup_crt_report_hook()
+CONSTRUCTOR(setup_crt_report_hook)
 {
 	_CrtSetReportHook(savesave_report_hook);
 }
