@@ -47,6 +47,11 @@ int cmd_sizeof(int argc, const char **argv)
 			goto err_lacks_size;
 		}
 
+		if (size < SZ_1K) {
+			printf("%s %ld B\n", path, size);
+			continue;
+		}
+
 		unsigned umi = 0;
 		off_t scale = 1;
 
@@ -62,7 +67,7 @@ int cmd_sizeof(int argc, const char **argv)
 		if (0) {
 		err_stat_file:
 			error_errno(_("failed to retrieve information for file `%s'"),
-			     path);
+				    path);
 		} else if (0) {
 		err_lacks_size:
 			error(_("file `%s' lacks a size information"), path);
