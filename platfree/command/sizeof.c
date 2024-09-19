@@ -13,6 +13,7 @@
 #include "list.h"
 #include "mkdir.h"
 
+USEDOTSAV
 int cmd_sizeof(int argc, const char **argv)
 {
 	struct arguopt options[] = {

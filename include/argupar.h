@@ -129,12 +129,13 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 	.flag     = (f),			\
 }
 
-#define APOPT_SUBCOMMAND(l, v, c)		\
+#define APOPT_SUBCOMMAND(l, v, c, f)		\
 {						\
 	.type     = ARGUOPT_SUBCOMMAND,		\
 	.longname = (l),			\
 	.value    = (v),			\
 	.subcmd   = (c),			\
+	.flag     = (f),			\
 }
 
 #include "command.h"

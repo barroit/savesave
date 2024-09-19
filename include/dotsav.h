@@ -26,7 +26,9 @@ struct savesave {
 
 char *get_dotsav_defpath(void);
 
-size_t parse_dotsav(const char *path, struct savesave **sav);
+char *read_dotsav(const char *name);
+
+size_t parse_dotsav(char *savstr, struct savesave **sav);
 
 void print_dotsav(struct savesave *sav, size_t nl);
 

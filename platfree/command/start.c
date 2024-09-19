@@ -5,7 +5,11 @@
  * Contact: barroit@linux.com
  */
 
-LONGRUNNING int cmd_start(int argc, const char **argv)
+#include "argupar.h"
+
+LONGRUNNING
+USEDOTSAV
+int cmd_start(int argc, const char **argv)
 {
 	return 0;
 }

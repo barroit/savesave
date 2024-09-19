@@ -17,7 +17,7 @@
 #include "fileiter.h"
 #include "mkdir.h"
 
-struct savesave_context {
+struct dotsav {
 	char *line;
 	char *stop;
 
@@ -26,36 +26,28 @@ struct savesave_context {
 	size_t cap;
 };
 
-static int read_savconf(const char *name, char **text)
+char *read_dotsav(const char *name)
 {
 	int fd = open(name, O_RDONLY);
 	if (fd == -1)
-		return error_errno(_("failed to open `%s'"), name);
+		die_errno(_("failed to open dotsav `%s'"), name);
 
+	int ret;
 	struct stat st;
-	if (fstat(fd, &st) == -1) {
-		error_errno(_("failed to retrieve information for file `%s'"),
-			    name);
-		goto err_stat_fd;
-	}
+
+	ret = fstat(fd, &st);
+	if (ret == -1)
+		die_errno(_("failed to retrieve information for dotsav `%s'"),
+			  name);
 
 	char *buf = xmalloc(st.st_size + 1);
-	buf[st.st_size] = 0;
 
-	if (robread(fd, buf, st.st_size) == -1) {
-		error_errno(_("failed to read `%s'"), name);
-		goto err_read_file;
-	}
+	ret = robread(fd, buf, st.st_size);
+	if (ret == -1)
+		die_errno(_("failed to read dotsav `%s'"), name);
 
-	*text = buf;
 	close(fd);
-	return 0;
-
-err_read_file:
-	free(buf);
-err_stat_fd:;
-	close(fd);
-	return 1;
+	return buf;
 }
 
 static char *skip_space(const char *str)
@@ -244,7 +236,7 @@ static int parse_entry_line(const char *line, struct savesave *sav)
 	return parse_entry_value(rest, sav, &entry);
 }
 
-static int parse_savconf_line(struct savesave_context *ctx)
+static int parse_savconf_line(struct dotsav *ctx)
 {
 	char *line = ctx->line;
 	char *stop = ctx->stop;
@@ -325,7 +317,7 @@ static void post_parse_savconf(struct savesave *sav, size_t nl)
 	}
 }
 
-static void do_parse_savconf(struct savesave_context *ctx)
+static void do_parse_savconf(struct dotsav *ctx)
 {
 	int err;
 
@@ -354,24 +346,13 @@ static void do_parse_savconf(struct savesave_context *ctx)
 	memset(&ctx->sav[ctx->nl], 0, sizeof(*ctx->sav));
 }
 
-size_t parse_dotsav(const char *name, struct savesave **sav)
+size_t parse_dotsav(char *savstr, struct savesave **sav)
 {
-	int err;
-	char *txtconf;
-
-	err = read_savconf(name, &txtconf);
-	if (err)
-		die_errno(_("an error occurred while reading dotsav `%s'"),
-			  name);
-	else if (*txtconf == 0)
-		die(_("file `%s' is empty"), name);
-
-	struct savesave_context ctx = {
-		.line  = txtconf,
+	struct dotsav ctx = {
+		.line  = savstr,
 	};
 
 	do_parse_savconf(&ctx);
-	free(txtconf);
 
 	*sav = ctx.sav;
 	return ctx.nl;

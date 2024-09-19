@@ -41,7 +41,10 @@ static void debug_check_argupar(struct argupar *ctx)
 		if (opt->type == ARGUOPT_GROUP)
 			continue;
 
-		BUG_ON(is_subcmd && opt->type != ARGUOPT_SUBCOMMAND);
+		if (is_subcmd) {
+			BUG_ON(opt->type != ARGUOPT_SUBCOMMAND);
+			continue;
+		}
 
 		BUG_ON((opt->flag & ARGUOPT_NOARG) &&
 		       (opt->flag & ARGUOPT_OPTARG));

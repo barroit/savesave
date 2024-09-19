@@ -6,9 +6,7 @@
  */
 
 #include "i18n.h"
-
-extern int cmd_main(int argc, const char **argv);
-extern void (*prepare_longrunning)(void);
+#include "maincmd.h"
 
 int main(int argc, const char **argv)
 {

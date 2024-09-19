@@ -11,9 +11,7 @@
 #include "getargv.h"
 #include "window.h"
 #include "notifyicon.h"
-
-extern int cmd_main(int argc, const char **argv);
-extern void (*prepare_longrunning)(void);
+#include "maincmd.h"
 
 int is_longrunning;
 
@@ -55,18 +53,6 @@ int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int ___)
 	exit(0);
 }
 
-// if (!dotsav_path)
-// 	dotsav_path = get_dotsav_defpath();
-// if (!dotsav_path)
-// 	die(_("no dotsav (.savesave) was provided"));
-
-// struct savesave *savv;
-// size_t savc = parse_dotsav(dotsav_path, &savv);
-// if (!savc)
-// 	die(_("dotsav `%s' must contain at least one configuration"),
-// 	    dotsav_path);
-// DEBUG_RUN()
-// 	print_dotsav(savv, savc);
 
 
 
