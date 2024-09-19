@@ -15,15 +15,6 @@
 #define likely(x)   __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
 
-#ifdef _WIN32
-/*
- * __attribute__((constructor)) just does not work on windows
- */
-# define CONSTRUCTOR(name) void name(void)
-#else
-# define CONSTRUCTOR(name) static void __attribute__((constructor)) name(void)
-#endif
-
 #define CONCAT2(a, b)	__CONCAT2(a, b)
 #define __CONCAT2(a, b)	a##b
 
@@ -76,6 +67,5 @@
 #define ___PLATSPECOF(suf, name) __platspec_##suf##_##name
 
 #define LONGRUNNING
-#define USESTDIO
 
 #endif /* COMPILER_H */

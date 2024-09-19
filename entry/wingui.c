@@ -68,9 +68,6 @@ int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int ___)
 // DEBUG_RUN()
 // 	print_dotsav(savv, savc);
 
-// backup(savv);
-// exit(0);
-
 
 
 // backup::backup(size_t nl)

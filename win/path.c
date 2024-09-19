@@ -8,6 +8,7 @@
 #include "path.h"
 #include "debug.h"
 #include "alloc.h"
+#include "constructor.h"
 
 static char *executable_dirname;
 

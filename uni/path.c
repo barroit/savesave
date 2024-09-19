@@ -10,6 +10,7 @@
 #include "debug.h"
 #include "alloc.h"
 #include "strbuf.h"
+#include "constructor.h"
 
 static const char *executable_dirname;
 

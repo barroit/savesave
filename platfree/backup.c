@@ -14,6 +14,7 @@
 #include "fileiter.h"
 #include "mkdir.h"
 #include "alloc.h"
+#include "constructor.h"
 
 static char stru8_map[UINT8_MAX + 1][STRU8_MAX];
 
