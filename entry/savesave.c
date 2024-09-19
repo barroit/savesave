@@ -12,7 +12,7 @@
 
 static const char *dotsav_path;
 
-void (*setup_longrunning_command)(void);
+void (*prepare_longrunning)(void);
 
 int cmd_main(int argc, const char **argv)
 {
@@ -39,13 +39,13 @@ int cmd_main(int argc, const char **argv)
 	argc = argupar_parse(&ap, commands, NULL,
 			     AP_COMMAND_MODE | AP_EXPECT_ARGS);
 
-	if (setup_longrunning_command) {
+	if (prepare_longrunning) {
 		size_t i;
 		const char *longrun[] = LONGRUNNING_LIST_INIT;
 
 		for_each_idx(i, sizeof_array(longrun)) {
 			if (strcmp(*argv, longrun[i]) == 0) {
-				setup_longrunning_command();
+				prepare_longrunning();
 				break;
 			}
 		}

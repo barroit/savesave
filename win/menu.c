@@ -5,31 +5,28 @@
  * Contact: barroit@linux.com
  */
 
-#include "win/ui.hpp"
+#include "menu.h"
 #include "termas.h"
-#include "alloc.h"
+#include "notifyicon.h"
 
 static int setup_menu(HMENU menu)
 {
-	int err;
-
 	MENUINFO info = {
-		.cbSize  = sizeof(MENUINFO),
+		.cbSize = sizeof(info),
 	};
 
-	err = !SetMenuInfo(menu, &info);
-	if (err)
-		return error_winerr(_("failed to set menu infomation"));
+	int err = !SetMenuInfo(menu, &info);
+	if (!err)
+		return 0;
 
-	return 0;
+	return error_winerr(_("failed to set menu infomation"));
 }
 
 static int add_menu_button(HMENU menu, unsigned id, const char *name)
 {
-	int err;
 
 	MENUITEMINFO button = {
-		.cbSize     = sizeof(MENUITEMINFO),
+		.cbSize     = sizeof(button),
 		.fMask      = MIIM_STRING | MIIM_ID,
 		.fType      = MFT_STRING,
 		.wID        = id,
@@ -37,47 +34,46 @@ static int add_menu_button(HMENU menu, unsigned id, const char *name)
 		.cch        = (UINT)strlen(name),
 	};
 
-	err = !InsertMenuItem(menu, id, false, &button);
-	if (err)
-		return error_winerr("failed to add ‘%s’ button", name);
+	int err = !InsertMenuItem(menu, id, 0, &button);
+	if (!err)
+		return 0;
 
-	return 0;
+	return error_winerr("failed to add ‘%s’ button", name);
 }
 
 int show_popup_menu(HWND window, POINT *cursor)
 {
-	int err;
+	int ret;
 
 	HMENU menu = CreatePopupMenu();
 	if (!menu)
 		return error_winerr("failed to create menu");
 
-	err = setup_menu(menu);
-	if (err)
+	ret = setup_menu(menu);
+	if (ret)
 		goto cleanup;
 
-	err = add_menu_button(menu, BUTTON_ABOUT, "About");
-	if (err)
+	ret = add_menu_button(menu, MNBUT_ABOUT, "About");
+	if (ret)
 		goto cleanup;
 
-	err = add_menu_button(menu, BUTTON_CLOSE, "Close");
-	if (err)
+	ret = add_menu_button(menu, MNBUT_CLOSE, "Close");
+	if (ret)
 		goto cleanup;
 
-	err = !SetForegroundWindow(window);
-	if (err) {
+	ret = !SetForegroundWindow(window);
+	if (ret) {
 		error("failed to set window to foreground");
 		goto cleanup;
 	}
 
-	err = !TrackPopupMenu(menu,
+	ret = !TrackPopupMenu(menu,
 			      TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON,
 			      cursor->x, cursor->y, 0, window, NULL);
-	if (err)
+	if (ret)
 		error_winerr("failed to track popup menu");
 
 cleanup:
 	DestroyMenu(menu);
-
-	return !!err;
+	return ret;
 }

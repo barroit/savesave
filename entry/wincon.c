@@ -9,7 +9,7 @@
 #include "atenter.h"
 
 extern int cmd_main(int argc, const char **argv);
-extern void (*setup_longrunning_command)(void);
+extern void (*prepare_longrunning)(void);
 
 int main(int argc, const char **argv)
 {
@@ -18,6 +18,6 @@ int main(int argc, const char **argv)
 
 	setup_message_translation();
 
-	setup_longrunning_command = NULL;
+	prepare_longrunning = NULL;
 	return cmd_main(argc, argv);
 }

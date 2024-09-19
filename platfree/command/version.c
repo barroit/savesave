@@ -9,8 +9,9 @@
 
 int cmd_version(int argc, const char **argv)
 {
-	printf("%s/%s-%s %s\n", SAVESAVE_NAME,
-	       SAVESAVE_HOST, SAVESAVE_ARCH, SAVESAVE_VERSION);
+	puts(SAVESAVE_NAME "/" SAVESAVE_HOST "-"
+	     SAVESAVE_ARCH " " SAVESAVE_VERSION);
+
 	printf("   libzstd-%s\n", ZSTD_versionString());
 	printf("   gettext-%s\n", GETTEXT_VERSION);
 
