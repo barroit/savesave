@@ -30,24 +30,37 @@ char *read_dotsav(const char *name)
 {
 	int fd = open(name, O_RDONLY);
 	if (fd == -1)
-		die_errno(_("failed to open dotsav `%s'"), name);
+		goto err_open_file;
 
 	int ret;
 	struct stat st;
 
 	ret = fstat(fd, &st);
 	if (ret == -1)
-		die_errno(_("failed to retrieve information for dotsav `%s'"),
-			  name);
+		goto err_stat_file;
 
 	char *buf = xmalloc(st.st_size + 1);
+	buf[st.st_size] = 0;
 
 	ret = robread(fd, buf, st.st_size);
 	if (ret == -1)
-		die_errno(_("failed to read dotsav `%s'"), name);
+		goto err_read_file;
 
 	close(fd);
 	return buf;
+
+	if (0) {
+	err_open_file:
+		error_errno(ERRMAS_OPEN_FILE(name));
+	} else if (0) {
+	err_stat_file:
+		error_errno(ERRMAS_STAT_FILE(name));
+	} else if (0) {
+	err_read_file:
+		error_errno(ERRMAS_READ_FILE(name));
+	}
+
+	return NULL;
 }
 
 static char *skip_space(const char *str)
@@ -71,12 +84,14 @@ static int skip_prefix(const char *str, const char *prefix, char **ret)
 
 static int check_unique_savconf(const struct savesave *sav, size_t nr)
 {
-	const char *name = sav[nr - 1].name;
 	size_t i;
+	const char *name = sav[nr - 1].name;
+
 	for_each_idx(i, nr - 1) {
 		if (likely(strcmp(sav[i].name, name)))
 			continue;
-		return error("configuration name `%s' conflicts at config indexes %zd and %zd",
+
+		return error("name `%s' has collisions at indexes %zu and %zu",
 			     name, i, nr - 1);
 	}
 
@@ -87,9 +102,9 @@ static int create_new_entry(const char *name,
 			    struct savesave **sav, size_t *nr, size_t *cap)
 {
 	if (!*name)
-		return error("empty configuration name is not allowed");
+		return error(_("empty sav name is not allowed"));
 	else if (strchr(name, ' ') != NULL)
-		return error("space in configuration name is not allowed");
+		return error(_("space in sav name is not allowed"));
 
 	CAP_ALLOC(sav, *nr + 1, cap);
 
@@ -114,12 +129,11 @@ static int parse_save(void *__save, struct savesave *sav)
 	struct stat st;
 
 	if (!is_absolute_path(save))
-		return error(_("save path `%s' must be an absolute path"),
-			     save);
+		return error(_("save name `%s' must be absolute path"), save);
 
 	err = stat(save, &st);
 	if (err)
-		return error(_("save path `%s' does not exist"), save);
+		return error_errno(ERRMAS_STAT_FILE(save));
 
 	if (S_ISREG(st.st_mode)) {
 		sav->save_size = st.st_size;
@@ -127,27 +141,29 @@ static int parse_save(void *__save, struct savesave *sav)
 	} else if (S_ISDIR(st.st_mode)) {
 		sav->is_dir_save = 1;
 		return calc_dir_size(save, &sav->save_size);
-	} else {
-		return error(_("unsupported save file mode `%d'"), st.st_mode);
+	} else if (!st.st_size) {
+		return error(_("unsupported save file `%s'"), save);
 	}
 
 	return 0;
 }
 
-static int check_stack(void *__stack, struct savesave *_)
+static int check_stack(void *__stack, struct savesave *sav)
 {
 	u8 stack = *(u8 *)__stack;
-	if (stack == 0)
-		return error(_("stack cannot be 0"));
-	return 0;
+	if (stack != 0)
+		return 0;
+
+	return error(_("stack cannot be 0"));
 }
 
-static int check_period(void *__period, struct savesave *_)
+static int check_period(void *__period, struct savesave *sav)
 {
 	u32 period = *(u32 *)__period;
-	if (period == 0)
-		return error(_("period cannot be 0"));
-	return 0;
+	if (period != 0)
+		return 0;
+
+	return error(_("period cannot be 0"));
 }
 
 enum entval {
@@ -200,7 +216,7 @@ static int parse_entry_value(const char *rest, struct savesave *sav,
 {
 	rest = skip_space(rest);
 	if (!*rest)
-		return error(_("name '%s' must have a value"), entry->name);
+		return error(_("value is missing"));
 
 	int res = 0;
 	switch (entry->type) {
@@ -231,7 +247,7 @@ static int parse_entry_line(const char *line, struct savesave *sav)
 
 	err = assign_entry(line, &rest, sav, &entry);
 	if (err)
-		return error(_("unrecognized name found in `%s'"), line);
+		return error(_("unrecognized sav key"));
 
 	return parse_entry_value(rest, sav, &entry);
 }
@@ -278,8 +294,8 @@ static void validate_savconf(const struct savesave *c)
 
 	size_t lines = strbuf_cntchr(&sb, '\n');
 	die(lines > 1 ?
-	    _("configuration `%s' missing the following fields\n\n%s") :
-	    _("configuration `%s' missing the following field\n\n%s"),
+	    _("sav `%s' missing the following fields\n\n%s") :
+	    _("sav `%s' missing the following field\n\n%s"),
 	    c->name, sb.str);
 }
 
@@ -331,8 +347,8 @@ static void do_parse_savconf(struct dotsav *ctx)
 
 		err = parse_savconf_line(ctx);
 		if (err)
-			die(_("failed to parse savesave configuration\n"
-			    "%7" PRIuMAX ":%s"), cnt, ctx->line);
+			die(_("failed to parse dotsav\n"
+			    "%7zu:%s"), cnt, ctx->line);
 
 		if (is_final)
 			break;

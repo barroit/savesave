@@ -55,7 +55,7 @@ static int sort_backup(struct strbuf *src,
 				goto err_rename_file;
 			room++;
 		} else if (errno != ENOENT) {
-			goto err_access_file;
+			return warn_errno(ERRMAS_ACCESS_FILE(src->str));
 		}
 
 		if (room == -1) {
@@ -76,8 +76,6 @@ static int sort_backup(struct strbuf *src,
 err_rename_file:
 	return warn_errno(_("failed to rename file `%s' to `%s'"),
 			  src->str, dest->str);
-err_access_file:
-	return warn_errno(_("failed to access file `%s'"), src->str);
 }
 
 static int find_next_room(struct strbuf *next, u8 stack)
@@ -93,8 +91,7 @@ static int find_next_room(struct strbuf *next, u8 stack)
 			strbuf_concatat_base(next, stru8_map[i + 1]);
 			return 0;
 		} else if (errno != ENOENT) {
-			return warn_errno(_("failed to access file `%s'"),
-					  next->str);
+			return warn_errno(ERRMAS_ACCESS_FILE(next->str));
 		}
 	}
 
@@ -102,13 +99,13 @@ static int find_next_room(struct strbuf *next, u8 stack)
 	return 0;
 }
 
-static char *get_next_backup_name(const struct savesave *c)
+static char *get_next_backup_name(const struct savesave *sav)
 {
 	int ret;
-	struct strbuf src = strbuf_from2(c->backup_prefix, 0, STRU8_MAX);
-	struct strbuf dest = strbuf_from2(c->backup_prefix, 0, STRU8_MAX);
+	struct strbuf src = strbuf_from2(sav->backup_prefix, 0, STRU8_MAX);
+	struct strbuf dest = strbuf_from2(sav->backup_prefix, 0, STRU8_MAX);
 
-	ret = sort_backup(&src, &dest, c->stack, NULL);
+	ret = sort_backup(&src, &dest, sav->stack, NULL);
 	if (ret == -1)
 		goto err_sort_backup;
 
@@ -118,28 +115,28 @@ static char *get_next_backup_name(const struct savesave *c)
 		if (ret)
 			goto err_drop_backup;
 
-		ret = sort_backup(&src, &dest, c->stack, NULL);
+		ret = sort_backup(&src, &dest, sav->stack, NULL);
 		if (ret == -1)
 			goto err_sort_backup;
 	}
 
-	ret = find_next_room(&dest, c->stack);
+	ret = find_next_room(&dest, sav->stack);
 	if (ret)
 		goto err_find_next;
 
 	if (0) {
 	err_drop_backup:
 		error(_("unable to drop deprecated backup of configuration `%s'"),
-		      c->name);
+		      sav->name);
 	} else if (0) {
 	err_sort_backup:
 		strbuf_concatat_base(&src, "*");
 		error(_("unable to sort backup `%s' of configuration `%s'"),
-		      src.str, c->name);
+		      src.str, sav->name);
 	} else if (0) {
 	err_find_next:
 		error(_("unable to determine next backup file name of configuration `%s'"),
-		      c->name);
+		      sav->name);
 	}
 
 	strbuf_destroy(&src);
@@ -194,7 +191,8 @@ static int do_backup(const char *dest, const char *temp,
 		ret = mkdirp(d);
 		free(d);
 		if (ret)
-			goto err_make_dir;
+			return error_errno(_("failed to make directory `%s'"),
+					   dest);
 	}
 
 	struct fileiter iter;
@@ -212,9 +210,6 @@ static int do_backup(const char *dest, const char *temp,
 	strbuf_destroy(&data[0]);
 	strbuf_destroy(&data[1]);
 	return ret;
-
-err_make_dir:
-	return error_errno(_("failed to make directory `%s'"), dest);
 }
 
 int backup(struct savesave *c)

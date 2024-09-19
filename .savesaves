@@ -1,0 +1,15 @@
+config overworld
+	save	 /home/barroit/workspace/livaut
+	backup	 /home/barroit/workspace/savesave/sandbox/backup
+	period	 1H
+	stack	 5
+	snapshot n
+	zip	 nsdf
+
+# config overworld
+# 	save	 C:\Users\barroit\paper-server
+# 	backup	 C:\Users\barroit\backup
+# 	period	 1H
+# 	stack	 5
+# 	snapshot n
+# 	zip	 n

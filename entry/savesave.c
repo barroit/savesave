@@ -24,6 +24,9 @@ static void prepare_dotsav(void)
 		die(_("no dotsav (.savesave) was provided"));
 
 	char *savstr = read_dotsav(dotsav_path);
+	if (!savstr)
+		die(_("unable to retrieve content for dotsav"));
+
 	size_t nl = parse_dotsav(savstr, &dotsav);
 	free(savstr);
 

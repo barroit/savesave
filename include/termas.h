@@ -55,4 +55,20 @@ const char *strwinerror(void);
 
 #endif /* _WIN32 */
 
+/*
+ * file-related error messages
+ */
+
+#define ERRMAS_STAT_FILE(name) \
+	_("failed to retrieve information for `%s'"), name
+
+#define ERRMAS_OPEN_FILE(name) \
+	_("failed to open `%s'"), name
+
+#define ERRMAS_ACCESS_FILE(name) \
+	_("failed to access file `%s'"), name
+
+#define ERRMAS_READ_FILE(name) \
+	_("failed to read file `%s'"), name
+
 #endif /* TERMAS_H */

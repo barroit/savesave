@@ -67,8 +67,7 @@ int cmd_sizeof(int argc, const char **argv)
 
 		if (0) {
 		err_stat_file:
-			error_errno(_("failed to retrieve information for file `%s'"),
-				    path);
+			error_errno(ERRMAS_STAT_FILE(path));
 		} else if (0) {
 		err_lacks_size:
 			error(_("file `%s' lacks a size information"), path);

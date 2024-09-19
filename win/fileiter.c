@@ -54,7 +54,7 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 	if (ctx->flag & FI_USE_STAT) {
 		int err = stat(absname, file.st);
 		if (err)
-			goto err_stat_file;
+			return warn_errno(ERRMAS_STAT_FILE(absname));
 	}
 
 	if (S_ISREG(file.st->st_mode))
@@ -70,10 +70,6 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 	warn(_("`%s' has unsupported st_mode `%u', skipped"),
 	     absname, file.st->st_mode);
 	return 0;
-
-err_stat_file:
-	return warn_errno(_("failed to retrieve information for file `%s'"),
-			  absname);
 }
 
 int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx)

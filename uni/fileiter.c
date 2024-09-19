@@ -18,14 +18,10 @@ static inline int dispatch_lnkfile(struct fileiter_file *file,
 	if (ctx->flag & FI_USE_STAT) {
 		int err = lstat(file->absname, file->st);
 		if (err)
-			goto err_stat_file;
+			return warn_errno(ERRMAS_STAT_FILE(file->absname));
 	}
 
 	return ctx->cb(file, ctx->data);
-
-err_stat_file:
-	return warn_errno(_("failed to retrieve information for file `%s'"),
-			  file->absname);
 }
 
 static int dispatch_regfile(struct fileiter_file *file, struct fileiter *ctx)
@@ -35,7 +31,7 @@ static int dispatch_regfile(struct fileiter_file *file, struct fileiter *ctx)
 	if (ctx->flag & FI_USE_FD) {
 		file->fd = open(file->absname, O_RDONLY);
 		if (file->fd == -1)
-			goto err_open_file;
+			return warn_errno(ERRMAS_OPEN_FILE(file->absname));
 	}
 
 	if (ctx->flag & FI_USE_STAT) {
@@ -50,7 +46,7 @@ static int dispatch_regfile(struct fileiter_file *file, struct fileiter *ctx)
 			close(file->fd);
 			errno = errnum;
 
-			goto err_stat_file;
+			return warn_errno(ERRMAS_STAT_FILE(file->absname));
 		}
 	}
 
@@ -59,12 +55,6 @@ static int dispatch_regfile(struct fileiter_file *file, struct fileiter *ctx)
 		close(file->fd);
 
 	return ret;
-
-err_open_file:
-	return warn_errno(_("failed to open file `%s'"), file->absname);
-err_stat_file:
-	return warn_errno(_("failed to retrieve information for file `%s'"),
-			  file->absname);
 }
 
 static int dispatch_file(struct fileiter *ctx, struct dirent *ent)
@@ -118,8 +108,7 @@ int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx)
 {
 	DIR *dir = opendir(ctx->sb->str);
 	if (!dir)
-		return warn_errno(_("failed to open directory `%s'"),
-				  ctx->sb->str);
+		return warn_errno(ERRMAS_OPEN_FILE(ctx->sb->str));
 
 	int ret;
 	struct dirent *ent;
