@@ -16,6 +16,5 @@ int main(int argc, const char **argv)
 
 	setup_message_translation();
 
-	prepare_longrunning = NULL;
 	return cmd_main(argc, argv);
 }

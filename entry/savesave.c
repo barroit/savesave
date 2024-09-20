@@ -10,11 +10,12 @@
 #include "dotsav.h"
 #include "list.h"
 #include "debug.h"
+#include "proc.h"
 
 static const char *dotsav_path;
 static struct savesave *dotsav;
 
-void (*prepare_longrunning)(void);
+int is_longrunning;
 
 static void prepare_dotsav(void)
 {
@@ -25,14 +26,14 @@ static void prepare_dotsav(void)
 
 	char *savstr = read_dotsav(dotsav_path);
 	if (!savstr)
-		die(_("unable to retrieve content for dotsav"));
+		die(_("unable to retrieve content for dotsav `%s'"),
+		    dotsav_path);
 
 	size_t nl = parse_dotsav(savstr, &dotsav);
 	free(savstr);
 
 	if (!nl)
-		die(_("dotsav `%s' must contain at least one configuration"),
-		    dotsav_path);
+		die(_("no configuration found in dotsav `%s'"), dotsav_path);
 
 	DEBUG_RUN()
 		print_dotsav(dotsav, nl);
@@ -68,11 +69,14 @@ int cmd_main(int argc, const char **argv)
 		if (runcmd != cmd->subcmd)
 			continue;
 
+		if (cmd->flag & CMD_UNIQUEPROC)
+			check_unique_process();
+
 		if (cmd->flag & CMD_USEDOTSAV)
 			prepare_dotsav();
 
-		if (cmd->flag & CMD_LONGRUNNING && prepare_longrunning)
-			prepare_longrunning();
+		if (cmd->flag & CMD_LONGRUNNING)
+			is_longrunning = 1;
 
 		break;
 	}

@@ -23,6 +23,8 @@ void winexit(int code)
 
 	if (code == 39)
 		code = 0;
+	else if (code == STILL_ACTIVE)
+		code = 128;
 
 	exit(code);
 }

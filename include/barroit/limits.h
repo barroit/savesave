@@ -27,8 +27,13 @@
 #endif
 
 /*
- * chars in a string uint8 number including nul
+ * number of character in a uint8 string including the terminating null byte
  */
 #define STRU8_MAX 4
+
+/*
+ * number of character in a pid string including the terminating null byte
+ */
+#define STRPID_MAX 11
 
 #endif /* BRT_LIMIT_H */

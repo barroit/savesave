@@ -13,7 +13,7 @@ int str2ulong(const char *str, size_t len,
 	      unsigned long max, unsigned long *val)
 {
 	if (isspace(*str) || *str == '-')
-		return error(_("unexpected leading char found in `%s'"), str);
+		return warn(_("unexpected leading char found in `%s'"), str);
 
 	char *tail;
 

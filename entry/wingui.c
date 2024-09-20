@@ -13,13 +13,6 @@
 #include "notifyicon.h"
 #include "maincmd.h"
 
-int is_longrunning;
-
-static void __prepare_longrunning(void)
-{
-	is_longrunning = 1;
-}
-
 int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int ___)
 {
 	setup_program();

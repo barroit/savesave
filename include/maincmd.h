@@ -9,7 +9,7 @@
 #define MAINCMD_H
 
 int cmd_main(int argc, const char **argv);
-extern void (*prepare_longrunning)(void);
+extern int is_longrunning;
 
 struct savesave;
 struct savesave *get_dotsav(void);

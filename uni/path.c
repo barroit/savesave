@@ -45,22 +45,16 @@ const char *get_home_dirname(void)
 
 const char *get_executable_dirname(void)
 {
-	static char *path;
+	static const char *path;
 
 	if (!path) {
-		int err;
-		struct stat st;
+		char buf[PATH_MAX];
 
-		err = lstat("/proc/self/exe", &st);
-		BUG_ON(err);
+		ssize_t nr = readlink("/proc/self/exe", buf, sizeof_array(buf));
+		BUG_ON(nr == -1 || nr == sizeof_array(buf));
 
-		size_t cap = st.st_size + 1;
-		path = xmalloc(cap);
-
-		ssize_t nr = readlink("/proc/self/exe", path, cap);
-		BUG_ON(nr == -1 || nr == cap);
-
-		path[nr] = 0;
+		buf[nr] = 0;
+		path = dirname(buf);
 	}
 
 	return path;

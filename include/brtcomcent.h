@@ -41,6 +41,7 @@
 #include <sys/stat.h>
 #include <stdatomic.h>
 #include <wchar.h>
+#include <signal.h>
 
 #ifdef _WIN32
 # include <sdkddkver.h>
@@ -67,6 +68,7 @@
 # include <libgen.h>
 # include <dirent.h>
 # include <sys/select.h>
+# include <pthread.h>
 #endif
 
 #include "ansidecl.h"
@@ -107,6 +109,7 @@
 #define putenv _putenv
 #define unlink _unlink
 #define rmdir  _rmdir
+#define getpid _getpid
 
 #define F_OK 00
 #define W_OK 02
@@ -128,6 +131,8 @@ typedef SSIZE_T ssize_t;
 typedef unsigned int mode_t;
 
 typedef off_t off64_t;
+
+typedef int pid_t;
 
 char *strchrnul(const char *s, int c);
 char *dirname(char *path);
