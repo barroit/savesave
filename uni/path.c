@@ -10,22 +10,6 @@
 #include "debug.h"
 #include "alloc.h"
 #include "strbuf.h"
-#include "constructor.h"
-
-static const char *executable_dirname;
-
-CONSTRUCTOR(setup_executable_dirname)
-{
-	char exe[PATH_MAX];
-	ssize_t nr = readlink("/proc/self/exe", exe, sizeof(exe) - 1);
-
-	BUG_ON(nr == -1);
-	exe[nr] = 0;
-
-	char *dir = dirname(exe);
-
-	executable_dirname = xstrdup(dir);
-}
 
 int is_absolute_path(const char *path)
 {
@@ -61,5 +45,38 @@ const char *get_home_dirname(void)
 
 const char *get_executable_dirname(void)
 {
-	return executable_dirname;
+	static char *path;
+
+	if (!path) {
+		int err;
+		struct stat st;
+
+		err = lstat("/proc/self/exe", &st);
+		BUG_ON(err);
+
+		size_t cap = st.st_size + 1;
+		path = xmalloc(cap);
+
+		ssize_t nr = readlink("/proc/self/exe", path, cap);
+		BUG_ON(nr == -1 || nr == cap);
+
+		path[nr] = 0;
+	}
+
+	return path;
+}
+
+const char *get_tmp_dirname(void)
+{
+	if (getuid() == geteuid() && getgid() == getegid()) {
+		const char *path = getenv("TMPDIR");
+		if (path)
+			return path;
+	}
+
+#ifdef P_tmpdir
+	return P_tmpdir;
+#else
+	return "/tmp";
+#endif
 }

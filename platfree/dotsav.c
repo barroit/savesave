@@ -88,7 +88,7 @@ static int check_unique_savconf(const struct savesave *sav, size_t nr)
 	const char *name = sav[nr - 1].name;
 
 	for_each_idx(i, nr - 1) {
-		if (likely(strcmp(sav[i].name, name)))
+		if (strcmp(sav[i].name, name))
 			continue;
 
 		return error("name `%s' has collisions at indexes %zu and %zu",
@@ -129,7 +129,7 @@ static int parse_save(void *__save, struct savesave *sav)
 	struct stat st;
 
 	if (!is_absolute_path(save))
-		return error(_("save name `%s' must be absolute path"), save);
+		return error(_("save path `%s' is not absolute"), save);
 
 	err = stat(save, &st);
 	if (err)

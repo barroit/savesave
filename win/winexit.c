@@ -12,12 +12,14 @@
 
 void winexit(int code)
 {
-	if (code && !IS_DEFINED(CONFIG_IS_CONSOLE_APP)) {
+#ifndef CONFIG_IS_CONSOLE_APP
+	if (code) {
 		show_console();
 
 		puts(_("Press any key to continue..."));
 		_getch();
 	}
+#endif
 
 	if (code == 39)
 		code = 0;

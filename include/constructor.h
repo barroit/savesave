@@ -21,14 +21,12 @@
 
 CONSTRUCTOR(init_u8tstr_table);
 CONSTRUCTOR(setup_crt_report_hook);
-CONSTRUCTOR(setup_executable_dirname);
 USESTDIO CONSTRUCTOR(check_libzstd_compat);
 USESTDIO CONSTRUCTOR(check_os_version);
 
 #define CONSTRUCTOR_LIST_INIT { \
 	init_u8tstr_table, \
 	setup_crt_report_hook, \
-	setup_executable_dirname, \
 }
 
 #define CONSTRUCTOR_USESTDIO_LIST_INIT { \

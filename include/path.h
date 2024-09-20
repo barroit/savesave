@@ -17,9 +17,8 @@ static inline int is_dir_indicator(const char *name)
 
 const char *get_home_dirname(void);
 
-/*
- * return the directory name of executable path
- */
 const char *get_executable_dirname(void);
+
+const char *get_tmp_dirname(void);
 
 #endif /* PATH_H */

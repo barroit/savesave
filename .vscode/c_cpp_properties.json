@@ -14,7 +14,6 @@
 			"compilerPath": "${env:HOME}/.local/bin/gcc",
 			"forcedInclude": [
 				"${workspaceFolder}/include/brtcomcent.h",
-				"${workspaceFolder}/include/generated/apphelp.h",
 				"${workspaceFolder}/include/generated/appinfo.h",
 				"${workspaceFolder}/include/generated/autoconf.h"
 			]
@@ -34,7 +33,6 @@
 			],
 			"forcedInclude": [
 				"${workspaceFolder}/include/brtcomcent.h",
-				"${workspaceFolder}/include/generated/apphelp.h",
 				"${workspaceFolder}/include/generated/appinfo.h",
 				"${workspaceFolder}/include/generated/autoconf.h"
 			],

@@ -8,19 +8,6 @@
 #include "path.h"
 #include "debug.h"
 #include "alloc.h"
-#include "constructor.h"
-
-static char *executable_dirname;
-
-CONSTRUCTOR(setup_executable_dirname)
-{
-	char exe[PATH_MAX];
-	DWORD len = GetModuleFileName(NULL, exe, sizeof(exe));
-	BUG_ON(len == 0);
-
-	char *dir = dirname(exe);
-	executable_dirname = xstrdup(dir);
-}
 
 int is_absolute_path(const char *path)
 {
@@ -34,5 +21,24 @@ const char *get_home_dirname(void)
 
 const char *get_executable_dirname(void)
 {
-	return executable_dirname;
+	static char path[PATH_MAX + 1];
+	if (!*path) {
+		DWORD len = GetModuleFileName(NULL, path, sizeof(path));
+		BUG_ON(len == 0 || len == sizeof(path));
+	}
+
+	return path;
+}
+
+const char *get_tmp_dirname(void)
+{
+	static char path[PATH_MAX + 1];
+	if (!*path) {
+		/* THIS GODDAMN MOTHERFUCKING PIECE OF SHIT WINDOWS */
+		DWORD nr = GetTempPath(sizeof(path), path);
+		BUG_ON(!nr);
+		path[nr - 1] = 0;
+	}
+
+	return path;
 }
