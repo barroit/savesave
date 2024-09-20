@@ -9,6 +9,7 @@
 
 LONGRUNNING
 USEDOTSAV
+UNIQUEPROC
 int cmd_start(int argc, const char **argv)
 {
 	return 0;
