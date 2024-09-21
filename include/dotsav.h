@@ -24,13 +24,15 @@ struct savesave {
 	u8 stack;
 };
 
+#define for_each_sav(sav) for (; sav->name; sav++)
+
 char *get_dotsav_defpath(void);
 
 char *read_dotsav(const char *name);
 
-size_t parse_dotsav(char *savstr, struct savesave **sav);
+size_t dotsav_parse(char *savstr, struct savesave **sav);
 
-void print_dotsav(struct savesave *sav, size_t nl);
+void dotsav_print(struct savesave *sav);
 
 #ifdef _WIN32
 void format_dotsav(struct savesave *dotsav, size_t n);

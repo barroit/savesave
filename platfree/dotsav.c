@@ -16,14 +16,55 @@
 #include "fileiter.h"
 #include "mkdir.h"
 
+#pragma GCC diagnostic ignored "-Wswitch"
+
+enum savtype {
+	SAVENT_END,
+
+	SAVENT_ENTSEP,
+
+	SAVENT_STRING,
+	SAVENT_TIMESPAN,
+	SAVENT_UINT8,
+	SAVENT_FLAG,
+};
+
+struct savent {
+	enum savtype type;
+	const char *name;
+
+	unsigned offset;
+	int (*cb)(struct savesave *, void *);
+};
+
+#define SE_END() {		\
+	.type = SAVENT_ENTSEP,	\
+}
+
+#define SAVENTOF(t, n, m, c) {			\
+	.type   = t,				\
+	.name   = n,				\
+	.offset = offsetof(struct savesave, m),	\
+	.cb     = c,				\
+}
+
+#define SE_ENTSEP(n, m, c)   SAVENTOF(SAVENT_ENTSEP, n, m, c)
+#define SE_STRING(n, m, c)   SAVENTOF(SAVENT_STRING, n, m, c)
+#define SE_TIMESPAN(n, m, c) SAVENTOF(SAVENT_TIMESPAN, n, m, c)
+#define SE_UINT8(n, m, c)    SAVENTOF(SAVENT_UINT8, n, m, c)
+#define SE_FLAG(n, m, c)     SAVENTOF(SAVENT_FLAG, n, m, c)
+
 struct dotsav {
 	char *line;
-	char *stop;
 
-	struct savesave *sav;
-	size_t nl;
-	size_t cap;
+	struct savent *ent;
+
+	struct savesave *savarr;
+	size_t savnl;
+	size_t savcap;
 };
+
+#define for_each_savent(ent) for (; ent->type != SAVENT_END; ent++)
 
 char *read_dotsav(const char *name)
 {
@@ -62,68 +103,9 @@ char *read_dotsav(const char *name)
 	return NULL;
 }
 
-static char *skip_space(const char *str)
+static int interpret_save(struct savesave *sav, void *data)
 {
-	while (isspace(*str))
-		str++;
-	return (char *)str;
-}
-
-static int skip_prefix(const char *str, const char *prefix, char **ret)
-{
-	do {
-		if (!*prefix) {
-			*ret = (char *)str;
-			return 0;
-		}
-	} while (*str++ == *prefix++);
-
-	return 1;
-}
-
-static int check_unique_savconf(const struct savesave *sav, size_t nr)
-{
-	size_t i;
-	const char *name = sav[nr - 1].name;
-
-	for_each_idx(i, nr - 1) {
-		if (strcmp(sav[i].name, name))
-			continue;
-
-		return error("name `%s' has collisions at indexes %zu and %zu",
-			     name, i, nr - 1);
-	}
-
-	return 0;
-}
-
-static int create_new_entry(const char *name,
-			    struct savesave **sav, size_t *nr, size_t *cap)
-{
-	if (!*name)
-		return error(_("empty sav name is not allowed"));
-	else if (strchr(name, ' ') != NULL)
-		return error(_("space in sav name is not allowed"));
-
-	CAP_ALLOC(sav, *nr + 1, cap);
-
-	struct savesave *c = &(*sav)[(*nr)++];
-	memset(c, 0, sizeof(*c));
-
-	c->name = xstrdup(name);
-	c->use_snapshot = -1;
-	c->use_compress = -1;
-	return 0;
-}
-
-static inline int is_entry(const char *line, const char *prefix, char **ret)
-{
-	return skip_prefix(line, prefix, ret) == 0 && isspace(**ret);
-}
-
-static int parse_save(void *__save, struct savesave *sav)
-{
-	const char *save = *(const char **)__save;
+	const char *save = *(const char **)data;
 	int err;
 	struct stat st;
 
@@ -147,145 +129,131 @@ static int parse_save(void *__save, struct savesave *sav)
 	return 0;
 }
 
-static int check_stack(void *__stack, struct savesave *sav)
+static int check_stack(struct savesave *sav, void *data)
 {
-	u8 stack = *(u8 *)__stack;
+	u8 stack = *(u8 *)data;
 	if (stack != 0)
 		return 0;
 
 	return error(_("stack cannot be 0"));
 }
 
-static int check_period(void *__period, struct savesave *sav)
+static int check_period(struct savesave *sav, void *data)
 {
-	u32 period = *(u32 *)__period;
+	u32 period = *(u32 *)data;
 	if (period != 0)
 		return 0;
 
 	return error(_("period cannot be 0"));
 }
 
-enum entval {
-	STRING,
-	TIMESPAN,
-	U8,
-	FLAG,
-};
-
-typedef int (*entry_callback)(void *, struct savesave *);
-
-struct confent {
-	const char *name;
-	intptr_t val;
-	entry_callback cb;
-	enum entval type;
-};
-
-#define SETENT(e, n, p, c, t)		\
-do {					\
-	(e)->name = (n);		\
-	(e)->val  = (intptr_t)(p);	\
-	(e)->cb   = (c);		\
-	(e)->type = (t);		\
-} while (0)
-
-static int assign_entry(const char *line, char **rest,
-			const struct savesave *sav, struct confent *ent)
+static int check_unique_savent(struct dotsav *ctx, const char *val)
 {
-	if (is_entry(line, "save", rest))
-		SETENT(ent, "save", &sav->save_prefix, parse_save, STRING);
-	else if (is_entry(line, "backup", rest))
-		SETENT(ent, "backup", &sav->backup_prefix, NULL, STRING);
-	else if (is_entry(line, "period", rest))
-		SETENT(ent, "period", &sav->period, check_period, TIMESPAN);
-	else if (is_entry(line, "stack", rest))
-		SETENT(ent, "stack", &sav->stack, check_stack, U8);
-	else if (is_entry(line, "snapshot", rest))
-		SETENT(ent, "snapshot", &sav->use_snapshot, NULL, FLAG);
-	else if (is_entry(line, "zip", rest))
-		SETENT(ent, "zip", &sav->use_compress, NULL, FLAG);
-	else
-		return 1;
+	size_t i;
+	for_each_idx(i, ctx->savnl) {
+		if (strcmp(ctx->savarr[i].name, val))
+			continue;
 
+		return error(_("name `%s' has collisions at indexes %zu and %zu"),
+			     val, i, ctx->savnl);
+	}
 	return 0;
 }
 
-static int parse_entry_value(const char *rest, struct savesave *sav,
-			     const struct confent *entry)
+static void append_savesave(struct dotsav *ctx)
 {
-	rest = skip_space(rest);
-	if (!*rest)
-		return error(_("value is missing"));
+	CAP_ALLOC(&ctx->savarr, ctx->savnl + 1, &ctx->savcap);
 
-	int res = 0;
-	switch (entry->type) {
-	case STRING:
-		*(char **)entry->val = xstrdup(rest);
+	memset(&ctx->savarr[ctx->savnl++], 0, sizeof(*ctx->savarr));
+}
+
+static int apply_savent(struct savent *ent,
+			struct savesave *sav, const char *val)
+{
+	int ret = 0;
+	intptr_t addr = (intptr_t)sav + ent->offset;
+
+	/*
+	 * damn, I made this shit too flexible
+	 */
+	switch (ent->type) {
+	case SAVENT_ENTSEP:
+		if (strnxtws(val))
+			goto err_inv_name;
+	case SAVENT_STRING:
+		char *cp = xstrdup(val);
+		memcpy((void *)addr, &cp, sizeof(cp));
 		break;
-	case TIMESPAN:
-		res = str2period(rest, (u32 *)entry->val);
+	case SAVENT_TIMESPAN:
+		ret = str2timespan(val, (u32 *)addr);
 		break;
-	case U8:
-		res = str2u8(rest, (u8 *)entry->val);
+	case SAVENT_UINT8:
+		ret = str2u8(val, (u8 *)addr);
 		break;
-	case FLAG:
-		res = str2bool(rest, (int *)entry->val);
+	case SAVENT_FLAG:
+		ret = str2bool(val, (int *)addr);
+		break;
 	}
 
-	if (res == 0 && entry->cb)
-		res = entry->cb((void *)entry->val, sav);
+	if (!ret && ent->cb)
+		ret = ent->cb(sav, (void *)addr);
+	return ret;
 
-	return res;
+err_inv_name:
+	return error(_("whitespace is not allowed in savent name"));
 }
 
-static int parse_entry_line(const char *line, struct savesave *sav)
+static int parse_line(struct dotsav *ctx)
 {
-	int err;
-	char *rest;
-	struct confent entry;
-
-	err = assign_entry(line, &rest, sav, &entry);
-	if (err)
-		return error(_("unrecognized sav key"));
-
-	return parse_entry_value(rest, sav, &entry);
-}
-
-static int parse_savconf_line(struct dotsav *ctx)
-{
-	char *line = ctx->line;
-	char *stop = ctx->stop;
-
-	*stop = 0;
+	const char *line = ctx->line;
 	if (*line == 0)
 		return 0;
 
-	char *str = skip_space(line);
-	if (*str == '#' || *str == 0)
+	line = strskipws(line);
+	if (*line == '#' || *line == 0)
 		return 0;
 
-	if (skip_prefix(line, "config ", &str) == 0) {
-		if (ctx->nl && check_unique_savconf(ctx->sav, ctx->nl) != 0)
-			return 1;
-		return create_new_entry(str, &ctx->sav, &ctx->nl, &ctx->cap);
-	} else if (skip_prefix(line, "\t", &str) == 0 && isalpha(*str)) {
-		return parse_entry_line(str, &ctx->sav[ctx->nl - 1]);
-	} else {
-		return error(_("encountered an unknown line"));
+	struct savent *ent = ctx->ent;
+	for_each_savent(ent) {
+		if (!ent->name)
+			continue;
+
+		if (strskip(line, ent->name, &line))
+			continue;
+
+		char *val = strskipws(line);
+		if (val == line)
+			return error(_("unrecognized sav entry"));
+
+		val = strtrimend(val);
+		if (!*val)
+			return error(_("value is empty"));
+
+		if (ent->type == SAVENT_ENTSEP) {
+			int err = check_unique_savent(ctx, val);
+			if (err)
+				return err;
+
+			append_savesave(ctx);
+		}
+
+		return apply_savent(ent, &ctx->savarr[ctx->savnl - 1], val);
 	}
+
+	return error(_("encountered an unknown line"));
 }
 
-static void validate_savconf(const struct savesave *c)
+static void check_valid_savent(struct savesave *sav)
 {
 	struct strbuf sb = STRBUF_INIT;
 
-	if (!c->save_prefix)
+	if (!sav->save_prefix)
 		strbuf_concat(&sb, "\tsave\n");
-	if (!c->backup_prefix)
+	if (!sav->backup_prefix)
 		strbuf_concat(&sb, "\tbackup\n");
-	if (!c->period)
+	if (!sav->period)
 		strbuf_concat(&sb, "\tperiod\n");
-	if (!c->stack)
+	if (!sav->stack)
 		strbuf_concat(&sb, "\tstack\n");
 
 	if (!sb.cap)
@@ -293,115 +261,121 @@ static void validate_savconf(const struct savesave *c)
 
 	size_t lines = strbuf_cntchr(&sb, '\n');
 	die(lines > 1 ?
-	    _("sav `%s' missing the following fields\n\n%s") :
-	    _("sav `%s' missing the following field\n\n%s"),
-	    c->name, sb.str);
+	    _("savent `%s' missing the following fields\n\n%s") :
+	    _("savent `%s' missing the following field\n\n%s"),
+	    sav->name, sb.str);
 }
 
-static void update_backup_prefix(struct savesave *c)
+static void update_backup_prefix(struct savesave *sav)
 {
 	struct strbuf sb = STRBUF_INIT;
-	if (c->use_compress)
-		strbuf_printf(&sb, "%s/%s.%s.", c->backup_prefix,
-			      c->name, CONFIG_ARCHIVE_EXTENTION);
-	else
-		strbuf_printf(&sb, "%s/%s.", c->backup_prefix, c->name);
 
-	free(c->backup_prefix);
-	c->backup_prefix = sb.str;
+	strbuf_concat_path(&sb, sav->backup_prefix, sav->name);
+	if (sav->use_compress)
+		strbuf_printf(&sb, ".%s.", CONFIG_ARCHIVE_EXTENTION);
+	else
+		strbuf_concat(&sb, ".");
+
+	free(sav->backup_prefix);
+	sav->backup_prefix = sb.str;
 }
 
-static void post_parse_savconf(struct savesave *sav, size_t nl)
+static void finalize_parsing(struct savesave *sav)
 {
-	size_t i;
-	struct savesave *c;
-	for_each_idx(i, nl) {
-		c = &sav[i];
-		validate_savconf(c);
+	for_each_sav(sav) {
+		check_valid_savent(sav);
 
-		if (c->use_compress == -1 &&
-		    c->is_dir_save &&
-		    c->save_size > CONFIG_COMPRESSING_THRESHOLD)
-			c->use_compress = 1;
+		if (sav->use_compress == -1 &&
+		    sav->is_dir_save &&
+		    sav->save_size > CONFIG_COMPRESSING_THRESHOLD)
+			sav->use_compress = 1;
 
-		if (c->use_snapshot == -1 &&
-		    c->save_size > CONFIG_SNAPSHOT_THRESHOLD)
-			c->use_snapshot = 1;
+		if (sav->use_snapshot == -1 &&
+		    sav->save_size > CONFIG_SNAPSHOT_THRESHOLD)
+			sav->use_snapshot = 1;
 
-		update_backup_prefix(c);
+		update_backup_prefix(sav);
 	}
 }
 
-static void do_parse_savconf(struct dotsav *ctx)
+static void do_parse(struct dotsav *ctx)
 {
 	int err;
+	char *next;
+	unsigned cnt = 0;
 
-	size_t cnt = 0;
-	int is_final = 0;
 	do {
 		cnt++;
-		ctx->stop = strchrnul(ctx->line, '\n');
-		if (!*ctx->stop)
-			is_final = 1;
+		next = strchrnul(ctx->line, '\n');
+		if (likely(*next))
+			*next = 0;
+		else
+			next = NULL;
 
-		err = parse_savconf_line(ctx);
+		err = parse_line(ctx);
 		if (err)
 			die(_("failed to parse dotsav\n"
-			    "%7zu:%s"), cnt, ctx->line);
+			    "%7u:%s"), cnt, ctx->line);
 
-		if (is_final)
+		if (unlikely(!next))
 			break;
-
-		ctx->line = ctx->stop + 1;
+		ctx->line = next + 1;
 	} while (39);
 
-	post_parse_savconf(ctx->sav, ctx->nl);
+	finalize_parsing(ctx->savarr);
 
-	CAP_ALLOC(&ctx->sav, ctx->nl + 1, &ctx->cap);
-	memset(&ctx->sav[ctx->nl], 0, sizeof(*ctx->sav));
+	CAP_ALLOC(&ctx->savarr, ctx->savnl + 1, &ctx->savcap);
+	memset(&ctx->savarr[ctx->savnl], 0, sizeof(*ctx->savarr));
 }
 
-size_t parse_dotsav(char *savstr, struct savesave **sav)
+size_t dotsav_parse(char *savstr, struct savesave **sav)
 {
-	struct dotsav ctx = {
-		.line  = savstr,
+	struct savent ent[] = {
+		SE_ENTSEP("config", name, NULL),
+
+		SE_STRING("save", save_prefix, interpret_save),
+		SE_STRING("backup", backup_prefix, NULL),
+
+		SE_FLAG("snapshot", use_snapshot, NULL),
+		SE_FLAG("compress", use_compress, NULL),
+
+		SE_TIMESPAN("period", period, check_period),
+		SE_UINT8("stack", stack, check_stack),
+
+		SE_END(),
 	};
 
-	do_parse_savconf(&ctx);
+	struct dotsav ctx = {
+		.line = savstr,
+		.ent  = ent,
+	};
 
-	*sav = ctx.sav;
-	return ctx.nl;
+	do_parse(&ctx);
+
+	*sav = ctx.savarr;
+	return ctx.savnl;
 }
 
-void print_dotsav(struct savesave *sav, size_t nl)
+void dotsav_print(struct savesave *sav)
 {
-	size_t i;
-	const struct savesave *c;
+	for_each_sav(sav) {
+		ssize_t size = sav->save_size / 1000 / 1000;
 
-	/*
-	 * for consistency, we can't use off_t, because there is no length
-	 * modifier dedicated to this type
-	 */
-	ssize_t size;
-	for_each_idx(i, nl) {
-		c = &sav[i];
-		size = c->save_size / 1000 / 1000;
-
-		printf("%s\n", c->name);
-		printf("	save	 %s\n", c->save_prefix);
-		printf("	backup	 %s\n", c->backup_prefix);
+		printf("%s\n", sav->name);
+		printf("	save	 %s\n", sav->save_prefix);
+		printf("	backup	 %s\n", sav->backup_prefix);
 		putchar('\n');
 
-		printf("	size	 %" PRIdMAX "M\n", size);
-		printf("	dirsave	 %d\n", c->is_dir_save);
+		printf("	size	 %zdM\n", size);
+		printf("	dirsave	 %d\n", sav->is_dir_save);
 		putchar('\n');
 
-		printf("	compress %d\n", c->use_compress);
-		printf("	snapshot %d\n", c->use_snapshot);
+		printf("	compress %d\n", sav->use_compress);
+		printf("	snapshot %d\n", sav->use_snapshot);
 		putchar('\n');
 
-		printf("	period	 %" PRIu32 "\n", c->period);
-		printf("	stack	 %" PRIu8 "\n", c->stack);
+		printf("	period	 %" PRIu32 "\n", sav->period);
+		printf("	stack	 %" PRIu8 "\n", sav->stack);
 		putchar('\n');
 	}
 }

@@ -1,4 +1,4 @@
                                  ISSUE LIST
 
 ----
-unique configuration name test false negative
+fileiter does not work on windows symlink

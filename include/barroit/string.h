@@ -17,16 +17,33 @@ void strrepl(char *str, int c, int r);
  * straftr - Get the position of next character after skipping ‘pref’ at the
  * 	     beginning of ‘str’.
  *
- * return  - the pointer to the next character. Otherwise, NULL is returned.
+ * return  - The pointer to the next character. Otherwise, NULL is returned.
  */
 char *straftr(const char *str, const char *pref);
 
 /**
- * strskip - Advance the pointer ‘str’ past the prefix ‘pref’
+ * strskip - Advance the pointer 'str' past the 'pref'
  *
  * return  - 0 on success, -1 if 'pref' is not a prefix of 'str'
  */
 int strskip(const char *str, const char *pref, const char **rest);
+
+/**
+ * strskipws - Skip leading whitespaces
+ */
+char *strskipws(const char *str);
+
+/**
+ * strtrimend - Remove tailing whitespaces
+ */
+char *strtrimend(char *str);
+
+/**
+ * strnxtws - Locate whitespace character
+ *
+ * return - pointer to the whitespace character, NULL if not found
+ */
+char *strnxtws(const char *str);
 
 int str2ullong(const char *str, size_t len, ullong *value, ullong max);
 
@@ -55,7 +72,7 @@ static inline int str2u8(const char *str, u8 *value)
 #endif
 #define str2uint str2u32
 
-int str2period(const char *str, u32 *val);
+int str2timespan(const char *str, u32 *val);
 
 int str2bool(const char *str, int *val);
 

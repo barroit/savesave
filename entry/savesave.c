@@ -13,7 +13,7 @@
 #include "proc.h"
 
 static const char *dotsav_path;
-static struct savesave *dotsav;
+static struct savesave *savarr;
 
 int is_longrunning;
 
@@ -29,14 +29,14 @@ static void prepare_dotsav(void)
 		die(_("unable to retrieve content for dotsav `%s'"),
 		    dotsav_path);
 
-	size_t nl = parse_dotsav(savstr, &dotsav);
+	size_t savnl = dotsav_parse(savstr, &savarr);
 	free(savstr);
 
-	if (!nl)
+	if (!savnl)
 		die(_("no configuration found in dotsav `%s'"), dotsav_path);
 
 	DEBUG_RUN()
-		print_dotsav(dotsav, nl);
+		dotsav_print(savarr);
 }
 
 int cmd_main(int argc, const char **argv)
@@ -88,6 +88,6 @@ int cmd_main(int argc, const char **argv)
 
 struct savesave *get_dotsav(void)
 {
-	BUG_ON(!dotsav);
-	return dotsav;
+	BUG_ON(!savarr);
+	return savarr;
 }

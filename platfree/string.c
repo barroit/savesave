@@ -35,6 +35,31 @@ int strskip(const char *str, const char *pref, const char **rest)
 	return 0;
 }
 
+char *strskipws(const char *str)
+{
+	while (isspace(*str))
+		str++;
+	return (char *)str;
+}
+
+char *strtrimend(char *str)
+{	
+	size_t len = strlen(str);
+	char *tail = &str[len];
+
+	while (tail != str && isspace(*(tail - 1)))
+		tail--;
+	*tail = 0;
+	return (char *)str;
+}
+
+char *strnxtws(const char *str)
+{
+	while (*str && !isspace(*str))
+		str++;
+	return *str == 0 ? NULL : (char *)str;
+}
+
 int str2llong(const char *str, size_t len, llong *value, llong min, llong max)
 {
 	BUG_ON(!*str);
@@ -114,7 +139,7 @@ static int char2mult(char c, u16 *mult)
 	return 1;
 }
 
-int str2period(const char *str, u32 *value)
+int str2timespan(const char *str, u32 *value)
 {
 	int err;
 
