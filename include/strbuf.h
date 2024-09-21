@@ -145,6 +145,12 @@ static inline char *strbuf_strrsep(struct strbuf *sb)
 }
 
 /**
+ * strbuf_concat_path - concat 'prefix/name' to strbuf
+ */
+size_t strbuf_concat_path(struct strbuf *sb,
+			  const char *prefix, const char *name);
+
+/**
  * strbuf_mkfdirp - make file directory as well as its parent directories,
  * 		    starting from initial string
  */

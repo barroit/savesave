@@ -187,3 +187,23 @@ void strbuf_to_dirname(struct strbuf *sb)
 
 	strbuf_trunc(sb, sb->len - dirlen);
 }
+
+size_t strbuf_concat_path(struct strbuf *sb,
+			  const char *prefix, const char *name)
+{
+	size_t plen = strlen(prefix);
+	size_t nlen = strlen(name);
+	size_t len = plen + nlen + 1;
+
+	strbuf_growlen(sb, len);
+	memcpy(&sb->str[sb->len], prefix, plen);
+	sb->len += plen;
+
+	sb->str[sb->len] = '/';
+	sb->len += 1;
+
+	memcpy(&sb->str[sb->len], name, nlen);
+	sb->len += nlen;
+
+	return len;
+}

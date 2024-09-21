@@ -2,3 +2,7 @@
 
 ----
 unique configuration name test false negative
+
+----
+strbuf_*2 functions
+	incorrect use of extalloc (exclude null terminator)?
