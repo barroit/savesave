@@ -202,7 +202,7 @@ size_t strbuf_concat_path(struct strbuf *sb,
 	sb->str[sb->len] = '/';
 	sb->len += 1;
 
-	memcpy(&sb->str[sb->len], name, nlen);
+	memcpy(&sb->str[sb->len], name, nlen + 1);
 	sb->len += nlen;
 
 	return len;

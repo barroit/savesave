@@ -102,8 +102,9 @@ static int find_next_room(struct strbuf *next, u8 stack)
 static char *get_next_backup_name(const struct savesave *sav)
 {
 	int ret;
-	struct strbuf src = strbuf_from2(sav->backup_prefix, 0, STRU8_MAX);
-	struct strbuf dest = strbuf_from2(sav->backup_prefix, 0, STRU8_MAX);
+	struct strbuf src = strbuf_from2(sav->backup_prefix, 0, STRU8_MAX - 1);
+	struct strbuf dest = strbuf_from2(sav->backup_prefix, 0,
+					  STRU8_MAX - 1);
 
 	ret = sort_backup(&src, &dest, sav->stack, NULL);
 	if (ret == -1)
@@ -152,7 +153,7 @@ static char *get_next_backup_name(const struct savesave *sav)
 static char *tmpdir_of_backup(const char *backup)
 {
 	struct strbuf sb = strbuf_from2(backup, 0,
-					sizeof(CONFIG_TMPFILE_EXTENTION));
+					sizeof(CONFIG_TMPFILE_EXTENTION) - 1);
 
 	strbuf_concat(&sb, CONFIG_TMPFILE_EXTENTION);
 	return sb.str;

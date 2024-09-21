@@ -29,6 +29,8 @@ void strbuf_init(struct strbuf *sb, flag_t flags);
 /**
  * strbuf_from - initialize strbuf with initial string base, as well as a
  * 		 pre-allocate area
+ *
+ * extalloc - the extra bytes to be allocated, excluding null-terminating byte
  */
 struct strbuf strbuf_from2(const char *base, flag_t flags, size_t extalloc);
 
@@ -83,6 +85,8 @@ size_t strbuf_move(struct strbuf *sb, const char *str);
 
 /**
  * strbuf_concat2 - concat str to strbuf, with pre-allocate area
+ *
+ * extalloc - the extra bytes to be allocated, excluding null-terminating byte
  */
 size_t strbuf_concat2(struct strbuf *sb, const char *str, size_t extalloc);
 

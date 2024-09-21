@@ -2,6 +2,3 @@
 
 ----
 cleanup dotsav
-
-----
-strbuf_concat_path() ?
