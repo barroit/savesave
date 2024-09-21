@@ -46,7 +46,27 @@ const char *get_procid_filename(void)
 		const char *prefix = get_procid_dirname();
 		struct strbuf sb = STRBUF_INIT;
 
-		strbuf_printf(&sb, "%s/%s", prefix, PROCID_NAME);
+		strbuf_concat_path(&sb, prefix, PROCID_NAME);
+		path = sb.str;
+	}
+
+	return path;
+}
+
+const char *get_locale_dirname(void)
+{
+	static const char *path = NULL;
+
+	if (!path) {
+		const char *dir = get_executable_dirname();
+		struct strbuf sb = STRBUF_INIT;
+
+		strbuf_concat_path(&sb, dir, "locale");
+
+		/*
+		 * gettext expect separator is shash
+		 */
+		strbuf_normalize_path(&sb);
 		path = sb.str;
 	}
 

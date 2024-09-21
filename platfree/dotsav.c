@@ -415,7 +415,7 @@ char *get_dotsav_defpath(void)
 		strbuf_concat(&sb, path);
 	} else {
 		const char *home = get_home_dirname();
-		strbuf_printf(&sb, "%s/%s", home, ".savesave");
+		strbuf_concat_path(&sb, home, ".savesave");
 	}
 
 	if (access(sb.str, R_OK) == 0) {

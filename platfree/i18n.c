@@ -14,21 +14,12 @@
 
 #define DOMAIN SAVESAVE_NAME
 
-static char *get_locale_dir(void)
+static void setup_gettext(void)
 {
-	const char *dir = get_executable_dirname();
-	struct strbuf sb = strbuf_from2(dir, 0, sizeof("/locale"));
+	const char *name = get_locale_dirname();
 
-	strbuf_concat(&sb, "/locale");
-	strbuf_normalize_path(&sb);
-
-	return sb.str;
-}
-
-static void setup_gettext(const char *dir)
-{
 	textdomain(DOMAIN);
-	bindtextdomain(DOMAIN, dir);
+	bindtextdomain(DOMAIN, name);
 	bind_textdomain_codeset(DOMAIN, "UTF-8");
 }
 
@@ -69,11 +60,9 @@ static void setup_locale(const char *locale)
 
 void setup_message_translation(void)
 {
-	char *dir = get_locale_dir();
 	char *locale = get_preferred_locale();
 
-	setup_gettext(dir);
-	free(dir);
+	setup_gettext();
 
 	/*
 	 * gettext-runtime/intl/dcigettext.c:guess_category_value

@@ -56,7 +56,7 @@ void check_unique_process(void)
 		if (piddir[i] == NULL)
 			continue;
 
-		strbuf_printf(&path, "%s/%s", piddir[i], PROCID_NAME);
+		strbuf_concat_path(&path, piddir[i], PROCID_NAME);
 		err = readpid(path.str, &pid);
 		if (err)
 			goto next;

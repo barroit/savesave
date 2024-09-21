@@ -31,4 +31,6 @@ const char *get_tmp_dirname(void);
 
 const char *get_procid_filename(void);
 
+const char *get_locale_dirname(void);
+
 #endif /* PATH_H */
