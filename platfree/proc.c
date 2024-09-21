@@ -9,12 +9,11 @@
 #include "strbuf.h"
 #include "robio.h"
 #include "debug.h"
-#include "text2num.h"
 #include "path.h"
 #include "list.h"
 #include "termas.h"
 
-static int readpid(const char *name, ulong *pid)
+static int readpid(const char *name, pid_t *pid)
 {
 	int fd;
 	char pidstr[STRPID_MAX];
@@ -30,10 +29,12 @@ static int readpid(const char *name, ulong *pid)
 		goto err_not_pid;
 
 	pidstr[nr] = 0;
-	int ret = str2ulong(pidstr, nr, max_uint_valueof(*pid), pid);
+	llong __pid;
+	int ret = str2llong(pidstr, -1, &__pid, 0, max_int_valueof(*pid));
 	if (ret)
 		goto err_not_pid;
 
+	*pid = __pid;
 	close(fd);
 	return ret;
 
@@ -45,10 +46,10 @@ err_not_pid:
 
 void check_unique_process(void)
 {
-	ulong pid;
+	pid_t pid;
 	int err;
 	struct strbuf path = STRBUF_INIT;
-	const char *piddir[3] = PROCID_DIRLIST_INIT;
+	const char *piddir[] = PROCID_DIRLIST_INIT;
 	size_t i;
 
 	for_each_idx(i, sizeof_array(piddir)) {
@@ -72,7 +73,7 @@ next:
 	return;
 
 err_not_unique:
-	die(_("there is already a running savesave (PID %lu)"), pid);
+	die(_("there is already a running savesave (PID %d)"), pid);
 }
 
 void push_process_id(void)

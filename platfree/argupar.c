@@ -8,7 +8,6 @@
 #include "argupar.h"
 #include "debug.h"
 #include "termas.h"
-#include "text2num.h"
 
 #define OPTARG_APPLICATOR(type)					\
 	int apply_##type##_optarg(struct arguopt *opt,		\

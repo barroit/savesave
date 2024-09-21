@@ -77,12 +77,13 @@
 
 #include "poll.h"
 
-#include "barroit/ctype.h"
+#include "barroit/types.h"
 #include "barroit/limits.h"
+#include "barroit/ctype.h"
 #include "barroit/size.h"
+
 #include "barroit/string.h"
 #include "barroit/time.h"
-#include "barroit/types.h"
 #include "barroit/zstd.h"
 
 #ifdef HAVE_INTL
