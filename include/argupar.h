@@ -63,8 +63,7 @@ typedef typeof(((struct arguopt *)0)->subcmd) argupar_subcommand_t;
 
 #define AP_STOPAT_NONOPT (1 << 0) /* stop at non-option */
 #define AP_COMMAND_MODE  (1 << 1) /* parse in command mode (oneshot) */
-#define AP_EXPECT_ARGS   (1 << 2) /* expect some args passed to parser */
-#define AP_NO_ENDOFOPT   (1 << 3) /* disallow end-of-option */
+#define AP_NO_ENDOFOPT   (1 << 2) /* disallow end-of-option */
 
 struct argupar {
 	int argc;

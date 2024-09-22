@@ -342,9 +342,6 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 	ctx->usage = usage;
 	ctx->flag = flag;
 
-	if ((ctx->flag & AP_EXPECT_ARGS) && !ctx->argc)
-		exit_with_short_help(ctx);
-
 	DEBUG_RUN()
 		debug_check_argupar(ctx);
 

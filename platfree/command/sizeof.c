@@ -23,8 +23,9 @@ int cmd_sizeof(int argc, const char **argv)
 	argupar_init(&ap, argc, argv);
 
 	if (!argc)
-		error(_("command 'sizeof' requires pathspec"));
-	argc = argupar_parse(&ap, options, NULL, AP_EXPECT_ARGS);
+		die(_("command 'sizeof' requires pathspec"));
+
+	argc = argupar_parse(&ap, options, NULL, 0);
 
 	int i;
 	const char *unit_map[] = { "B", "KiB", "MiB", "GiB", "TiB" };

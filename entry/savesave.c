@@ -52,17 +52,15 @@ int cmd_main(int argc, const char **argv)
 	argv++;
 	argupar_init(&ap, argc, argv);
 	argc = argupar_parse(&ap, options, NULL,
-			     AP_STOPAT_NONOPT |
-			     AP_EXPECT_ARGS |
-			     AP_NO_ENDOFOPT);
+			     AP_STOPAT_NONOPT | AP_NO_ENDOFOPT);
 
 	argupar_subcommand_t runcmd;
 	struct arguopt commands[] = MAINCOMMAND_LIST_INIT(&runcmd);
 
 	if (!argc)
-		error(_("no command specified"));
-	argc = argupar_parse(&ap, commands, NULL,
-			     AP_COMMAND_MODE | AP_EXPECT_ARGS);
+		die(_("savesave requires a command"));
+
+	argc = argupar_parse(&ap, commands, NULL, AP_COMMAND_MODE);
 
 	struct arguopt *cmd = commands;
 	for_each_option(cmd) {
