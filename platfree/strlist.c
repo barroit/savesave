@@ -112,14 +112,6 @@ char **strlist_dump2(struct strlist *sl, int copy)
 	return arr;
 }
 
-void strlist_destory_dumped(char **arr)
-{
-	char **p = arr;
-	while (*p != NULL)
-		free(*p++);
-	free(arr);
-}
-
 void strlist_strsplt_every(struct strlist *sl, const char *str, size_t len)
 {
 	size_t tot = strlen(str);

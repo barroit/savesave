@@ -25,7 +25,7 @@ int cmd_version(int argc, const char **argv);
 
 #define MAINCOMMAND_LIST_INIT(v) { \
 	APOPT_SUBCOMMAND("help", (v), cmd_help, 0), \
-	APOPT_SUBCOMMAND("sizeof", (v), cmd_sizeof, CMD_USEDOTSAV), \
+	APOPT_SUBCOMMAND("sizeof", (v), cmd_sizeof, 0), \
 	APOPT_SUBCOMMAND("start", (v), cmd_start, CMD_LONGRUNNING | CMD_USEDOTSAV | CMD_UNIQUEPROC), \
 	APOPT_SUBCOMMAND("version", (v), cmd_version, 0), \
 	APOPT_END(), \

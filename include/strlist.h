@@ -51,8 +51,6 @@ static inline char **strlist_dump(struct strlist *sl)
 	return strlist_dump2(sl, 1);
 }
 
-void strlist_destory_dumped(char **arr);
-
 void strlist_strsplt_every(struct strlist *sl, const char *str, size_t len);
 
 /*

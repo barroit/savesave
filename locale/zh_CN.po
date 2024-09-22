@@ -69,9 +69,9 @@ msgstr  ""
 msgid   "your $HOME corrupted"
 msgstr  ""
 
-#: uni/proc.c:21
+#: uni/proc.c:21 win/proc.c:22
 #, c-format
-msgid   "failed to determine the existence of process `%lu'"
+msgid   "failed to determine existence of process `%d'"
 msgstr  ""
 
 #: win/atenter.c:16
@@ -102,17 +102,21 @@ msgstr  ""
 msgid   "failed to retrieve symbol for 0x<PRIxMAX>"
 msgstr  ""
 
-#: win/fileiter.c:70
+#: win/fileiter.c:60
+msgid   "a broken symlink?"
+msgstr  ""
+
+#: win/fileiter.c:74
 #, c-format
 msgid   "`%s' has unsupported st_mode `%u', skipped"
 msgstr  ""
 
-#: win/fileiter.c:94
+#: win/fileiter.c:100
 #, c-format
 msgid   "failed to find next file of file `%s'"
 msgstr  ""
 
-#: win/fileiter.c:101
+#: win/fileiter.c:107
 #, c-format
 msgid   "failed to find first file from pattern `%s'"
 msgstr  ""
@@ -155,32 +159,32 @@ msgstr  ""
 msgid   "failed to duplicate string"
 msgstr  ""
 
-#: platfree/argupar.c:137
+#: platfree/argupar.c:136
 #, c-format
 msgid   "failed to parse option `%s' with value `%s'"
 msgstr  ""
 
-#: platfree/argupar.c:171
+#: platfree/argupar.c:170
 #, c-format
 msgid   "short option `%c' requires a value"
 msgstr  ""
 
-#: platfree/argupar.c:264
+#: platfree/argupar.c:263
 #, c-format
 msgid   "unknown long option `%.*s'"
 msgstr  ""
 
-#: platfree/argupar.c:267
+#: platfree/argupar.c:266
 #, c-format
 msgid   "long option `%s%s' requires a value"
 msgstr  ""
 
-#: platfree/argupar.c:270
+#: platfree/argupar.c:269
 #, c-format
 msgid   "long option `%s%s' takes no value"
 msgstr  ""
 
-#: platfree/argupar.c:273
+#: platfree/argupar.c:272
 #, c-format
 msgid   "long option `%.*s' is ambiguous (could be --%s%s or --%s%s)"
 msgstr  ""
@@ -190,32 +194,32 @@ msgstr  ""
 msgid   "failed to rename file `%s' to `%s'"
 msgstr  ""
 
-#: platfree/backup.c:129
+#: platfree/backup.c:130
 #, c-format
 msgid   "unable to drop deprecated backup of configuration `%s'"
 msgstr  ""
 
-#: platfree/backup.c:134
+#: platfree/backup.c:135
 #, c-format
 msgid   "unable to sort backup `%s' of configuration `%s'"
 msgstr  ""
 
-#: platfree/backup.c:138
+#: platfree/backup.c:139
 #, c-format
 msgid   "unable to determine next backup file name of configuration `%s'"
 msgstr  ""
 
-#: platfree/backup.c:194
+#: platfree/backup.c:195
 #, c-format
 msgid   "failed to make directory `%s'"
 msgstr  ""
 
-#: platfree/backup.c:207
+#: platfree/backup.c:208
 #, c-format
 msgid   "failed to backup save `%s' to `%s'"
 msgstr  ""
 
-#: platfree/backup.c:226
+#: platfree/backup.c:227
 #, c-format
 msgid   "next backup name\n"
         "\t%s\n"
@@ -226,62 +230,63 @@ msgstr  ""
 msgid   "savesave requires a multithreading supported version of libzstd"
 msgstr  ""
 
-#: platfree/dotsav.c:105
-msgid   "empty sav name is not allowed"
-msgstr  ""
-
-#: platfree/dotsav.c:107
-msgid   "space in sav name is not allowed"
-msgstr  ""
-
-#: platfree/dotsav.c:132
+#: platfree/dotsav.c:113
 #, c-format
 msgid   "save path `%s' is not absolute"
 msgstr  ""
 
-#: platfree/dotsav.c:145
+#: platfree/dotsav.c:126
 #, c-format
 msgid   "unsupported save file `%s'"
 msgstr  ""
 
-#: platfree/dotsav.c:157
+#: platfree/dotsav.c:138
 msgid   "stack cannot be 0"
 msgstr  ""
 
-#: platfree/dotsav.c:166
+#: platfree/dotsav.c:147
 msgid   "period cannot be 0"
 msgstr  ""
 
-#: platfree/dotsav.c:219
-msgid   "value is missing"
+#: platfree/dotsav.c:157
+#, c-format
+msgid   "name `%s' has collisions at indexes %zu and %zu"
 msgstr  ""
 
-#: platfree/dotsav.c:250
-msgid   "unrecognized sav key"
+#: platfree/dotsav.c:203
+msgid   "whitespace is not allowed in savent name"
 msgstr  ""
 
-#: platfree/dotsav.c:275
+#: platfree/dotsav.c:226
+msgid   "unrecognized sav entry"
+msgstr  ""
+
+#: platfree/dotsav.c:230
+msgid   "value is empty"
+msgstr  ""
+
+#: platfree/dotsav.c:243
 msgid   "encountered an unknown line"
 msgstr  ""
 
-#: platfree/dotsav.c:297
+#: platfree/dotsav.c:264
 #, c-format
-msgid   "sav `%s' missing the following fields\n"
+msgid   "savent `%s' missing the following fields\n"
         "\n"
         "%s"
 msgstr  ""
 
-#: platfree/dotsav.c:298
+#: platfree/dotsav.c:265
 #, c-format
-msgid   "sav `%s' missing the following field\n"
+msgid   "savent `%s' missing the following field\n"
         "\n"
         "%s"
 msgstr  ""
 
-#: platfree/dotsav.c:350
+#: platfree/dotsav.c:317
 #, c-format
 msgid   "failed to parse dotsav\n"
-        "%7zu:%s"
+        "%7u:%s"
 msgstr  ""
 
 #: platfree/mkdir.c:88
@@ -295,9 +300,49 @@ msgid   "PID found in file `%s' is malformed; ensure savesave is completely "
         "terminated and manually remove this file."
 msgstr  ""
 
-#: platfree/proc.c:78
+#: platfree/proc.c:76
 #, c-format
-msgid   "there is already a running savesave (PID %lu)"
+msgid   "there is already a running savesave (PID %d)"
+msgstr  ""
+
+#: platfree/proc.c:100
+#, c-format
+msgid   "failed to init pid file `%s', unique process detection disabled"
+msgstr  ""
+
+#: platfree/proc.c:102
+msgid   "ensure only one savesave process runs at a time, behavior otherwise "
+        "is undefined"
+msgstr  ""
+
+#: platfree/string.c:87
+#, c-format
+msgid   "signed integer `%s' is too big (range [%lld, %lld])"
+msgstr  ""
+
+#: platfree/string.c:90
+#, c-format
+msgid   "invalid character found in signed value `%s'"
+msgstr  ""
+
+#: platfree/string.c:117
+#, c-format
+msgid   "unsigned integer `%s' is too big (up to %llu)"
+msgstr  ""
+
+#: platfree/string.c:120
+#, c-format
+msgid   "invalid character found in unsigned integer `%s'"
+msgstr  ""
+
+#: platfree/string.c:166
+#, c-format
+msgid   "unknown time unit specifier `%c'"
+msgstr  ""
+
+#: platfree/string.c:183
+#, c-format
+msgid   "unknown bool value `%s'"
 msgstr  ""
 
 #: platfree/termas.c:27
@@ -308,36 +353,6 @@ msgstr  ""
 #: platfree/termas.c:40
 #, c-format
 msgid   "fatal: unable to format message `%s'\n"
-msgstr  ""
-
-#: platfree/text2num.c:16
-#, c-format
-msgid   "unexpected leading char found in `%s'"
-msgstr  ""
-
-#: platfree/text2num.c:24
-#, c-format
-msgid   "cannot convert `%s' to unsigned value"
-msgstr  ""
-
-#: platfree/text2num.c:27
-#, c-format
-msgid   "invalid char found in unsigned value `%s'"
-msgstr  ""
-
-#: platfree/text2num.c:30
-#, c-format
-msgid   "unsigned value `%s' is too big (up to %lu)"
-msgstr  ""
-
-#: platfree/text2num.c:65
-#, c-format
-msgid   "unknown time unit specifier `%c'"
-msgstr  ""
-
-#: platfree/text2num.c:92
-#, c-format
-msgid   "unknown bool value `%s'"
 msgstr  ""
 
 #: entry/savesave.c:25

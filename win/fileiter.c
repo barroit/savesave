@@ -53,8 +53,12 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 
 	if (ctx->flag & FI_USE_STAT) {
 		int err = stat(absname, file.st);
-		if (err)
-			return warn_errno(ERRMAS_STAT_FILE(absname));
+		if (err) {
+			warn_errno(ERRMAS_STAT_FILE(absname));
+			if (errno != ENOENT)
+				return -1;
+			return warn(_("a broken symlink?"));
+		}
 	}
 
 	if (S_ISREG(file.st->st_mode))
@@ -86,8 +90,10 @@ int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx)
 	do {
 		strbuf_reset(ctx->sb);
 		ret = dispatch_file(ctx, &ent);
-		if (ret)
+		if (ret) {
+			SetLastError(ERROR_NO_MORE_FILES);
 			break;
+		}
 	} while (FindNextFile(dir, &ent));
 
 	if (GetLastError() != ERROR_NO_MORE_FILES)
