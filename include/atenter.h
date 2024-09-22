@@ -12,8 +12,8 @@
 #ifndef ATENTER_H
 #define ATENTER_H
 
-void setup_program(void);
+void do_setup(void);
 
-void post_setup_program(void);
+void do_delayed_setup(void);
 
 #endif /* ATENTER_H */

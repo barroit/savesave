@@ -85,7 +85,7 @@ void push_process_id(void)
 	int snr = snprintf(buf, sizeof(buf), "%d", pid);
 	BUG_ON(snr < 0);
 
-	int fd = creat(name, 0664);
+	int fd = flexcreat(name);
 	if (fd == -1)
 		goto err_init_pidfile;
 

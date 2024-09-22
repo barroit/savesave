@@ -322,10 +322,10 @@ static void do_parse(struct dotsav *ctx)
 		ctx->line = next + 1;
 	} while (39);
 
-	finalize_parsing(ctx->savarr);
-
 	CAP_ALLOC(&ctx->savarr, ctx->savnl + 1, &ctx->savcap);
 	memset(&ctx->savarr[ctx->savnl], 0, sizeof(*ctx->savarr));
+
+	finalize_parsing(ctx->savarr);
 }
 
 size_t dotsav_parse(char *savstr, struct savesave **sav)

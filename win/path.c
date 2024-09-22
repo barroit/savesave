@@ -36,7 +36,7 @@ const char *get_tmp_dirname(void)
 	static char path[PATH_MAX + 1];
 	if (!*path) {
 		/* THIS GODDAMN MOTHERFUCKING PIECE OF SHIT WINDOWS */
-		DWORD nr = GetTempPath2(sizeof(path), path);
+		DWORD nr = GetTempPath(sizeof(path), path);
 		if (!nr)
 			goto err_get_path;
 		path[nr - 1] = 0;

@@ -30,7 +30,7 @@ int PLATSPECOF(backup_copy_regfile)(struct fileiter_file *src,
 				    struct strbuf *dest)
 {
 	int ret;
-	int destfd = creat(dest->str, 0664);
+	int destfd = flexcreat(dest->str);
 
 	if (destfd == -1) {
 		if (errno != ENOENT)
@@ -40,7 +40,7 @@ int PLATSPECOF(backup_copy_regfile)(struct fileiter_file *src,
 		if (ret)
 			goto err_make_dir;
 
-		destfd = creat(dest->str, 0664);
+		destfd = flexcreat(dest->str);
 		if (destfd == -1)
 			goto err_create_file;
 	}

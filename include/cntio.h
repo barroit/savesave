@@ -13,6 +13,15 @@
 int cntcreat(const char *file, mode_t mode);
 #define creat cntcreat
 
+#ifdef _WIN32
+/*
+ * good job, microsoft filesystem permission strategy
+ */
+# define flexcreat(file) creat(file, S_IREAD | S_IWRITE)
+#else
+# define flexcreat(file) creat(file, 0664)
+#endif
+
 int cntopen2(const char *file, int oflag);
 int cntopen3(const char *file, int oflag, mode_t mode);
 #define open(...) FLEXCALL_FUNCTION3(cntopen, __VA_ARGS__)

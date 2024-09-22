@@ -52,7 +52,7 @@ if ($command -eq 'distclean') {
 	exit 0
 } elseif ($command -eq 'mcheck') {
 	drmemory -check_uninit_blocklist "KERNELBASE.dll,ntdll.dll" `
-		 -suppress .suppress .\build\savesave.exe
+		 -suppress .suppress .\build\savesave.exe $args
 	exit 0
 }
 

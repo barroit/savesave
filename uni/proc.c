@@ -8,7 +8,7 @@
 #include "proc.h"
 #include "termas.h"
 
-int PLATSPECOF(is_process_alive)(ulong pid)
+int PLATSPECOF(is_process_alive)(pid_t pid)
 {
 	int err;
 
@@ -18,5 +18,5 @@ int PLATSPECOF(is_process_alive)(ulong pid)
 	else if (errno == ESRCH)
 		return 0;
 
-	die_errno(_("failed to determine existence of process `%lu'"), pid);
+	die_errno(_("failed to determine existence of process `%d'"), pid);
 }

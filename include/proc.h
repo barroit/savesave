@@ -10,7 +10,7 @@
 
 void check_unique_process(void);
 
-int PLATSPECOF(is_process_alive)(ulong pid);
+int PLATSPECOF(is_process_alive)(pid_t pid);
 
 void push_process_id(void);
 

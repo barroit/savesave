@@ -85,16 +85,9 @@ endmenu # "Compiling"
 
 menu "Feature"
 
-menu "Windows"
-	depends on $(BUILD) = "windows"
-
-config DISABLE_CONSOLE_OUTPUT
-	bool "disable console output"
-
 config IS_CONSOLE_APP
 	bool "build console version of savesave"
-
-endmenu # "Windows"
+	depends on $(BUILD) = "windows"
 
 config ARCHIVE_EXTENTION
 	string "file extension for archive file (no dot)"

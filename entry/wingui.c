@@ -15,9 +15,9 @@
 
 int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int ___)
 {
-	setup_program();
+	do_setup();
 	setup_console();
-	post_setup_program();
+	do_delayed_setup();
 
 	const char *defargv[] = { "savesave", "start" };
 	int argc = sizeof_array(defargv);
@@ -26,7 +26,6 @@ int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int ___)
 	if (*cmdline)
 		argc = getargv(&argv);
 
-	prepare_longrunning = __prepare_longrunning;
 	cmd_main(argc, argv);
 
 	if (!is_longrunning)

@@ -60,6 +60,7 @@
 #  include <dbghelp.h>
 #  include <crtdbg.h>
 # endif
+# include <process.h>
 #else /* linux */
 # include <unistd.h>
 # include <pwd.h>

@@ -6,13 +6,18 @@
  */
 
 #include "proc.h"
+#include "termas.h"
 
-int PLATSPECOF(is_process_alive)(ulong pid)
+int PLATSPECOF(is_process_alive)(pid_t pid)
 {
 	HANDLE proc = OpenProcess(SYNCHRONIZE, FALSE, pid);
-	if (!proc)
+	if (proc) {
+		CloseHandle(proc);
+		return 1;
+	}
+
+	if (GetLastError() == ERROR_INVALID_PARAMETER)
 		return 0;
 
-	CloseHandle(proc);
-	return 1;
+	die_winerr(_("failed to determine existence of process `%d'"), pid);
 }

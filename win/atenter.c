@@ -16,7 +16,7 @@ USESTDIO CONSTRUCTOR(check_os_version)
 		die(_("unsupported windows version (at least win7)"));
 }
 
-void setup_program(void)
+void do_setup(void)
 {
 	unsigned i;
 	constructor_t constructors[] = CONSTRUCTOR_LIST_INIT;
@@ -25,7 +25,7 @@ void setup_program(void)
 		constructors[i]();
 }
 
-void post_setup_program(void)
+void do_delayed_setup(void)
 {
 	unsigned i;
 	constructor_t constructors[] = CONSTRUCTOR_USESTDIO_LIST_INIT;

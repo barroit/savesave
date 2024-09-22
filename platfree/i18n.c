@@ -12,15 +12,15 @@
 
 #ifdef HAVE_INTL
 
-#define DOMAIN SAVESAVE_NAME
+#define TEXTDOMAIN SAVESAVE_NAME
 
 static void setup_gettext(void)
 {
 	const char *name = get_locale_dirname();
 
-	textdomain(DOMAIN);
-	bindtextdomain(DOMAIN, name);
-	bind_textdomain_codeset(DOMAIN, "UTF-8");
+	textdomain(TEXTDOMAIN);
+	bindtextdomain(TEXTDOMAIN, name);
+	bind_textdomain_codeset(TEXTDOMAIN, "UTF-8");
 }
 
 /*
