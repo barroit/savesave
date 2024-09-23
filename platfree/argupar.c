@@ -8,6 +8,14 @@
 #include "argupar.h"
 #include "debug.h"
 #include "termas.h"
+#include "strlist.h"
+#include "list.h"
+
+#define OPTMAS_INDENT_OPT  "    "
+#define OPTMAS_INDENT_CMD  "   "
+
+#define OPTMAS_PADOPT 26
+#define OPTMAS_PADCMD 16
 
 #define OPTARG_APPLICATOR(type)					\
 	int apply_##type##_optarg(struct arguopt *opt,		\
@@ -31,7 +39,6 @@ void argupar_init(struct argupar *ctx, int argc, const char **argv)
 static void debug_check_argupar(struct argupar *ctx)
 {
 	struct arguopt *opt = ctx->option;
-	int is_subcmd = ctx->flag & AP_COMMAND_MODE;
 
 	BUG_ON((ctx->flag & AP_STOPAT_NONOPT) &&
 	       (ctx->flag & AP_COMMAND_MODE));
@@ -40,10 +47,8 @@ static void debug_check_argupar(struct argupar *ctx)
 		if (opt->type == ARGUOPT_GROUP)
 			continue;
 
-		if (is_subcmd) {
-			BUG_ON(opt->type != ARGUOPT_SUBCOMMAND);
+		if (ctx->flag & AP_COMMAND_MODE)
 			continue;
-		}
 
 		BUG_ON((opt->flag & ARGUOPT_NOARG) &&
 		       (opt->flag & ARGUOPT_OPTARG));
@@ -275,16 +280,117 @@ err_ambiguous_opt:
 		     abbrev.unset ? "no-" : "", abbrev.opt->longname);
 }
 
-static NORETURN exit_with_short_help(struct argupar *ctx)
+static void print_command_usage(const char *const *usage, struct strlist *sl)
 {
-	puts("help!");
-	exit(128);
+	const char *pref = "usage: ";
+
+	while (*usage != NULL) {
+		const char *str = *usage;
+		const char *mas = strnxtws(str);
+
+		mas = strskipws(mas);
+		int namlen = mas - str;
+		int preflen = strlen("usage: ");
+
+		strlist_split_word(sl, mas, 80 - preflen);
+
+		printf("%*s%.*s", preflen, pref, namlen, str);
+		puts(sl->list[0].str);
+
+		if (sl->nl == 1)
+			goto next;
+
+		size_t i = 1;
+		int pad = preflen + namlen;
+
+		for_each_idx_from(i, sl->nl)
+			printf("%*s%s\n", pad, "", sl->list[i].str);
+
+next:
+		strlist_reset(sl);
+		usage++;
+		pref = "or: ";
+	}
 }
 
-static NORETURN exit_with_long_help(struct argupar *ctx)
+static void print_option_usage(struct arguopt *option, struct strlist *sl)
 {
-	/* manpage? pdf? */
-	exit_with_short_help(ctx);
+	struct arguopt *opt = option;
+	for_each_option(opt) {
+		if (opt->type == ARGUOPT_GROUP) {
+			printf("\n");
+			if (opt->longname)
+				puts(opt->longname);
+			continue;
+		}
+
+		const char *fmt;
+		int nr;
+		int is_subcmd = opt->type == ARGUOPT_SUBCOMMAND;
+
+		if (is_subcmd) {
+			nr = strlen(OPTMAS_INDENT_CMD);
+			fputs(OPTMAS_INDENT_CMD, stdout);
+
+			nr += strlen(opt->longname);
+			fputs(opt->longname, stdout);
+
+			goto print_option_usage;
+		} else {
+			nr = strlen(OPTMAS_INDENT_OPT);
+			fputs(OPTMAS_INDENT_OPT, stdout);
+		}
+
+		if (opt->shrtname)
+			nr += printf("-%c, ", opt->shrtname);
+
+		fmt = (opt->flag & ARGUOPT_HASNEG) ? "--[no-]%s" :
+						     "--%s";
+		nr += printf(fmt, opt->longname);
+
+		if (!opt->argh)
+			goto print_option_usage;
+
+		int nobrac = strpbrk(opt->argh, "()<>[]|") != NULL;
+		if (opt->flag & ARGUOPT_OPTARG)
+			fmt = nobrac ? "[=%s]" : "[=<%s>]";
+		else
+			fmt = nobrac ? " %s" : " <%s>";
+
+		nr += printf(fmt, opt->argh);
+
+print_option_usage:
+		int pad = is_subcmd ? OPTMAS_PADCMD : OPTMAS_PADOPT;
+
+		if (nr >= pad) {
+			putchar('\n');
+			nr = 0;
+		}
+
+		strlist_split_word(sl, _(opt->usage), 80 - pad);
+		printf("%*s%s\n", pad - nr, "", sl->list[0].str);
+
+		if (sl->nl == 1)
+			goto next;
+
+		size_t i = 1;
+		for_each_idx_from(i, sl->nl)
+			printf("%*s%s\n", pad, "", sl->list[i].str);
+
+next:
+		strlist_reset(sl);
+	}
+}
+
+static NORETURN prompt_shrt_help(struct argupar *ctx)
+{
+	struct strlist sl = STRLIST_INIT;
+
+	print_command_usage(ctx->usage, &sl);
+	putchar('\n');
+
+	print_option_usage(ctx->option, &sl);
+	exit(128);
 }
 
 static enum arguret do_parse(struct argupar *ctx)
@@ -306,7 +412,7 @@ static enum arguret do_parse(struct argupar *ctx)
 		str += 1;
 
 		if (str[0] == 'h' && str[1] == 0)
-			exit_with_short_help(ctx);
+			prompt_shrt_help(ctx);
 
 		*ctx->argv = str;
 		return parse_shrtopt(ctx);
@@ -316,23 +422,17 @@ static enum arguret do_parse(struct argupar *ctx)
 		str += 2;
 
 		if (str[0] == 0) {
-			if (ctx->flag & AP_NO_ENDOFOPT)
-				goto err_inv_eoo;
-
 			ctx->argc--;
 			ctx->argv++;
 			return AP_DONE;
 		}
 
 		if (strcmp(str, "help") == 0)
-			exit_with_long_help(ctx);
+			prompt_shrt_help(ctx);
 
 		*ctx->argv = str;
 		return parse_longopt(ctx);
 	}
-
-err_inv_eoo:
-	return error("end of options '--' is not allowed in this part");
 }
 
 int argupar_parse(struct argupar *ctx, struct arguopt *option,

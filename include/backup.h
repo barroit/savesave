@@ -19,6 +19,4 @@ int PLATSPECOF(backup_copy_regfile)(struct fileiter_file *src,
 int PLATSPECOF(backup_copy_symlink)(struct fileiter_file *src,
 				    struct strbuf *dest, struct strbuf *__buf);
 
-int PLATSPECOF(drop_backup_file)(struct strbuf *path);
-
 #endif /* BACKUP_H */

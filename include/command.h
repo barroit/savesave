@@ -18,17 +18,17 @@
 #define CMD_USEDOTSAV   (1 << 1)
 #define CMD_LONGRUNNING (1 << 2)
 
+#define CMDDESCRIP(mas)
+
 int cmd_help(int argc, const char **argv);
 int cmd_sizeof(int argc, const char **argv);
 int cmd_start(int argc, const char **argv);
 int cmd_version(int argc, const char **argv);
 
-#define MAINCOMMAND_LIST_INIT(v) { \
-	APOPT_SUBCOMMAND("help", (v), cmd_help, 0), \
-	APOPT_SUBCOMMAND("sizeof", (v), cmd_sizeof, 0), \
-	APOPT_SUBCOMMAND("start", (v), cmd_start, CMD_LONGRUNNING | CMD_USEDOTSAV | CMD_UNIQUEPROC), \
-	APOPT_SUBCOMMAND("version", (v), cmd_version, 0), \
-	APOPT_END(), \
-}
+#define APOPT_MAINCOMMAND(v) \
+	APOPT_SUBCOMMAND("help", (v), N_("Display help information about Savesave"), cmd_help, 0), \
+	APOPT_SUBCOMMAND("sizeof", (v), N_("Calculate file size of given path"), cmd_sizeof, 0), \
+	APOPT_SUBCOMMAND("start", (v), N_("Start backup task in background"), cmd_start, CMD_LONGRUNNING | CMD_USEDOTSAV | CMD_UNIQUEPROC), \
+	APOPT_SUBCOMMAND("version", (v), N_("Display version information about Savesave"), cmd_version, 0)
 
 #endif /* GENH_COMMAND_H */

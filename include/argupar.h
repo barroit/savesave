@@ -62,8 +62,7 @@ struct arguopt {
 typedef typeof(((struct arguopt *)0)->subcmd) argupar_subcommand_t;
 
 #define AP_STOPAT_NONOPT (1 << 0) /* stop at non-option */
-#define AP_COMMAND_MODE  (1 << 1) /* parse in command mode (oneshot) */
-#define AP_NO_ENDOFOPT   (1 << 2) /* disallow end-of-option */
+#define AP_COMMAND_MODE  (1 << 1) /* stop at command (but parse it) */
 
 struct argupar {
 	int argc;
@@ -92,6 +91,12 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 	.type = ARGUOPT_END,	\
 }
 
+#define APOPT_GROUP(l)		\
+{				\
+	.type = ARGUOPT_GROUP,	\
+	.longname = (l),	\
+}
+
 #define APOPT_COUNTUP(s, l, v, h) __APOPT_COUNTUP(s, l, v, h, 0)
 #define __APOPT_COUNTUP(s, l, v, h, f)		\
 {						\
@@ -110,29 +115,32 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 	.shrtname = (s),			\
 	.longname = (l),			\
 	.value    = (v),			\
-	.argh     = N_("n"),			\
+	.argh     = "n",			\
 	.usage    = (h),			\
 	.flag     = (f),			\
 }
 
 #define APOPT_FILENAME(s, l, v, h) __APOPT_STRING(s, l, v, "path", h, 0)
 #define APOPT_STRING(s, l, v, a, h) __APOPT_STRING(s, l, v, a, h, 0)
-#define __APOPT_STRING(s, l, v, a, h, f)	\
+#define __APOPT_STRING(s, l, v, a, h, f) ___APOPT_STRING(s, l, v, 0, a, h, f)
+#define ___APOPT_STRING(s, l, v, d, a, h, f)	\
 {						\
 	.type     = ARGUOPT_STRING,		\
 	.shrtname = (s),			\
 	.longname = (l),			\
 	.value    = (v),			\
+	.defval   = (intptr_t)(d),		\
 	.argh     = (a),			\
 	.usage    = (h),			\
 	.flag     = (f),			\
 }
 
-#define APOPT_SUBCOMMAND(l, v, c, f)		\
+#define APOPT_SUBCOMMAND(l, v, h, c, f)		\
 {						\
 	.type     = ARGUOPT_SUBCOMMAND,		\
 	.longname = (l),			\
 	.value    = (v),			\
+	.usage    = (h),			\
 	.subcmd   = (c),			\
 	.flag     = (f),			\
 }

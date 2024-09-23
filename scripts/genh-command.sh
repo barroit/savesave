@@ -16,14 +16,20 @@ declare=$(awk '
 }
 
 /^int cmd_[a-zA-Z_]+\(/ {
-	if (buf != "")
-		print $0 " " buf
+	getline mas
+	if (!mas)
+		exit 1
+
+	if (buf)
+		print $0 " " mas " " buf
 	else
-		print $0
+		print $0 " " mas
+
+	nextfile
 }
 
 {
-	if (buf != "")
+	if (buf)
 		buf = buf " | "
 	buf = buf "CMD_" $0
 }' $src)
@@ -49,28 +55,36 @@ cat <<EOF > $dest
 #define CMD_USEDOTSAV   (1 << 1)
 #define CMD_LONGRUNNING (1 << 2)
 
+#define CMDDESCRIP(mas)
+
 EOF
 
 awk -F')' '{ print $1 ");" }' <<< $declare >> $dest
 
 cat <<EOF >> $dest
 
-#define MAINCOMMAND_LIST_INIT(v) { \\
+#define APOPT_MAINCOMMAND(v) \\
 EOF
 
 awk -F'[()]' '
 {
 	cmd = substr($1, 5)
-	printf "\tAPOPT_SUBCOMMAND(\"%s\", (v), %s, ", substr(cmd, 5), cmd
-	if ($3)
-		printf "%s), \\\n", substr($3, 2)
+	printf "\tAPOPT_SUBCOMMAND(\"%s\", (v), N_(%s), %s, ", \
+	       substr(cmd, 5), $4, cmd
+
+	if ($5)
+		printf "%s)", substr($5, 2)
 	else
-		print "0), \\"
-}' <<< $declare >> $dest
+		printf "0)"
+
+	if (NR != n)
+		print ", \\"
+	else
+		print ""
+
+}' n=$(wc -l <<< $declare) <<< $declare  >> $dest
 
 cat <<EOF >> $dest
-	APOPT_END(), \\
-}
 
 #endif /* GENH_COMMAND_H */
 EOF

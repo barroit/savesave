@@ -30,6 +30,12 @@ void strlist_init(struct strlist *sl, flag_t flags);
  */
 void strlist_destroy(struct strlist *sl);
 
+/*
+ * strlist_reset - make strlist 'factory new' without releasing
+ *		   allocated memory
+ */
+void strlist_reset(struct strlist *sl);
+
 size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc);
 
 static inline size_t strlist_push(struct strlist *sl, const char *str)
@@ -51,11 +57,10 @@ static inline char **strlist_dump(struct strlist *sl)
 	return strlist_dump2(sl, 1);
 }
 
-void strlist_strsplt_every(struct strlist *sl, const char *str, size_t len);
-
 /*
- * same as strlist_strsplt_every but align to previous word boundary
+ * strlist_split_word - split string, make sure the words don't get broken
+ *			into pieces
  */
-void strlist_strsplt_every2(struct strlist *sl, const char *str, size_t len);
+void strlist_split_word(struct strlist *sl, const char *str, uint bound);
 
 #endif /* STRLIST_H */

@@ -5,6 +5,10 @@
  * Contact: barroit@linux.com
  */
 
+#ifndef _WIN32
+# error "window.h is win-spec"
+#endif
+
 #ifndef WINDOW_H
 #define WINDOW_H
 

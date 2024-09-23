@@ -34,9 +34,12 @@ void strlist_destroy(struct strlist *sl)
 	sl->cap = 0;
 }
 
-static int strlist_need_grow(struct strlist *sl)
+#include "keepref.h"
+
+void strlist_reset(struct strlist *sl)
 {
-	return sl->nl == sl->cap;
+	BUG_ON(sl->use_ref);
+	while (strlist_pop2(sl, 0));
 }
 
 static void strlist_grow1(struct strlist *sl)
@@ -45,7 +48,7 @@ static void strlist_grow1(struct strlist *sl)
 
 	size_t i = sl->uninit;
 	for_each_idx_from(i, sl->cap)
-		sl->list[i].cap = 0; /* set cap is just enough */
+		sl->list[i].cap = 0; /* cap as a marker */
 }
 
 static void strlist_init_strbuf(struct strlist *sl, struct strbuf *sb)
@@ -62,7 +65,7 @@ size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc)
 {
 	BUG_ON(sl->use_ref && extalloc);
 
-	if (strlist_need_grow(sl))
+	if (sl->nl == sl->cap)
 		strlist_grow1(sl);
 
 	struct strbuf *sb = &sl->list[sl->nl++];
@@ -112,7 +115,7 @@ char **strlist_dump2(struct strlist *sl, int copy)
 	return arr;
 }
 
-void strlist_strsplt_every(struct strlist *sl, const char *str, size_t len)
+void strlist_split_word(struct strlist *sl, const char *str, uint bound)
 {
 	size_t tot = strlen(str);
 	char *ptr = xstrdup(str);
@@ -120,45 +123,22 @@ void strlist_strsplt_every(struct strlist *sl, const char *str, size_t len)
 	char *tail = &ptr[tot];
 
 	while (ptr < tail) {
-		if (ptr + len >= tail)
-			len = tail - ptr;
+		if (ptr + bound >= tail)
+			bound = tail - ptr;
 
-		char tmp = ptr[len];
-		ptr[len] = 0;
+		char *p = &ptr[bound];
+		uint l = bound;
 
-		strlist_push(sl, ptr);
-
-		ptr += len;
-		*ptr = tmp;
-	}
-
-	free(mp);
-}
-
-void strlist_strsplt_every2(struct strlist *sl, const char *str, size_t len)
-{
-	size_t tot = strlen(str);
-	char *ptr = xstrdup(str);
-	char *mp = ptr;
-	char *tail = &ptr[tot];
-
-	while (ptr < tail) {
-		if (ptr + len >= tail)
-			len = tail - ptr;
-
-		char *p = &ptr[len];
-		size_t l = len;
-
-		while (*p != 0 && !(isascii(*p) && isspace(*p))) {
-			p--;
-			l--;
-		}
+		if (*p != 0)
+			while (!(isascii(*p) && isspace(*p))) {
+				p--;
+				l--;
+			}
 
 		*p = 0;
 		l += 1;
 
 		strlist_push(sl, ptr);
-
 		ptr += l;
 	}
 

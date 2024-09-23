@@ -5,6 +5,7 @@
  * Contact: barroit@linux.com
  */
 
+#include "maincmd.h"
 #include "argupar.h"
 #include "termas.h"
 #include "dotsav.h"
@@ -12,12 +13,12 @@
 #include "debug.h"
 #include "proc.h"
 
-static const char *dotsav_path;
-static struct savesave *savarr;
+static const char *dotsav_path = NULL;
 
+struct savesave *savarr;
 int is_longrunning;
 
-static void prepare_dotsav(void)
+void prepare_dotsav(void)
 {
 	if (!dotsav_path)
 		dotsav_path = get_dotsav_defpath();
@@ -41,28 +42,35 @@ static void prepare_dotsav(void)
 
 int cmd_main(int argc, const char **argv)
 {
-	argupar_t ap;
-	struct arguopt options[] = {
+	argupar_subcommand_t runcmd = NULL;
+	struct arguopt option[] = {
 		APOPT_FILENAME(0, "dotsav", &dotsav_path,
-			       _("Configuration file for savesave")),
+			       N_("use specified dotsav")),
+		APOPT_GROUP("Savesave commands"),
+		APOPT_MAINCOMMAND(&runcmd),
 		APOPT_END(),
 	};
+	const char *usage[] = {
+		"savesave [--dotsav=<path>] <command> [<args>]",
+		NULL,
+	};
+	const char *argfb[] = { "-h", NULL };
+	argupar_t ap;
 
 	argc--;
 	argv++;
+	if (argc == 0) {
+		argv = argfb;
+		argc = 1;
+	}
+
 	argupar_init(&ap, argc, argv);
-	argc = argupar_parse(&ap, options, NULL,
-			     AP_STOPAT_NONOPT | AP_NO_ENDOFOPT);
+	argc = argupar_parse(&ap, option, usage, AP_COMMAND_MODE);
 
-	argupar_subcommand_t runcmd;
-	struct arguopt commands[] = MAINCOMMAND_LIST_INIT(&runcmd);
-
-	if (!argc)
+	if (!runcmd)
 		die(_("savesave requires a command"));
 
-	argc = argupar_parse(&ap, commands, NULL, AP_COMMAND_MODE);
-
-	struct arguopt *cmd = commands;
+	struct arguopt *cmd = option;
 	for_each_option(cmd) {
 		if (runcmd != cmd->subcmd)
 			continue;
@@ -82,10 +90,4 @@ int cmd_main(int argc, const char **argv)
 	argc--;
 	argv++;
 	return runcmd(argc, argv);
-}
-
-struct savesave *get_dotsav(void)
-{
-	BUG_ON(!savarr);
-	return savarr;
 }

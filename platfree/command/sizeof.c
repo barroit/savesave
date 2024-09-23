@@ -14,6 +14,7 @@
 #include "mkdir.h"
 
 int cmd_sizeof(int argc, const char **argv)
+CMDDESCRIP("Calculate file size of given path")
 {
 	struct arguopt options[] = {
 		APOPT_END(),
@@ -23,7 +24,7 @@ int cmd_sizeof(int argc, const char **argv)
 	argupar_init(&ap, argc, argv);
 
 	if (!argc)
-		die(_("command 'sizeof' requires pathspec"));
+		die(_("sizeof requires pathspec"));
 
 	argc = argupar_parse(&ap, options, NULL, 0);
 

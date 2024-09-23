@@ -159,32 +159,32 @@ msgstr  ""
 msgid   "failed to duplicate string"
 msgstr  ""
 
-#: platfree/argupar.c:136
+#: platfree/argupar.c:141
 #, c-format
 msgid   "failed to parse option `%s' with value `%s'"
 msgstr  ""
 
-#: platfree/argupar.c:170
+#: platfree/argupar.c:175
 #, c-format
 msgid   "short option `%c' requires a value"
 msgstr  ""
 
-#: platfree/argupar.c:263
+#: platfree/argupar.c:268
 #, c-format
 msgid   "unknown long option `%.*s'"
 msgstr  ""
 
-#: platfree/argupar.c:266
+#: platfree/argupar.c:271
 #, c-format
 msgid   "long option `%s%s' requires a value"
 msgstr  ""
 
-#: platfree/argupar.c:269
+#: platfree/argupar.c:274
 #, c-format
 msgid   "long option `%s%s' takes no value"
 msgstr  ""
 
-#: platfree/argupar.c:272
+#: platfree/argupar.c:277
 #, c-format
 msgid   "long option `%.*s' is ambiguous (could be --%s%s or --%s%s)"
 msgstr  ""
@@ -355,30 +355,26 @@ msgstr  ""
 msgid   "fatal: unable to format message `%s'\n"
 msgstr  ""
 
-#: entry/savesave.c:25
+#: entry/savesave.c:26
 msgid   "no dotsav (.savesave) was provided"
 msgstr  ""
 
-#: entry/savesave.c:29
+#: entry/savesave.c:30
 #, c-format
 msgid   "unable to retrieve content for dotsav `%s'"
 msgstr  ""
 
-#: entry/savesave.c:36
+#: entry/savesave.c:37
 #, c-format
 msgid   "no configuration found in dotsav `%s'"
 msgstr  ""
 
-#: entry/savesave.c:47
-msgid   "Configuration file for savesave"
+#: entry/savesave.c:48
+msgid   "use specified dotsav"
 msgstr  ""
 
-#: entry/savesave.c:63
-msgid   "no command specified"
-msgstr  ""
-
-#: include/argupar.h:114
-msgid   "n"
+#: entry/savesave.c:71
+msgid   "savesave requires a command"
 msgstr  ""
 
 #: include/calc.h:32 include/calc.h:42 include/termas.h:34 include/termas.h:36
@@ -393,6 +389,11 @@ msgstr  ""
 #: include/calc.h:42
 #, c-format
 msgid   "size overflow: %<PRIuMAX> + %<PRIuMAX>"
+msgstr  ""
+
+#: include/command.h:29 include/command.h:30 include/command.h:31
+#: include/command.h:32
+msgid   "sss"
 msgstr  ""
 
 #: include/compiler.h:48

@@ -66,7 +66,7 @@ static int savesave_report_hook(int type, char *message, int *_)
 	size_t i;
 	struct strlist sl = STRLIST_INIT;
 
-	strlist_strsplt_every2(&sl, message, CONFIG_LINEWRAP_THRESHOLD);
+	strlist_split_word(&sl, message, CONFIG_LINEWRAP_THRESHOLD);
 
 	for_each_idx(i, sl.nl)
 		puts(sl.list[i].str);

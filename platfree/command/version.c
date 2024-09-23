@@ -7,7 +7,10 @@
  * version - Print program version, as well as the library version
  */
 
+#include "argupar.h"
+
 int cmd_version(int argc, const char **argv)
+CMDDESCRIP("Display version information about Savesave")
 {
 	puts(SAVESAVE_NAME "/" SAVESAVE_HOST "-"
 	     SAVESAVE_ARCH " " SAVESAVE_VERSION);

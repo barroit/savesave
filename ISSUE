@@ -1,4 +1,4 @@
                                  ISSUE LIST
 
 ----
-fileiter does not work on windows symlink
+strlist_split_word lacks on bound range check
