@@ -50,7 +50,7 @@ void strbuf_require_cap(struct strbuf *sb, size_t n);
 /**
  * strbuf_destroy - destroy strbuf
  *
- * note: a destroyed strbuf object can be re-initialized using strbuf_init();
+ * note: a destroyed strbuf object can be re-initialized using strbuf_init()
  */
 void strbuf_destroy(struct strbuf *sb);
 

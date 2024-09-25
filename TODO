@@ -4,4 +4,4 @@
 make strbuf/strlist handle multibyte string
 
 ----
-strlist init from argv/a given member, use offset? (wtf?)
+strlist init from argv/a given member, use offset? (ah I got this)

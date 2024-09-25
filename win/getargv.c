@@ -47,7 +47,7 @@ int getargv(const char ***argv)
 		strlist_push(&sl, buf);
 	}
 
-	*argv = (const char **)strlist_dump2(&sl, 1);
+	*argv = (const char **)strlist_dump(&sl);
 
 	LocalFree(wargv);
 	strlist_destroy(&sl);
