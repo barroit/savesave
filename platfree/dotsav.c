@@ -147,17 +147,16 @@ static int check_period(struct savesave *sav, void *data)
 	return error(_("period cannot be 0"));
 }
 
-static int check_unique_savent(struct dotsav *ctx, const char *val)
+static size_t find_savent_collision(struct dotsav *ctx, const char *val)
 {
 	size_t i;
 	for_each_idx(i, ctx->savnl) {
 		if (strcmp(ctx->savarr[i].name, val))
 			continue;
-
-		return error(_("name `%s' has collisions at indexes %zu and %zu"),
-			     val, i, ctx->savnl);
+		break;
 	}
-	return 0;
+
+	return i;
 }
 
 static void append_savesave(struct dotsav *ctx)
@@ -223,16 +222,17 @@ static int parse_line(struct dotsav *ctx)
 
 		char *val = strskipws(line);
 		if (val == line)
-			return error(_("unrecognized sav entry"));
+			continue;
 
 		val = strtrimend(val);
 		if (!*val)
-			return error(_("value is empty"));
+			return error(_("sav entry is missing a value"));
 
 		if (ent->type == SAVENT_ENTSEP) {
-			int err = check_unique_savent(ctx, val);
-			if (err)
-				return err;
+			size_t idx = find_savent_collision(ctx, val);
+			if (idx != ctx->savnl)
+				return error(_("name `%s' has collisions at indexes %zu and %zu"),
+					     val, idx, ctx->savnl);
 
 			append_savesave(ctx);
 		}
@@ -240,7 +240,7 @@ static int parse_line(struct dotsav *ctx)
 		return apply_savent(ent, &ctx->savarr[ctx->savnl - 1], val);
 	}
 
-	return error(_("encountered an unknown line"));
+	return error(_("sav entry contains an unrecognized key"));
 }
 
 static void check_valid_savent(struct savesave *sav)

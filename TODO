@@ -1,10 +1,7 @@
                                   TODO LIST
 
 ----
-unknown line vs unknown ent key?
-
-----
 make strbuf/strlist handle multibyte string
 
 ----
-strlist init from argv/a given member, use offset?
+strlist init from argv/a given member, use offset? (wtf?)
