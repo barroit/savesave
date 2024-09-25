@@ -57,6 +57,20 @@ static inline size_t strlist_push(struct strlist *sl, const char *str)
 }
 
 /**
+ * strlist_join_argv - Append entire argv to sl (not including terminated NULL)
+ */
+void strlist_join_argv(struct strlist *sl, const char **argv);
+
+/**
+ * strlist_join_member - Append the specified member of each element in an
+ *			 array to sl
+ *
+ * note: Member must be of type const char *
+ */
+void strlist_join_member(struct strlist *sl, void *arr,
+			 size_t nmemb, size_t size, size_t offset);
+
+/**
  * strlist_pop2 - Remove an element from sl, and return the value of element
  *
  * dup: If this value is zero, the return value is simply a pointer points to

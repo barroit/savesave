@@ -54,4 +54,6 @@ static inline void list_add_tail(struct list_head *list,
 
 #define for_each_idx_from(i, n) for (; i < n; i++)
 
+#define for_each_str(arr) for (; *arr != NULL; arr++)
+
 #endif /* LIST_H */
