@@ -33,7 +33,7 @@ struct savent {
 	enum savtype type;
 	const char *name;
 
-	uint offset;
+	size_t offset;
 	int (*cb)(struct savesave *, void *);
 };
 
