@@ -4,7 +4,7 @@
 unknown line vs unknown ent key?
 
 ----
-replace unsigned with uint
+make strbuf/strlist handle multibyte string
 
 ----
-make strbuf/strlist handle multibyte string
+strlist init from argv/a given member, use offset?

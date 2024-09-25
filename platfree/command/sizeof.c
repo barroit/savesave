@@ -54,7 +54,7 @@ CMDDESCRIP("Calculate file size of given path")
 			continue;
 		}
 
-		unsigned umi = 0;
+		uint umi = 0;
 		off_t scale = 1;
 
 		while (size / (scale * SZ_1K) != 0) {

@@ -18,7 +18,7 @@ enum arguopt_type {
 	ARGUOPT_CALLBACK,	/* callback */
 
 	ARGUOPT_COUNTUP,	/* count up */
-	ARGUOPT_UNSIGNED,	/* unsigned integer */
+	ARGUOPT_UINT,		/* unsigned integer */
 
 	ARGUOPT_STRING,		/* string */
 
@@ -108,10 +108,10 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 	.flag     = ARGUOPT_NOARG | (f),	\
 }
 
-#define APOPT_UNSIGNED(s, l, v, h) __APOPT_UNSIGNED(s, l, v, h, 0)
-#define __APOPT_UNSIGNED(s, l, v, h, f)		\
+#define APOPT_UINT(s, l, v, h) __APOPT_UINT(s, l, v, h, 0)
+#define __APOPT_UINT(s, l, v, h, f)		\
 {						\
-	.type     = ARGUOPT_UNSIGNED,		\
+	.type     = ARGUOPT_UINT,		\
 	.shrtname = (s),			\
 	.longname = (l),			\
 	.value    = (v),			\

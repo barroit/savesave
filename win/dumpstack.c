@@ -27,8 +27,8 @@ static void assert_failure_routine(void)
 		die_winerr(_("failed to initialize symbol handler"));
 
 	void *stack[CONFIG_MAX_DUMP_STACK];
-	unsigned short frames = CaptureStackBackTrace(0, sizeof_array(stack),
-						      stack, NULL);
+	ushort frames = CaptureStackBackTrace(0, sizeof_array(stack),
+					      stack, NULL);
 
 	SYMBOL_INFO *symbol;
 	char buf[sizeof(*symbol) + MAX_SYM_NAME * sizeof(TCHAR)];
@@ -37,7 +37,7 @@ static void assert_failure_routine(void)
 	symbol->SizeOfStruct = sizeof(*symbol);
 	symbol->MaxNameLen = MAX_SYM_NAME;
 
-	unsigned short i;
+	ushort i;
 	IMAGEHLP_LINE64 line = {
 		.SizeOfStruct = sizeof(line),
 	};

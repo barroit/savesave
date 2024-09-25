@@ -18,7 +18,7 @@ USESTDIO CONSTRUCTOR(check_os_version)
 
 void do_setup(void)
 {
-	unsigned i;
+	uint i;
 	constructor_t constructors[] = CONSTRUCTOR_LIST_INIT;
 
 	for_each_idx(i, sizeof_array(constructors))
@@ -27,7 +27,7 @@ void do_setup(void)
 
 void do_delayed_setup(void)
 {
-	unsigned i;
+	uint i;
 	constructor_t constructors[] = CONSTRUCTOR_USESTDIO_LIST_INIT;
 
 	for_each_idx(i, sizeof_array(constructors))

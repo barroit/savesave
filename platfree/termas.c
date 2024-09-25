@@ -40,7 +40,7 @@ static void vreport_message(char **buf, size_t *avail,
 		fprintf(stderr, _("fatal: unable to format message `%s'\n"),
 			fmt);
 		exit(128);
-	} else if ((unsigned)nr > *avail) {
+	} else if ((uint)nr > *avail) {
 		nr = *avail;
 	}
 
@@ -61,7 +61,7 @@ static void vreport_extra(char **buf, size_t *avail, const char *extr)
 }
 
 struct cntrl_char {
-	unsigned *pos;
+	uint *pos;
 	size_t nr;
 	size_t cap;
 };
@@ -83,7 +83,7 @@ static void record_cntrl_char(char *str, size_t nr, struct cntrl_char *cntrl)
 	}
 }
 
-static void format_cntrl_char_simple(char *str, unsigned *cntrl, size_t nr)
+static void format_cntrl_char_simple(char *str, uint *cntrl, size_t nr)
 {
 	size_t i;
 	for_each_idx(i, nr)
@@ -107,7 +107,7 @@ static void format_cntrl_char_simple(char *str, unsigned *cntrl, size_t nr)
  */
 static void format_cntrl_char_advanced(char *str, size_t lasidx,
 				       size_t off, size_t replen,
-				       unsigned *cntrl, size_t nr)
+				       uint *cntrl, size_t nr)
 {
 	size_t baslen;
 	char *base;

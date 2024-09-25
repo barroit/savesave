@@ -96,12 +96,12 @@ static OPTARG_APPLICATOR(countup)
 	return 0;
 }
 
-static OPTARG_APPLICATOR(unsigned)
+static OPTARG_APPLICATOR(uint)
 {
 	if (!unset)
 		return str2uint(arg, opt->value);
 
-	*(unsigned *)opt->value = 0;
+	*(uint *)opt->value = 0;
 	return 0;
 }
 
@@ -131,7 +131,7 @@ static int dispatch_optarg(struct arguopt *opt, const char *arg, int unset)
 		[ARGUOPT_CALLBACK]   = apply_callback_optarg,
 
 		[ARGUOPT_COUNTUP]    = apply_countup_optarg,
-		[ARGUOPT_UNSIGNED]   = apply_unsigned_optarg,
+		[ARGUOPT_UINT]   = apply_uint_optarg,
 
 		[ARGUOPT_STRING]     = apply_string_optarg,
 	};

@@ -15,7 +15,7 @@ static LRESULT CALLBACK receive_message(HWND window, UINT message,
 {
 	switch (message) {
 	case WM_NOTIFYICON:
-		unsigned type = LOWORD(arg2);
+		uint type = LOWORD(arg2);
 
 		if (type != WM_CONTEXTMENU &&
 		    type != NIN_SELECT &&

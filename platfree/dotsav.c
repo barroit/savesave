@@ -33,7 +33,7 @@ struct savent {
 	enum savtype type;
 	const char *name;
 
-	unsigned offset;
+	uint offset;
 	int (*cb)(struct savesave *, void *);
 };
 
@@ -302,7 +302,7 @@ static void do_parse(struct dotsav *ctx)
 {
 	int err;
 	char *next;
-	unsigned cnt = 0;
+	uint cnt = 0;
 
 	do {
 		cnt++;

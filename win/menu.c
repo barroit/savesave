@@ -22,7 +22,7 @@ static int setup_menu(HMENU menu)
 	return error_winerr(_("failed to set menu infomation"));
 }
 
-static int add_menu_button(HMENU menu, unsigned id, const char *name)
+static int add_menu_button(HMENU menu, uint id, const char *name)
 {
 
 	MENUITEMINFO button = {
