@@ -390,6 +390,7 @@ static NORETURN prompt_shrt_help(struct argupar *ctx)
 	putchar('\n');
 
 	print_option_usage(ctx->option, &sl);
+	putchar('\n');
 	exit(128);
 }
 
