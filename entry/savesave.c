@@ -35,9 +35,6 @@ void prepare_dotsav(void)
 
 	if (!savnl)
 		die(_("no configuration found in dotsav `%s'"), dotsav_path);
-
-	DEBUG_RUN()
-		dotsav_print(savarr);
 }
 
 int cmd_main(int argc, const char **argv)
