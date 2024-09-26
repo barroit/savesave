@@ -91,14 +91,14 @@ void strlist_join_argv(struct strlist *sl, const char **argv)
 		strlist_push(sl, *argv);
 }
 
-void strlist_join_member(struct strlist *sl, void *arr,
-			 size_t nmemb, size_t size, size_t offset)
+void __strlist_join_member(struct strlist *sl, void *arr,
+			   size_t nmemb, size_t size, size_t offset)
 {
 	intptr_t addr = (intptr_t)arr;
 	intptr_t end = st_add(addr, st_mult(nmemb, size));
 
 	for (; addr != end; addr += nmemb)
-		strlist_push(sl, (const char *)(addr + offset));
+		strlist_push(sl, *(const char **)(addr + offset));
 }
 
 char *strlist_pop2(struct strlist *sl, int dup)

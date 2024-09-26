@@ -61,14 +61,18 @@ static inline size_t strlist_push(struct strlist *sl, const char *str)
  */
 void strlist_join_argv(struct strlist *sl, const char **argv);
 
+void __strlist_join_member(struct strlist *sl, void *arr,
+			   size_t nmemb, size_t size, size_t offset);
+
 /**
  * strlist_join_member - Append the specified member of each element in an
  *			 array to sl
  *
- * note: Member must be of type const char *
+ * note: Member must be of type const char * or char *
  */
-void strlist_join_member(struct strlist *sl, void *arr,
-			 size_t nmemb, size_t size, size_t offset);
+#define strlist_join_member(sl, arr, nl, memb) \
+	__strlist_join_member(sl, arr, sizeof(*arr), nl, \
+			      offsetof(typeof(*savarr), memb))
 
 /**
  * strlist_pop2 - Remove an element from sl, and return the value of element
