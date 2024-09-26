@@ -14,11 +14,12 @@
 #include "proc.h"
 
 static const char *dotsav_path = NULL;
+static struct savesave *savarr;
+static size_t savnl;
 
-struct savesave *savarr;
 int is_longrunning;
 
-void prepare_dotsav(void)
+static void prepare_dotsav(void)
 {
 	if (!dotsav_path)
 		dotsav_path = get_dotsav_defpath();
@@ -30,11 +31,20 @@ void prepare_dotsav(void)
 		die(_("unable to retrieve content for dotsav `%s'"),
 		    dotsav_path);
 
-	size_t savnl = dotsav_parse(savstr, &savarr);
+	savnl = dotsav_parse(savstr, &savarr);
 	free(savstr);
 
 	if (!savnl)
 		die(_("no configuration found in dotsav `%s'"), dotsav_path);
+}
+
+size_t get_dotsav(struct savesave **ret)
+{
+	if (!savarr)
+		prepare_dotsav();
+
+	*ret = savarr;
+	return savnl;
 }
 
 int cmd_main(int argc, const char **argv)

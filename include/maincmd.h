@@ -11,9 +11,7 @@
 int cmd_main(int argc, const char **argv);
 extern int is_longrunning;
 
-void prepare_dotsav(void);
-
 struct savesave;
-extern struct savesave *savarr;
+size_t get_dotsav(struct savesave **ret);
 
 #endif /* MAINCMD_H */

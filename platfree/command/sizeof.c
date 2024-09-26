@@ -12,28 +12,51 @@
 #include "termas.h"
 #include "list.h"
 #include "mkdir.h"
+#include "maincmd.h"
+#include "dotsav.h"
+#include "strlist.h"
 
 int cmd_sizeof(int argc, const char **argv)
 CMDDESCRIP("Calculate file size of given path")
 {
-	struct arguopt options[] = {
+	int from_dotsav = 0;
+
+	struct arguopt option[] = {
+		APOPT_COUNTUP('s', "from-dotsav", &from_dotsav,
+			      _("read path from dotsav")),
 		APOPT_END(),
+	};
+	const char *usage[] = {
+		"sizeof <pathspec>...",
+		"sizeof --from-dotsav [--] [<pathspec>...]",
+		NULL,
 	};
 
 	argupar_t ap;
 	argupar_init(&ap, argc, argv);
 
-	if (!argc)
+	argc = argupar_parse(&ap, option, usage, AP_STOPAT_NONOPT);
+
+	struct savesave *savarr;
+	size_t savnl = 0;
+
+	if (from_dotsav)
+		savnl = get_dotsav(&savarr);
+	else if (!argc)
 		die(_("sizeof requires pathspec"));
 
-	argc = argupar_parse(&ap, options, NULL, 0);
-
-	int i;
+	size_t i;
 	const char *unit_map[] = { "B", "KiB", "MiB", "GiB", "TiB" };
+	struct strlist sl;
 
-	for_each_idx(i, argc) {
+	strlist_init(&sl, STRLIST_USEREF);
+	if (savnl)
+		strlist_join_member(&sl, savarr, savnl, save_prefix);
+	strlist_join_argv(&sl, argv);
+
+	for_each_idx(i, sl.nl) {
 		int err;
-		const char *path = argv[i];
+		const char *path = sl.list[i].str;
 
 		struct stat st;
 		err = stat(path, &st);
@@ -75,5 +98,6 @@ CMDDESCRIP("Calculate file size of given path")
 		}
 	}
 
+	strlist_destroy(&sl);
 	return 0;
 }
