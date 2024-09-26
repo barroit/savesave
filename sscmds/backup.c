@@ -10,7 +10,7 @@
 LONGRUNNING
 USEDOTSAV
 UNIQUEPROC
-int cmd_start(int argc, const char **argv)
+int cmd_backup(int argc, const char **argv)
 CMDDESCRIP("Start backup task in background")
 {
 	return 0;
