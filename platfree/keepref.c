@@ -10,7 +10,7 @@
 #include "alloc.h"
 
 struct leak_ref {
-	struct list_head node;
+	struct list_head list;
 	char carrier[];
 };
 
@@ -24,8 +24,6 @@ void __keepref(void *ptr, size_t size)
 	struct leak_ref *ref = xmalloc(n);
 	alloced_or_die(ref, n);
 
-	list_init(&ref->node);
-	list_add(&ref->node, &refs);
-
+	list_add(&ref->list, &refs);
 	memcpy(ref->carrier, ptr, size);
 }
