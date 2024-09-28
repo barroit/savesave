@@ -18,6 +18,7 @@ static struct savesave *savarr;
 static size_t savnl;
 
 int is_longrunning;
+void (*prepare_longrunning)(void);
 
 static void prepare_dotsav(void)
 {
@@ -93,6 +94,9 @@ int cmd_main(int argc, const char **argv)
 
 		break;
 	}
+
+	if (is_longrunning && prepare_longrunning)
+		prepare_longrunning();
 
 	argc--;
 	argv++;

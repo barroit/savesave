@@ -9,17 +9,18 @@
 #include "maincmd.h"
 #include "proc.h"
 
+static void __prepare_longrunning(void)
+{
+	// make_daemon();
+
+	push_process_id();
+	atexit(pop_process_id);
+}
+
 int main(int argc, const char **argv)
 {
 	setup_message_translation();
 
+	prepare_longrunning = __prepare_longrunning;
 	cmd_main(argc, argv);
-
-	if (!is_longrunning)
-		exit(0);
-
-	push_process_id();
-	atexit(pop_process_id);
-
-	pthread_exit(NULL);
 }
