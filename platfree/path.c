@@ -10,11 +10,11 @@
 #include "debug.h"
 #include "strbuf.h"
 
-static const char *get_procid_dirname(void)
+static const char *find_data_dirname(void)
 {
 	int err;
 	size_t i;
-	const char *dir[] = PROCID_DIRLIST_INIT;
+	const char *dir[] = DATA_DIRLIST_INIT;
 
 	for_each_idx(i, sizeof_array(dir)) {
 		const char *name = dir[i];
@@ -39,11 +39,22 @@ static const char *get_procid_dirname(void)
 	BUG_ON(1); /* even executable directory is not available !? */
 }
 
+const char *get_data_dirname(void)
+{
+	static const char *dir;
+
+	if (!dir)
+		dir = find_data_dirname();
+
+	return dir;
+}
+
 const char *get_procid_filename(void)
 {
 	static const char *path;
+
 	if (!path) {
-		const char *prefix = get_procid_dirname();
+		const char *prefix = get_data_dirname();
 		struct strbuf sb = STRBUF_INIT;
 
 		strbuf_concat_path(&sb, prefix, PROCID_NAME);
@@ -55,7 +66,7 @@ const char *get_procid_filename(void)
 
 const char *get_locale_dirname(void)
 {
-	static const char *path = NULL;
+	static const char *path;
 
 	if (!path) {
 		const char *dir = get_executable_dirname();
@@ -67,6 +78,24 @@ const char *get_locale_dirname(void)
 		 * gettext expect separator is shash
 		 */
 		strbuf_normalize_path(&sb);
+		path = sb.str;
+	}
+
+	return path;
+}
+
+const char *get_dotsav_filename(void)
+{
+	static const char *path;
+
+	if (!path)
+		path = getenv("SAVESAVE");
+
+	if (!path) {
+		struct strbuf sb = STRBUF_INIT;
+		const char *home = get_home_dirname();
+
+		strbuf_concat_path(&sb, home, ".savesave");
 		path = sb.str;
 	}
 

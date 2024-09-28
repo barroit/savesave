@@ -69,37 +69,37 @@ struct dotsav {
 char *read_dotsav(const char *name)
 {
 	int fd = open(name, O_RDONLY);
-	if (fd == -1)
-		goto err_open_file;
+	if (fd == -1) {
+		error_errno(ERRMAS_OPEN_FILE(name));
+		goto err_open_fd;
+	}
 
 	int ret;
 	struct stat st;
 
 	ret = fstat(fd, &st);
-	if (ret == -1)
-		goto err_stat_file;
+	if (ret == -1) {
+		error_errno(ERRMAS_STAT_FILE(name));
+		goto err_stat_fd;
+	}
 
 	char *buf = xmalloc(st.st_size + 1);
 	buf[st.st_size] = 0;
 
 	ret = robread(fd, buf, st.st_size);
-	if (ret == -1)
-		goto err_read_file;
+	if (ret == -1) {
+		error_errno(ERRMAS_READ_FILE(name));
+		goto err_read_fd;
+	}
 
 	close(fd);
 	return buf;
 
-	if (0) {
-	err_open_file:
-		error_errno(ERRMAS_OPEN_FILE(name));
-	} else if (0) {
-	err_stat_file:
-		error_errno(ERRMAS_STAT_FILE(name));
-	} else if (0) {
-	err_read_file:
-		error_errno(ERRMAS_READ_FILE(name));
-	}
-
+err_read_fd:
+	free(buf);
+err_stat_fd:
+	close(fd);
+err_open_fd:
 	return NULL;
 }
 
@@ -378,25 +378,4 @@ void dotsav_print(struct savesave *sav)
 		printf("	stack	 %" PRIu8 "\n", sav->stack);
 		putchar('\n');
 	}
-}
-
-char *get_dotsav_defpath(void)
-{
-	struct strbuf sb = STRBUF_INIT;
-	char *path = getenv("SAVESAVE");
-
-	if (path) {
-		strbuf_concat(&sb, path);
-	} else {
-		const char *home = get_home_dirname();
-		strbuf_concat_path(&sb, home, ".savesave");
-	}
-
-	if (access(sb.str, R_OK) == 0) {
-		strbuf_normalize_path(&sb);
-		return sb.str;
-	}
-
-	strbuf_destroy(&sb);
-	return NULL;
 }

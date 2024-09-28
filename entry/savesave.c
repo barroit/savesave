@@ -12,8 +12,10 @@
 #include "list.h"
 #include "debug.h"
 #include "proc.h"
+#include "path.h"
 
 static const char *dotsav_path = NULL;
+
 static struct savesave *savarr;
 static size_t savnl;
 
@@ -23,8 +25,8 @@ void (*prepare_longrunning)(void);
 static void prepare_dotsav(void)
 {
 	if (!dotsav_path)
-		dotsav_path = get_dotsav_defpath();
-	if (!dotsav_path)
+		dotsav_path = get_dotsav_filename();
+	if (access(dotsav_path, F_OK | R_OK) != 0)
 		die(_("no dotsav (.savesave) was provided"));
 
 	char *savstr = read_dotsav(dotsav_path);

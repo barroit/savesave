@@ -49,7 +49,7 @@ void check_unique_process(void)
 	pid_t pid;
 	int err;
 	struct strbuf path = STRBUF_INIT;
-	const char *piddir[] = PROCID_DIRLIST_INIT;
+	const char *piddir[] = DATA_DIRLIST_INIT;
 	size_t i;
 
 	for_each_idx(i, sizeof_array(piddir)) {

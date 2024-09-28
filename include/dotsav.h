@@ -26,8 +26,6 @@ struct savesave {
 
 #define for_each_sav(sav) for (; sav->name; sav++)
 
-char *get_dotsav_defpath(void);
-
 char *read_dotsav(const char *name);
 
 size_t dotsav_parse(char *savstr, struct savesave **sav);
