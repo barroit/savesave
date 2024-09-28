@@ -71,6 +71,8 @@ const char *strwinerror(void);
 #define ERRMAS_READ_FILE(name) \
 	_("failed to read file `%s'"), name
 
-int redirect_output(const char *dest);
+void setup_lr_logging(void);
+
+void teardown_lr_logging(void);
 
 #endif /* TERMAS_H */

@@ -11,6 +11,7 @@
 #include "alloc.h"
 #include "strbuf.h"
 #include "debug.h"
+#include "path.h"
 
 #define UPDATE_BUF(buf, n, len)	\
 do {				\
@@ -230,20 +231,37 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 	exit(128);
 }
 
-int redirect_output(const char *dest)
+void setup_lr_logging(void)
 {
-	int fd = flexcreat(dest);
-	if (fd == -1)
-		return warn_errno(_("failed to create log file `%s'"), dest);
+	const char *name = get_log_filename();
+	int fd = flexcreat(name);
 
-	if (dup2(fd, STDOUT_FILENO) == -1)
-		return warn_errno(_("failed to redirect stdout to `%s'"),
-				  dest);
-	
-	if (dup2(fd, STDERR_FILENO) == -1)
-		return warn_errno(_("failed to redirect stderr to `%s'"),
-				  dest);
+	if (fd == -1)
+		warn_errno(_("failed to create log file `%s' for long-running task"),
+			   name);
+	else if (dup2(fd, STDOUT_FILENO) == -1)
+		warn_errno(_("failed to redirect stdout to `%s' for long-running task"),
+			   name);
+	else if (dup2(fd, STDERR_FILENO) == -1)
+		warn_errno(_("failed to redirect stderr to `%s' for long-running task"),
+			   name);
 
 	close(fd);
-	return 0;
+}
+
+void teardown_lr_logging(void)
+{
+	const char *name = get_log_filename();
+
+	struct stat st;
+	int err;
+
+	err = stat(name, &st);
+	if (err)
+		return;
+
+	if (st.st_size != 0)
+		return;
+
+	unlink(name);
 }

@@ -9,18 +9,19 @@
 #include "maincmd.h"
 #include "termas.h"
 #include "proc.h"
-#include "path.h"
+#include "atexit.h"
 
 static void __prepare_longrunning(void)
 {
 	// make_daemon();
 
-	const char *iodest = get_log_filename();
-	redirect_output(iodest);
-	/* todo: atexit cleanup empty log */
+	setup_lr_logging();
+	atexit_push(teardown_lr_logging);
 
 	push_process_id();
-	atexit(pop_process_id);
+	atexit_push(pop_process_id);
+
+	atexit_apply();
 }
 
 int main(int argc, const char **argv)

@@ -115,6 +115,7 @@ const char *get_log_filename(void)
 		path = userspec.lr_log_path;
 	if (!path)
 		path = filename_at_datadir(SAVLOG_NAME);
+	BUG_ON(!path);
 
 	return path;
 }
