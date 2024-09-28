@@ -9,6 +9,7 @@
 #include "list.h"
 #include "debug.h"
 #include "strbuf.h"
+#include "maincmd.h"
 
 static const char *find_data_dirname(void)
 {
@@ -49,17 +50,21 @@ const char *get_data_dirname(void)
 	return dir;
 }
 
+static char *filename_at_datadir(const char *name)
+{
+	const char *prefix = get_data_dirname();
+	struct strbuf sb = STRBUF_INIT;
+
+	strbuf_concat_path(&sb, prefix, name);
+	return sb.str;
+}
+
 const char *get_procid_filename(void)
 {
 	static const char *path;
 
-	if (!path) {
-		const char *prefix = get_data_dirname();
-		struct strbuf sb = STRBUF_INIT;
-
-		strbuf_concat_path(&sb, prefix, PROCID_NAME);
-		path = sb.str;
-	}
+	if (!path)
+		path = filename_at_datadir(PROCID_NAME);
 
 	return path;
 }
@@ -98,6 +103,18 @@ const char *get_dotsav_filename(void)
 		strbuf_concat_path(&sb, home, ".savesave");
 		path = sb.str;
 	}
+
+	return path;
+}
+
+const char *get_log_filename(void)
+{
+	static const char *path;
+
+	if (!path)
+		path = userspec.lr_log_path;
+	if (!path)
+		path = filename_at_datadir(SAVLOG_NAME);
 
 	return path;
 }

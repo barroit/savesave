@@ -16,4 +16,11 @@ extern void (*prepare_longrunning)(void);
 struct savesave;
 size_t get_dotsav(struct savesave **ret);
 
+struct userspec_argument {
+	const char *dotsav_path;
+	const char *lr_log_path;
+};
+
+extern struct userspec_argument userspec;
+
 #endif /* MAINCMD_H */

@@ -22,6 +22,7 @@ const char *get_executable_dirname(void);
 const char *get_tmp_dirname(void);
 
 #define PROCID_NAME "savesave.pid"
+#define SAVLOG_NAME "savesave.log"
 
 #define DATA_DIRLIST_INIT {			\
 	[0] = getenv("XDG_RUNTIME_DIR"),	\
@@ -36,5 +37,7 @@ const char *get_procid_filename(void);
 const char *get_locale_dirname(void);
 
 const char *get_dotsav_filename(void);
+
+const char *get_log_filename(void);
 
 #endif /* PATH_H */

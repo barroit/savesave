@@ -1,4 +1,7 @@
                                   TODO LIST
 
 ----
+atexit chain
+
+----
 make strbuf/strlist handle multibyte string

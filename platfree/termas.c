@@ -229,3 +229,21 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 
 	exit(128);
 }
+
+int redirect_output(const char *dest)
+{
+	int fd = flexcreat(dest);
+	if (fd == -1)
+		return warn_errno(_("failed to create log file `%s'"), dest);
+
+	if (dup2(fd, STDOUT_FILENO) == -1)
+		return warn_errno(_("failed to redirect stdout to `%s'"),
+				  dest);
+	
+	if (dup2(fd, STDERR_FILENO) == -1)
+		return warn_errno(_("failed to redirect stderr to `%s'"),
+				  dest);
+
+	close(fd);
+	return 0;
+}
