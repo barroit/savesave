@@ -31,7 +31,7 @@
 			   CONCAT2(prefix, 2),			\
 			   CONCAT2(prefix, 1))(__VA_ARGS__)
 
-#define typeof_member(type, member) typeof(((type *)0)->member)
+#define typeof_member(type, memb) typeof(((type *)0)->memb)
 
 #define sizeof_array(arr) (sizeof(arr) / sizeof((arr)[0]))
 
@@ -41,12 +41,12 @@
 # define static_assert(expr, message) _Static_assert(expr, message)
 #endif
 
-#define containerof(ptr, type, member)					\
+#define containerof(ptr, type, memb)					\
 ({									\
-	static_assert(same_type(*(ptr), typeof_member(type, member)) ||	\
+	static_assert(same_type(*(ptr), typeof_member(type, memb)) ||	\
 		      same_type(*(ptr), void),				\
-		      _("pointer type mismatch in containerof()"));	\
-	((type *)(((void *)ptr) - offsetof(type, member)));		\
+		      "pointer type mismatch in containerof()");	\
+	((type *)(((void *)ptr) - offsetof(type, memb)));		\
 })
 
 #ifdef __linux
