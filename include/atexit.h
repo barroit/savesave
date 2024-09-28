@@ -11,12 +11,12 @@
 #ifndef ATEXIT_H
 #define ATEXIT_H
 
-typedef void (*atexit_t)(void);
+typedef void (*atexit_function_t)(void);
 
-void atexit_push(atexit_t func);
+void atexit_push(atexit_function_t func);
 
-atexit_t atexit_pop(void);
+atexit_function_t atexit_pop(void);
 
-// void atexit_apply(void);
+void atexit_apply(void);
 
 #endif /* ATEXIT_H */
