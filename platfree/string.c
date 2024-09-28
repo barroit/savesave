@@ -124,6 +124,7 @@ err_inv_char:
 static int char2mult(char c, u16 *mult)
 {
 	*mult = 1;
+
 	switch (c) {
 	case 'H':
 	case 'h':
@@ -143,7 +144,7 @@ int str2timespan(const char *str, u32 *value)
 {
 	int err;
 
-	u16 mult;
+	u16 mult = 1;
 	size_t len = strlen(str);
 	char unit = str[len - 1];
 
