@@ -13,7 +13,7 @@
 
 static void __prepare_longrunning(void)
 {
-	// make_daemon();
+	detach_process();
 
 	setup_lr_logging();
 	atexit_push(teardown_lr_logging);

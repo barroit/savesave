@@ -16,4 +16,6 @@ void push_process_id(void);
 
 void pop_process_id(void);
 
+void detach_process(void);
+
 #endif /* PROC_H */
