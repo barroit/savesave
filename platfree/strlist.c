@@ -34,8 +34,6 @@ void strlist_destroy(struct strlist *sl)
 	sl->cap = 0;
 }
 
-#include "keepref.h"
-
 void strlist_reset(struct strlist *sl)
 {
 	BUG_ON(sl->use_ref);

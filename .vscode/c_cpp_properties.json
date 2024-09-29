@@ -3,39 +3,18 @@
 	"configurations": [
 		{
 			"name": "gcc",
-			"defines": [
-				"_GNU_SOURCE",
-				"HAVE_INTL"
-			],
 			"intelliSenseMode": "linux-gcc-x64",
-			"includePath": [
-				"${workspaceFolder}/include"
-			],
-			"compilerPath": "${env:HOME}/.local/bin/gcc",
-			"forcedInclude": [
-				"${workspaceFolder}/include/brtcomcent.h",
-				"${workspaceFolder}/include/generated/appinfo.h",
-				"${workspaceFolder}/include/generated/autoconf.h"
-			]
+			"compilerPath": "${env:HOME}/.local/bin/gcc"
 		},
 		{
 			"name": "mingw64",
 			"defines": [
-				"_GNU_SOURCE",
-				"HAVE_INTL",
+				"${default}",
 				"NTDDI_WIN7",
 				"WINVER=_WIN32_WINNT_WIN7",
 				"_WIN32_WINNT=_WIN32_WINNT_WIN7"
 			],
 			"intelliSenseMode": "windows-gcc-x64",
-			"includePath": [
-				"${workspaceFolder}/include"
-			],
-			"forcedInclude": [
-				"${workspaceFolder}/include/brtcomcent.h",
-				"${workspaceFolder}/include/generated/appinfo.h",
-				"${workspaceFolder}/include/generated/autoconf.h"
-			],
 			"compilerPath": "/usr/bin/x86_64-w64-mingw32-gcc"
 		}
 	],

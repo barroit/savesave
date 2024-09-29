@@ -12,5 +12,20 @@
 	},
 	"search.exclude": {
 		"**/locale/**": true
-	}
+	},
+	"C_Cpp.files.exclude": {
+		"**/sandbox/*": true,
+	},
+	"C_Cpp.default.includePath": [
+		"${workspaceFolder}/include"
+	],
+	"C_Cpp.default.forcedInclude": [
+		"${workspaceFolder}/include/brtcomcent.h",
+		"${workspaceFolder}/include/generated/appinfo.h",
+		"${workspaceFolder}/include/generated/autoconf.h"
+	],
+	"C_Cpp.default.defines": [
+		"_GNU_SOURCE",
+		"HAVE_INTL"
+	]
 }

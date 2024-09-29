@@ -9,6 +9,8 @@
 #include "list.h"
 #include "path.h"
 #include "termas.h"
+#include "strbuf.h"
+#include "noleak.h"
 
 struct pathinfo {
 	const char *name;
@@ -52,6 +54,9 @@ static int cmd_query_path(int argc, const char **argv)
 	};
 
 	int i;
+	struct strbuf sb = STRBUF_INIT;
+
+	strbuf_require_cap(&sb, PATH_MAX);
 	for_each_idx(i, argc) {
 		size_t j;
 		const char *name = argv[i];
@@ -63,7 +68,10 @@ static int cmd_query_path(int argc, const char **argv)
 				continue;
 
 			const char *path = q->func();
-			printf("%-10s %s\n", name, path);
+
+			strbuf_concatat_base(&sb, path);
+			strbuf_normalize_path(&sb);
+			printf("%-10s %s\n", name, sb.str);
 
 			goto next;
 		}
@@ -72,6 +80,7 @@ static int cmd_query_path(int argc, const char **argv)
 next:
 	}
 
+	NOLEAK(sb);
 	return 0;
 }
 
