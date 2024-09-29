@@ -22,12 +22,15 @@ enum arguopt_type {
 
 	ARGUOPT_STRING,		/* string */
 
+	ARGUOPT_MEMBINFO,	/* member information (print usage) */
+
 	ARGUOPT_TYPEMAX,
 };
 
-#define ARGUOPT_NOARG	(1 << 0)	/* no argument */
-#define ARGUOPT_OPTARG	(1 << 1)	/* argument is optional */
-#define ARGUOPT_HASNEG	(1 << 2)	/* negated version available (no-*) */
+#define ARGUOPT_NOARG   (1 << 0) /* no argument */
+#define ARGUOPT_OPTARG  (1 << 1) /* argument is optional */
+#define ARGUOPT_HASNEG  (1 << 2) /* negated version available (no-*) */
+#define ARGUOPT_NOUSAGE (1 << 3) /* no usage print */
 
 struct arguopt {
 	enum arguopt_type type;	/* option type */
@@ -37,32 +40,29 @@ struct arguopt {
 
 	void *value;		/* a pointer that points to the value */
 
-	intptr_t defval;	/* default value of the option (1) */
+	intptr_t defval;	/* default value of the option, the way the
+				   value be interpreted can vary, depending
+				   on the arguopt type */
 
-	const char *argh;	/* a short name of option argument (2) */
+	const char *argh;	/* a short name of option argument, should be
+				   wrapped by N_() for translation */
+
 	const char *usage;	/* option usages */
 
 	flag_t flag;		/* option flag */
 
-	int (*callback)(const struct arguopt *, const char *);	/* (3) */
-	int (*subcmd)(int, const char **);			/* (4) */
+	int (*callback)(const struct arguopt *, const char *);
+				/* function to use for ARGUOPT_CALLBACK */
 
-	/*
-	 * (1)	the way the value be interpreted can vary depending
-	 *	on the arguopt type
-	 *
-	 * (2)	should be wrapped by N_() for translation
-	 *
-	 * (3) function to use for ARGUOPT_CALLBACK
-	 *
-	 * (4) function to use for ARGUOPT_SUBCOMMAND
-	 */
+	int (*subcmd)(int, const char **);
+				/* function to use for ARGUOPT_SUBCOMMAND */
 };
 
 typedef typeof(((struct arguopt *)0)->subcmd) argupar_subcommand_t;
 
 #define AP_STOPAT_NONOPT (1 << 0) /* stop at non-option */
-#define AP_COMMAND_MODE  (1 << 1) /* stop at command (but parse it) */
+#define AP_COMMAND_MODE  (1 << 1) /* stop *after* command */
+#define AP_NEED_ARGUMENT (1 << 2) /* need argument */
 
 struct argupar {
 	int argc;
@@ -85,6 +85,8 @@ void argupar_init(struct argupar *ctx, int argc, const char **argv);
 
 int argupar_parse(struct argupar *ctx, struct arguopt *option,
 		  const char *const *usage, flag_t flag);
+
+extern int command_usage_no_newline;
 
 #define APOPT_END()		\
 {				\
@@ -143,6 +145,13 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 	.usage    = (h),			\
 	.subcmd   = (c),			\
 	.flag     = (f),			\
+}
+
+#define APOPT_MEMBINFO(l, h)			\
+{						\
+	.type     = ARGUOPT_MEMBINFO,		\
+	.longname = (l),			\
+	.usage    = (h),			\
 }
 
 #include "command.h"

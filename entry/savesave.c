@@ -97,9 +97,6 @@ int cmd_main(int argc, const char **argv)
 
 	if (is_longrunning && prepare_longrunning)
 		prepare_longrunning();
-
-	argc--;
-	argv++;
 	return runcmd(argc, argv);
 }
 

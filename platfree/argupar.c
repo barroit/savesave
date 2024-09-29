@@ -22,9 +22,10 @@
 				  const char *arg, int unset)
 
 enum arguret {
-	AP_ERROR   = -1, /* error */
-	AP_SUCCESS = 0,	 /* success */
+	AP_ERROR   = -1, /* equals to error() */
+	AP_SUCCESS = 0,
 	AP_DONE,	 /* no more options to be parsed */
+	AP_SUBCMD
 };
 
 void argupar_init(struct argupar *ctx, int argc, const char **argv)
@@ -38,14 +39,17 @@ void argupar_init(struct argupar *ctx, int argc, const char **argv)
 
 static void debug_check_argupar(struct argupar *ctx)
 {
-	struct arguopt *opt = ctx->option;
+	BUG_ON(!ctx->usage);
 
 	BUG_ON((ctx->flag & AP_STOPAT_NONOPT) &&
 	       (ctx->flag & AP_COMMAND_MODE));
 
+	struct arguopt *opt = ctx->option;
 	for_each_option(opt) {
 		if (opt->type == ARGUOPT_GROUP)
 			continue;
+
+		BUG_ON(!opt->usage && !(opt->flag & ARGUOPT_NOUSAGE));
 
 		if (ctx->flag & AP_COMMAND_MODE)
 			continue;
@@ -68,7 +72,7 @@ static enum arguret parse_subcommand(struct arguopt *opt, const char *cmd)
 			continue;
 
 		*(argupar_subcommand_t *)opt->value = opt->subcmd;
-		return AP_DONE;
+		return AP_SUBCMD;
 	}
 
 	return error("no matching subcommand found for `%s'", cmd);
@@ -220,7 +224,10 @@ static int parse_longopt(struct argupar *ctx)
 
 	for_each_option(opt) {
 		const char *optname = opt->longname;
-		if (!optname || opt->type == ARGUOPT_SUBCOMMAND)
+
+		if (!optname ||
+		    opt->type == ARGUOPT_SUBCOMMAND ||
+		    opt->type == ARGUOPT_MEMBINFO)
 			continue;
 
 		int opt_unset = strskip(optname, "no-", &optname) == 0;
@@ -313,10 +320,16 @@ next:
 	}
 }
 
-static void print_option_usage(struct arguopt *option, struct strlist *sl)
+static size_t print_option_usage(struct arguopt *option, struct strlist *sl)
 {
 	struct arguopt *opt = option;
+	size_t cnt = 0;
+
 	for_each_option(opt) {
+		if (opt->flag & ARGUOPT_NOUSAGE)
+			continue;
+
+		cnt++;
 		if (opt->type == ARGUOPT_GROUP) {
 			printf("\n");
 			if (opt->longname)
@@ -344,8 +357,11 @@ static void print_option_usage(struct arguopt *option, struct strlist *sl)
 		if (opt->shrtname)
 			nr += printf("-%c, ", opt->shrtname);
 
-		fmt = (opt->flag & ARGUOPT_HASNEG) ? "--[no-]%s" :
-						     "--%s";
+		if (opt->type == ARGUOPT_MEMBINFO)
+			fmt = "%s";
+		else
+			fmt = (opt->flag & ARGUOPT_HASNEG) ? "--[no-]%s" :
+							     "--%s";
 		nr += printf(fmt, opt->longname);
 
 		if (!opt->argh)
@@ -380,17 +396,25 @@ print_option_usage:
 next:
 		strlist_reset(sl);
 	}
+
+	return cnt;
 }
+
+/* I fucked this up :( */
+int command_usage_no_newline;
 
 static NORETURN prompt_shrt_help(struct argupar *ctx)
 {
 	struct strlist sl = STRLIST_INIT;
 
 	print_command_usage(ctx->usage, &sl);
-	putchar('\n');
+	if (!command_usage_no_newline)
+		putchar('\n');
 
-	print_option_usage(ctx->option, &sl);
-	putchar('\n');
+	size_t cnt = print_option_usage(ctx->option, &sl);
+	if (cnt > 0)
+		putchar('\n');
+
 	exit(128);
 }
 
@@ -446,10 +470,14 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 	DEBUG_RUN()
 		debug_check_argupar(ctx);
 
+	if (flag & AP_NEED_ARGUMENT && !ctx->argc)
+		prompt_shrt_help(ctx);
+
 	enum arguret ret;
 	while (ctx->argc) {
 		ret = do_parse(ctx);
 		switch (ret) {
+		case AP_SUBCMD:
 		case AP_SUCCESS:
 			break;
 		case AP_ERROR:
@@ -460,6 +488,9 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 
 		ctx->argc--;
 		ctx->argv++;
+
+		if (ret == AP_SUBCMD)
+			goto parse_done;
 	}
 
 parse_done:
