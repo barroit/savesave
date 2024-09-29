@@ -3,9 +3,6 @@
  * Copyright 2024 Jiamu Sun
  *
  * Contact: barroit@linux.com
- *
- * not necessary for current work, leave definitions
- * here for later implementation
  */
 
 #ifndef ATEXIT_H

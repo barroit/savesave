@@ -44,7 +44,7 @@ int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int __)
 	cmd_main(argc, argv);
 
 	if (!is_longrunning)
-		exit(0);
+		exit(39);
 
 	HWND window = create_main_window(app);
 

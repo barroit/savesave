@@ -9,9 +9,12 @@
 
 #include "console.h"
 #include "termas.h"
+#include "debug.h"
 
 void winexit(int code)
 {
+	BUG_ON(code == STILL_ACTIVE);
+
 #ifndef CONFIG_IS_CONSOLE_APP
 	if (code) {
 		show_console();
@@ -20,6 +23,13 @@ void winexit(int code)
 		_getch();
 	}
 #endif
+
+	/*
+	 * we need a magic value to make a console display even if there's no
+	 * error, so miku is used
+	 */
+	if (code == 39)
+		code = 0;
 
 	exit(code);
 }
