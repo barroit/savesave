@@ -12,17 +12,10 @@
 #include "termas.h"
 #include "debug.h"
 
-#define TMRSIGID (SIGRTMIN + (uint)3.9)
-
-static void tmrfunc(int sig, siginfo_t *info, void *ucontext)
+static void tmrfunc(sigval_t sv)
 {
-	struct savesave *sav = info->si_value.sival_ptr;
-
-	if (!sav)
-		/*
-		 * a bad guy sends TMRSIGID to our process
-		 */
-		return;
+	struct savesave *sav = sv.sival_ptr;
+	puts(sav->name);
 }
 
 void baktimer_init(struct baktimer *bt, struct savesave *savarr, size_t savnl)
@@ -31,26 +24,16 @@ void baktimer_init(struct baktimer *bt, struct savesave *savarr, size_t savnl)
 	bt->sav = savarr;
 	bt->nl = savnl;
 
-	int err;
-	struct sigaction sa = {
-		.sa_flags     = SA_SIGINFO,
-		.sa_sigaction = tmrfunc,
-	};
-
-	sigemptyset(&sa.sa_mask);
-	err = sigaction(TMRSIGID, &sa, NULL);
-	BUG_ON(err);
-
 	struct sigevent sev = {
-		.sigev_notify = SIGEV_SIGNAL,
-		.sigev_signo  = TMRSIGID,
+		.sigev_notify           = SIGEV_THREAD,
+		.sigev_notify_function  = tmrfunc,
 	};
 
 	size_t i;
 	for_each_idx(i, bt->nl) {
 		sev.sigev_value.sival_ptr = &bt->sav[i];
 
-		err = timer_create(CLOCK_REALTIME, &sev, &bt->tmr[i]);
+		int err = timer_create(CLOCK_REALTIME, &sev, &bt->tmr[i]);
 		if (err)
 			die_errno(_("failed to create backup timer for sav `%s'"),
 				  bt->sav[i].name);
