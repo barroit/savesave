@@ -20,7 +20,8 @@ CMDDESCRIP("Start backup task in background")
 	struct savesave *sav;
 	size_t nl = get_dotsav(&sav);
 
-	baktimer_init(&bt, sav, nl);
-	baktimer_arm(&bt);
+	dotsav_print(sav);
+	// baktimer_init(&bt, sav, nl);
+	// baktimer_arm(&bt);
 	return 0;
 }

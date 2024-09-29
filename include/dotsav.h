@@ -9,6 +9,8 @@
 #define SAVCONF_H
 
 struct savesave {
+	uint pos;
+
 	char *name;
 
 	char *save_prefix;

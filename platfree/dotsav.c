@@ -163,7 +163,9 @@ static void append_savesave(struct dotsav *ctx)
 {
 	CAP_ALLOC(&ctx->savarr, ctx->savnl + 1, &ctx->savcap);
 
-	memset(&ctx->savarr[ctx->savnl++], 0, sizeof(*ctx->savarr));
+	memset(&ctx->savarr[ctx->savnl], 0, sizeof(*ctx->savarr));
+	ctx->savarr[ctx->savnl].pos = ctx->savnl;
+	ctx->savnl++;
 }
 
 static int apply_savent(struct savent *ent,
@@ -359,19 +361,14 @@ void dotsav_print(struct savesave *sav)
 	for_each_sav(sav) {
 		ssize_t size = sav->save_size / 1000 / 1000;
 
-		printf("%s\n", sav->name);
+		puts(sav->name);
+		printf("	pos	 %u\n", sav->pos);
 		printf("	save	 %s\n", sav->save_prefix);
 		printf("	backup	 %s\n", sav->backup_prefix);
-		putchar('\n');
-
 		printf("	size	 %zdM\n", size);
 		printf("	dirsave	 %d\n", sav->is_dir_save);
-		putchar('\n');
-
 		printf("	compress %d\n", sav->use_compress);
 		printf("	snapshot %d\n", sav->use_snapshot);
-		putchar('\n');
-
 		printf("	period	 %" PRIu32 "\n", sav->period);
 		printf("	stack	 %" PRIu8 "\n", sav->stack);
 		putchar('\n');
