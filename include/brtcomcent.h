@@ -130,6 +130,9 @@ typedef SSIZE_T ssize_t;
 
 #define PATH_MAX MAX_PATH
 
+typedef unsigned int uint;
+typedef unsigned short ushort;
+
 typedef uint mode_t;
 
 typedef off_t off64_t;

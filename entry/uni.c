@@ -16,10 +16,10 @@ static void __prepare_longrunning(void)
 	detach_process();
 
 	setup_lr_logging();
-	atexit_push(teardown_lr_logging);
+	atexit_enque(teardown_lr_logging);
 
 	push_process_id();
-	atexit_push(pop_process_id);
+	atexit_enque(pop_process_id);
 
 	atexit_apply();
 }
@@ -31,5 +31,9 @@ int main(int argc, const char **argv)
 	prepare_longrunning = __prepare_longrunning;
 	cmd_main(argc, argv);
 
-	exit(0);
+	if (!is_longrunning)
+		exit(0);
+
+	while (39)
+		pause();
 }

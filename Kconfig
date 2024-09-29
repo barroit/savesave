@@ -129,6 +129,9 @@ config SOURCE_NDEBUG
 config SUPPRESS_ANNOTATED_LEAKS
 	bool "suppress annotated leaks"
 
+config NO_LONGRUNNING_DAEMON
+	bool "disable daemonized longrunning"
+
 menu "Windows"
 	depends on $(BUILD) = "windows"
 

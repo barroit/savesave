@@ -22,6 +22,10 @@ static size_t savnl;
 int is_longrunning;
 void (*prepare_longrunning)(void);
 
+#ifdef CONFIG_NO_LONGRUNNING_DAEMON
+# define prepare_longrunning() do {} while (0)
+#endif
+
 static void prepare_dotsav(void)
 {
 	if (!userspec.dotsav_path)

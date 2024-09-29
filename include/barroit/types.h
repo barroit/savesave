@@ -16,7 +16,6 @@ typedef uint64_t u64;
 typedef long long llong;
 typedef unsigned long long ullong;
 
-
 typedef uintmax_t flag_t;
 
 #endif /* BRT_TYPES_H */

@@ -18,7 +18,7 @@ struct atexit {
 	struct list_head list;
 };
 
-void atexit_push(atexit_function_t func)
+void atexit_enque(atexit_function_t func)
 {
 	struct atexit *ae = xmalloc(sizeof(*ae));
 
@@ -26,7 +26,7 @@ void atexit_push(atexit_function_t func)
 	list_add_tail(&ae->list, &aearr);
 }
 
-atexit_function_t atexit_pop(void)
+atexit_function_t atexit_deque(void)
 {
 	if (list_is_empty(&aearr))
 		return NULL;
@@ -44,6 +44,6 @@ void atexit_apply(void)
 {
 	atexit_function_t func;
 
-	while (func = atexit_pop())
+	while (func = atexit_deque())
 		atexit(func);
 }

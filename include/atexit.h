@@ -13,9 +13,9 @@
 
 typedef void (*atexit_function_t)(void);
 
-void atexit_push(atexit_function_t func);
+void atexit_enque(atexit_function_t func);
 
-atexit_function_t atexit_pop(void);
+atexit_function_t atexit_deque(void);
 
 void atexit_apply(void);
 

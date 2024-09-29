@@ -172,9 +172,7 @@ static int apply_savent(struct savent *ent,
 	int ret = 0;
 	intptr_t addr = (intptr_t)sav + ent->offset;
 
-	/*
-	 * damn, I made this shit too flexible
-	 */
+	/* I made this shit too flexible */
 	switch (ent->type) {
 	case SAVENT_ENTSEP:
 		if (strnxtws(val))

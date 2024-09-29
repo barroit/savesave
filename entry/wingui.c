@@ -12,24 +12,39 @@
 #include "window.h"
 #include "notifyicon.h"
 #include "maincmd.h"
+#include "termas.h"
+#include "atexit.h"
+#include "proc.h"
 
-int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int ___)
+static void __prepare_longrunning(void)
+{
+	setup_lr_logging();
+	atexit_enque(teardown_lr_logging);
+
+	push_process_id();
+	atexit_enque(pop_process_id);
+
+	atexit_apply();
+}
+
+int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int __)
 {
 	do_setup();
 	setup_console();
 	do_delayed_setup();
 
-	const char *defargv[] = { "savesave", "start" };
+	const char *defargv[] = { "savesave", "backup" };
 	int argc = sizeof_array(defargv);
 	const char **argv = defargv;
 
 	if (*cmdline)
 		argc = getargv(&argv);
 
+	prepare_longrunning = __prepare_longrunning;
 	cmd_main(argc, argv);
 
 	if (!is_longrunning)
-		exit(39);
+		exit(0);
 
 	HWND window = create_main_window(app);
 

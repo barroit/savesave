@@ -1,2 +1,5 @@
 UNINITIALIZED READ
-system call NtQueryDirectoryFileEx parameter value #6
+system call NtQueryDirectoryFileEx*
+
+UNINITIALIZED READ
+ucrtbased.dll!strpbrk*
