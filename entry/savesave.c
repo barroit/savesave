@@ -53,7 +53,7 @@ int cmd_main(int argc, const char **argv)
 		APOPT_FILENAME(0, "dotsav", &userspec.dotsav_path,
 			       N_("use specified dotsav")),
 		APOPT_FILENAME(0, "log", &userspec.lr_log_path,
-			       N_("output to log file (only work for long-running task)")),
+			       N_("output to log file (only affect long-running tasks)")),
 		APOPT_GROUP("Savesave commands"),
 		APOPT_MAINCOMMAND(&runcmd),
 		APOPT_END(),

@@ -16,7 +16,10 @@ CMDDESCRIP("Display version information about Savesave")
 	     SAVESAVE_ARCH " " SAVESAVE_VERSION);
 
 	printf("   libzstd-%s\n", ZSTD_versionString());
+
+#ifdef HAVE_INTL
 	printf("   gettext-%s\n", GETTEXT_VERSION);
+#endif
 
 	return 0;
 }

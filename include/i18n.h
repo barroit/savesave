@@ -25,7 +25,7 @@ void setup_message_translation(void);
 #define textdomain(...)     do {} while (0)
 #define bindtextdomain(...) do {} while (0)
 
-#define setup_message_i18n() do {} while (0)
+#define setup_message_translation() do {} while (0)
 
 #endif /* HAVE_INTL */
 
