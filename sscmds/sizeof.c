@@ -23,7 +23,7 @@ CMDDESCRIP("Calculate file size of given path")
 
 	struct arguopt option[] = {
 		APOPT_COUNTUP('s', "from-dotsav", &from_dotsav,
-			      _("read path from dotsav")),
+			      N_("read path from dotsav")),
 		APOPT_END(),
 	};
 	const char *usage[] = {
