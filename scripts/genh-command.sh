@@ -16,14 +16,17 @@ declare=$(awk '
 }
 
 /^int cmd_[a-zA-Z_]+\(/ {
-	getline mas
-	if (!mas)
+	getline usage
+	if (!usage)
 		exit 1
 
+	split($0, res, /cmd_|[()]/)
+	cmd = res[2]
+
 	if (buf)
-		print $0 " " mas " " buf
+		print cmd "†" usage "†" buf
 	else
-		print $0 " " mas
+		print cmd "†" usage
 
 	nextfile
 }
@@ -55,25 +58,26 @@ cat <<EOF > $dest
 #define CMD_USEDOTSAV   (1 << 1)
 #define CMD_LONGRUNNING (1 << 2)
 
-#define CMDDESCRIP(mas)
+#define CMDDESCRIP(usage)
 
 EOF
 
-awk -F')' '{ print $1 ");" }' <<< $declare >> $dest
+awk -F'†' '{
+	printf "int cmd_%s(int argc, const char **argv);\n", $1
+}' <<< $declare >> $dest
 
 cat <<EOF >> $dest
 
 #define APOPT_MAINCOMMAND(v) \\
 EOF
 
-awk -F'[()]' '
+awk -F'†' '
 {
-	cmd = substr($1, 5)
-	printf "\tAPOPT_SUBCOMMAND(\"%s\", (v), N_(%s), %s, ", \
-	       substr(cmd, 5), $4, cmd
+	printf "\tAPOPT_SUBCOMMAND(\"%s\", (v), N_%s, cmd_%s, ",
+	       $1, substr($2, 11), $1
 
-	if ($5)
-		printf "%s)", substr($5, 2)
+	if ($3)
+		printf "%s)", $3
 	else
 		printf "0)"
 
@@ -82,7 +86,7 @@ awk -F'[()]' '
 	else
 		print ""
 
-}' n=$(wc -l <<< $declare) <<< $declare  >> $dest
+}' n=$(wc -l <<< $declare) <<< $declare >> $dest
 
 cat <<EOF >> $dest
 
