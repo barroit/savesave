@@ -15,10 +15,12 @@ struct list_head {
 	struct list_head *next;
 };
 
-#define LIST_HEAD(name) \
-	struct list_head name = { &(name), &(name) }
+#define LIST_HEAD_INIT(name) { &(name), &(name) }
 
-static inline void list_init(struct list_head *list)
+#define LIST_HEAD(name) \
+	struct list_head name = LIST_HEAD_INIT(name)
+
+static inline void list_head_init(struct list_head *list)
 {
 	list->next = list;
 	list->prev = list;

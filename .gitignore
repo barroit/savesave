@@ -1,15 +1,19 @@
 # SPDX-License-Identifier: GPL-3.0-only
-/.gdbinit
-/.savesave
-/.config
-/.config.old
-/savesave.manifest
 
-/build/*
-!/build/locale
-/include/generated
-/locale/*~
-/locale/generated.pot
+.gdbinit
 
-/sandbox
-/DRAFT
+.savesave.*
+!.savesave.example
+
+.config
+.config.old
+
+build/*
+!build/locale
+savesave.manifest
+include/generated
+locale/*~
+locale/generated.pot
+
+sandbox
+DRAFT

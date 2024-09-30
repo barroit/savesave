@@ -9,6 +9,7 @@
 #define BAKTIMER_H
 
 struct savesave;
+struct baksched;
 
 struct baktimer {
 	size_t nl;
@@ -19,17 +20,21 @@ struct baktimer {
 #else
 	HANDLE *tmr;
 	HANDLE tmrque;
+	struct baksched *bs;
 #endif
 };
 
-typedef struct baktimer baktimer_t;
+typedef struct baktimer *baktimer_t;
 
-void baktimer_init(baktimer_t *bt, struct savesave *savarr, size_t savnl);
+void baktimer_init(baktimer_t *ctx,
+		   struct baksched *bs, struct savesave *sav, size_t nl);
 
-void baktimer_arm(baktimer_t *bt);
+void PLATSPECOF(baktimer_init)(struct baktimer *ctx, struct baksched *bs);
 
-void baktimer_disarm(baktimer_t *bt);
+void baktimer_arm(baktimer_t ctx);
 
-void baktimer_destroy(baktimer_t *bt);
+// void baktimer_disarm(baktimer_t ctx);
+
+// void baktimer_destroy(baktimer_t ctx);
 
 #endif /* BAKTIMER_H */

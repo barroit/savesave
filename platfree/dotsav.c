@@ -163,8 +163,12 @@ static void append_savesave(struct dotsav *ctx)
 {
 	CAP_ALLOC(&ctx->savarr, ctx->savnl + 1, &ctx->savcap);
 
-	memset(&ctx->savarr[ctx->savnl], 0, sizeof(*ctx->savarr));
-	ctx->savarr[ctx->savnl].pos = ctx->savnl;
+	struct savesave *new = &ctx->savarr[ctx->savnl];
+	memset(new, 0, sizeof(*ctx->savarr));
+
+	new->task_idx = ctx->savnl / sizeof(ullong);
+	new->task_pos = 1 << (ctx->savnl % sizeof(ullong));
+
 	ctx->savnl++;
 }
 
@@ -362,7 +366,6 @@ void dotsav_print(struct savesave *sav)
 		ssize_t size = sav->save_size / 1000 / 1000;
 
 		puts(sav->name);
-		printf("	pos	 %u\n", sav->pos);
 		printf("	save	 %s\n", sav->save_prefix);
 		printf("	backup	 %s\n", sav->backup_prefix);
 		printf("	size	 %zdM\n", size);

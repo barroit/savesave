@@ -10,19 +10,6 @@
 #ifndef BRTCOMCENT_H
 #define BRTCOMCENT_H
 
-/*
- * include MSVC's <atomic> with stdatomic.h provided by clang, will cause
- * function signature conflicting
- * 
- * clang --- void atomic_thread_fence(memory_order)
- * conflicts
- * MSVC  --- _EXPORT_STD extern "C" inline void atomic_thread_fence(const
- *           memory_order _Order) noexcept
- */
-#ifdef _WIN32
-# define _ATOMIC_
-#endif
-
 #include <stddef.h>
 #include <stdint.h>
 #include <inttypes.h>
@@ -39,9 +26,9 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <stdatomic.h>
 #include <wchar.h>
 #include <signal.h>
+#include <threads.h>
 
 #ifdef _WIN32
 # include <sdkddkver.h>
@@ -69,7 +56,6 @@
 # include <libgen.h>
 # include <dirent.h>
 # include <sys/select.h>
-# include <pthread.h>
 #endif
 
 #include "ansidecl.h"

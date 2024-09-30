@@ -236,6 +236,9 @@ void setup_lr_logging(void)
 	const char *name = get_log_filename();
 	int fd = flexcreat(name);
 
+	setbuf(stdout, NULL);
+	setbuf(stderr, NULL);
+
 	if (fd == -1)
 		warn_errno(_("failed to create log file `%s' for long-running task"),
 			   name);

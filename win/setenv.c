@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-#include "keepref.h"
+#include "noleak.h"
 
 int setenv(const char *name, const char *value, int overwrite)
 {
@@ -33,7 +33,7 @@ int setenv(const char *name, const char *value, int overwrite)
 	if (err)
 		goto err_put_env;
 
-	KEEPREF(str);
+	NOLEAK(str);
 	return 0;
 
 err_put_env:

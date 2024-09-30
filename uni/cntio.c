@@ -5,35 +5,35 @@
  * Contact: barroit@linux.com
  */
 
-void cntio_cntadd1(void);
-void cntio_cntsub1(void);
+#include "debug.h"
 
 #ifdef opendir
 # undef opendir
 #endif
 
+DIR *cntopendir(const char *name)
+{
+	DIR *dir = opendir(name);
+
+	if (likely(dir != NULL))
+		__atomic_fetch_add(&cntio_fdcnt, 1, __ATOMIC_RELAXED);
+
+	return dir;
+}
+
 #ifdef closedir
 # undef closedir
 #endif
 
-DIR *cntopendir(const char *name)
-{
-	DIR *dir = opendir(name);
-	if (dir == NULL)
-		return NULL;
-
-	cntio_cntadd1();
-	return dir;
-}
-
 int cntclosedir(DIR *dirp)
 {
-	int err;
+	int ret = closedir(dirp);
 
-	err = closedir(dirp);
-	if (err)
-		return -1;
+	if (likely(ret == 0)) {
+		uint prev = __atomic_fetch_sub(&cntio_fdcnt,
+					       1, __ATOMIC_RELAXED);
+		BUG_ON(prev == 0);
+	}
 
-	cntio_cntsub1();
-	return 0;
+	return ret;
 }

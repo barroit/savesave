@@ -9,8 +9,6 @@
 #define SAVCONF_H
 
 struct savesave {
-	uint pos;
-
 	char *name;
 
 	char *save_prefix;
@@ -24,6 +22,9 @@ struct savesave {
 
 	u32 period;
 	u8 stack;
+
+	uint task_idx;
+	ullong task_pos;
 };
 
 #define for_each_sav(sav) for (; sav->name; sav++)
