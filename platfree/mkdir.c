@@ -62,8 +62,8 @@ int rmdirr(const char *name)
 	int ret;
 	struct fileiter iter;
 
-	fileiter_init(&iter, name, do_rmdirr, NULL, FI_LIST_DIR);
-	ret = fileiter_exec(&iter);
+	fileiter_init(&iter, do_rmdirr, NULL, FITER_RECUR_DIR);
+	ret = fileiter_exec(&iter, name);
 	fileiter_destroy(&iter);
 
 	return ret;
@@ -74,10 +74,10 @@ int calc_dir_size(const char *name, off_t *size)
 	int err;
 	struct fileiter ctx;
 
-	fileiter_init(&ctx, name, PLATSPECOF(sizeof_file), size,
-		      FI_USE_STAT | FI_LOOP_UNSUP);
+	fileiter_init(&ctx, PLATSPECOF(sizeof_file), size,
+		      FITER_USE_STAT | FITER_LIST_UNSUP);
 
-	err = fileiter_exec(&ctx);
+	err = fileiter_exec(&ctx, name);
 	if (err)
 		goto err_calc_size;
 

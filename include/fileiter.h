@@ -30,7 +30,7 @@ struct fileiter_file {
 	int fd;
 };
 
-typedef int (*fileiter_callback_t)(struct fileiter_file *file, void *data);
+typedef int (*fileiter_function_t)(struct fileiter_file *file, void *data);
 
 struct fileiter {
 	const char *root;
@@ -38,24 +38,29 @@ struct fileiter {
 	struct strbuf *sb;
 	struct strlist *sl;
 
-	fileiter_callback_t cb;
+	fileiter_function_t cb;
 	void *data;
 
 	flag_t flag;
 };
 
-#define FI_USE_STAT   (1 << 0)
-#define FI_USE_FD     (1 << 1)
-#define FI_LIST_DIR   (1 << 2)
-#define FI_LOOP_UNSUP (1 << 3)
+#define FITER_USE_STAT   (1 << 0)	/* make st member available */
+#define FITER_USE_FD     (1 << 1)	/* make fd member available */
+#define FITER_LIST_DIR   (1 << 2)	/* list directories */
+#define FITER_RECUR_DIR  (1 << 3)	/* list directories like a recursive
+					   call, useful for implementing
+					   recursive directories deletion */
+#define FITER_LIST_UNSUP (1 << 4)	/* list unsupported files */
 
-void fileiter_init(struct fileiter *ctx, const char *root,
-		   fileiter_callback_t cb, void *data, flag_t flags);
+/**
+ * fileiter_init - Initialize file iterator
+ */
+void fileiter_init(struct fileiter *ctx,
+		   fileiter_function_t cb, void *data, flag_t flags);
 
-void fileiter_destroy(struct fileiter *ctx);
-
+int fileiter_exec(struct fileiter *ctx, const char *root);
 int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx);
 
-int fileiter_exec(struct fileiter *ctx);
+void fileiter_destroy(struct fileiter *ctx);
 
 #endif /* FILEITER_H */

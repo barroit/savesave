@@ -181,7 +181,7 @@ static int do_backup(const char *dest, const char *temp,
 		     const char *save, int use_compress)
 {
 	int ret;
-	fileiter_callback_t cb;
+	fileiter_function_t cb;
 
 	if (use_compress) {
 		cb = backup_file_compress;
@@ -202,8 +202,8 @@ static int do_backup(const char *dest, const char *temp,
 		[1] = strbuf_from2("", 0, PATH_MAX),
 	};
 
-	fileiter_init(&iter, save, cb, data, FI_USE_STAT | FI_USE_FD);
-	ret = fileiter_exec(&iter);
+	fileiter_init(&iter, cb, data, FITER_USE_STAT | FITER_USE_FD);
+	ret = fileiter_exec(&iter, save);
 	if (ret)
 		error(_("failed to backup save `%s' to `%s'"), save, dest);
 

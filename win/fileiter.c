@@ -51,7 +51,7 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 		return 0;
 	}
 
-	if (ctx->flag & FI_USE_STAT) {
+	if (ctx->flag & FITER_USE_STAT) {
 		int err = stat(absname, file.st);
 		if (err) {
 			warn_errno(ERRMAS_STAT_FILE(absname));
@@ -66,7 +66,8 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 
 	DWORD attr = GetFileAttributes(absname);
 
-	if ((ctx->flag & FI_LOOP_UNSUP) || (attr & FILE_ATTRIBUTE_ARCHIVE)) {
+	if ((ctx->flag & FITER_LIST_UNSUP) ||
+	    (attr & FILE_ATTRIBUTE_ARCHIVE)) {
 		file.st->st_mode = _S_IFREG;
 		return ctx->cb(&file, ctx->data);
 	}
