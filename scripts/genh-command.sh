@@ -6,7 +6,7 @@ if [[ ! -f .savesave.example ]]; then
 	exit 1
 fi
 
-src=$(echo sscmds/*.c)
+src=$(echo commands/*.c)
 dest=include/command.h
 
 declare=$(awk '

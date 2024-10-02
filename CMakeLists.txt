@@ -100,7 +100,7 @@ endif()
 add_library(platspec OBJECT ${platspec_src})
 
 # -------------------------------- platfree --------------------------------
-file(GLOB platfree_src LIST_DIRECTORIES false platfree/*.c sscmds/*.c)
+file(GLOB platfree_src LIST_DIRECTORIES false platfree/*.c commands/*.c)
 add_library(platfree OBJECT ${platfree_src})
 
 # -------------------------------- savesave --------------------------------
