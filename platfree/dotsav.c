@@ -64,43 +64,43 @@ struct dotsav {
 	size_t savcap;
 };
 
-#define for_each_savent(ent) for (; ent->type != SAVENT_END; ent++)
-
 char *read_dotsav(const char *name)
 {
 	int fd = open(name, O_RDONLY);
-	if (fd == -1) {
-		error_errno(ERRMAS_OPEN_FILE(name));
-		goto err_open_fd;
-	}
+	if (fd == -1)
+		goto err_open_file;
 
-	int ret;
 	struct stat st;
+	int err = fstat(fd, &st);
 
-	ret = fstat(fd, &st);
-	if (ret == -1) {
-		error_errno(ERRMAS_STAT_FILE(name));
-		goto err_stat_fd;
-	}
+	if (err == -1)
+		goto err_stat_file;
 
 	char *buf = xmalloc(st.st_size + 1);
 	buf[st.st_size] = 0;
 
-	ret = robread(fd, buf, st.st_size);
-	if (ret == -1) {
+	ssize_t nr = robread(fd, buf, st.st_size);
+	if (nr == -1)
+		goto err_read_file;
+
+	if (0) {
+	err_open_file:
+		error_errno(ERRMAS_OPEN_FILE(name));
+	} else if (0) {
+	err_stat_file:
+		error_errno(ERRMAS_STAT_FILE(name));
+	} else if (0) {
+	err_read_file:
 		error_errno(ERRMAS_READ_FILE(name));
-		goto err_read_fd;
+	}
+
+	if (err) {
+		free(buf);
+		buf = NULL;
 	}
 
 	close(fd);
 	return buf;
-
-err_read_fd:
-	free(buf);
-err_stat_fd:
-	close(fd);
-err_open_fd:
-	return NULL;
 }
 
 static int interpret_save(struct savesave *sav, void *data)
@@ -110,21 +110,18 @@ static int interpret_save(struct savesave *sav, void *data)
 	struct stat st;
 
 	if (!is_absolute_path(save))
-		return error(_("save path `%s' is not absolute"), save);
+		return error(_("save `%s' must be absolute path"), save);
 
 	err = stat(save, &st);
 	if (err)
 		return error_errno(ERRMAS_STAT_FILE(save));
 
-	if (S_ISREG(st.st_mode)) {
-		sav->save_size = st.st_size;
+	if (S_ISREG(st.st_mode))
 		sav->is_dir_save = 0;
-	} else if (S_ISDIR(st.st_mode)) {
+	else if (S_ISDIR(st.st_mode))
 		sav->is_dir_save = 1;
-		return calc_dir_size(save, &sav->save_size);
-	} else if (!st.st_size) {
+	else if (!st.st_size)
 		return error(_("unsupported save file `%s'"), save);
-	}
 
 	return 0;
 }
@@ -217,7 +214,7 @@ static int parse_line(struct dotsav *ctx)
 		return 0;
 
 	struct savent *ent = ctx->ent;
-	for_each_savent(ent) {
+	for (; ent->type != SAVENT_END; ent++) {
 		if (!ent->name)
 			continue;
 
@@ -289,14 +286,8 @@ static void finalize_parsing(struct savesave *sav)
 	for_each_sav(sav) {
 		check_valid_savent(sav);
 
-		if (sav->use_compress == -1 &&
-		    sav->is_dir_save &&
-		    sav->save_size > CONFIG_COMPRESSING_THRESHOLD)
+		if (sav->use_compress == -1 && sav->is_dir_save)
 			sav->use_compress = 1;
-
-		if (sav->use_snapshot == -1 &&
-		    sav->save_size > CONFIG_SNAPSHOT_THRESHOLD)
-			sav->use_snapshot = 1;
 
 		update_backup_prefix(sav);
 	}
@@ -340,7 +331,6 @@ size_t dotsav_parse(char *savstr, struct savesave **sav)
 		SE_STRING("save", save_prefix, interpret_save),
 		SE_STRING("backup", backup_prefix, NULL),
 
-		SE_FLAG("snapshot", use_snapshot, NULL),
 		SE_FLAG("compress", use_compress, NULL),
 
 		SE_TIMESPAN("period", period, check_period),
@@ -363,15 +353,11 @@ size_t dotsav_parse(char *savstr, struct savesave **sav)
 void dotsav_print(struct savesave *sav)
 {
 	for_each_sav(sav) {
-		ssize_t size = sav->save_size / 1000 / 1000;
-
 		puts(sav->name);
 		printf("	save	 %s\n", sav->save_prefix);
 		printf("	backup	 %s\n", sav->backup_prefix);
-		printf("	size	 %zdM\n", size);
 		printf("	dirsave	 %d\n", sav->is_dir_save);
 		printf("	compress %d\n", sav->use_compress);
-		printf("	snapshot %d\n", sav->use_snapshot);
 		printf("	period	 %" PRIu32 "\n", sav->period);
 		printf("	stack	 %" PRIu8 "\n", sav->stack);
 		putchar('\n');

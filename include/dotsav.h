@@ -14,11 +14,8 @@ struct savesave {
 	char *save_prefix;
 	char *backup_prefix;
 
-	off_t save_size;
 	int is_dir_save;
-
 	int use_compress;
-	int use_snapshot;
 
 	u32 period;
 	u8 stack;

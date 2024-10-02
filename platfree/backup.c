@@ -228,10 +228,6 @@ int backup(struct savesave *c)
 		fflush(stdout);
 	}
 
-	if (c->use_snapshot) {
-		/* create snapshot here */
-	}
-
 	ret = do_backup(dest, temp, c->save_prefix, c->use_compress);
 
 	free(dest);

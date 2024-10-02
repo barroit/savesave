@@ -97,14 +97,6 @@ config TMPFILE_EXTENTION
 	string "file extension for temporary directory (no dot)"
 	default "tmp"
 
-config COMPRESSING_THRESHOLD
-	int "size threshold for compression (in KiB)"
-	default 30720
-
-config SNAPSHOT_THRESHOLD
-	int "size threshold for creating snapshot (in MiB)"
-	default 102400
-
 config LINEWRAP_THRESHOLD
 	int "character threshold for line wrap"
 	default 80

@@ -34,14 +34,13 @@ void baktimer_arm(struct baktimer *ctx)
 		struct savesave *sav = &ctx->sav[i];
 		void **data = xcalloc(sizeof(void *), 2);
 		DWORD cd = sav->period * 1000;
-		ULONG flag = sav->save_size > CONFIG_COMPRESSING_THRESHOLD ?
-			     WT_EXECUTELONGFUNCTION : WT_EXECUTEDEFAULT;
 
 		data[0] = &ctx->sav[i];
 		data[1] = ctx->bs;
 
 		int err = !CreateTimerQueueTimer(&ctx->tmr[i], ctx->tmrque,
-						 tmrfunc, data, cd, cd, flag);
+						 tmrfunc, data, cd, cd,
+						 WT_EXECUTELONGFUNCTION);
 
 		if (err)
 			die_winerr(_("failed to create timer for sav `%s'"),
