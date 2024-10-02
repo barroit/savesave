@@ -8,22 +8,6 @@
 #ifndef SAVCONF_H
 #define SAVCONF_H
 
-struct savesave {
-	char *name;
-
-	char *save_prefix;
-	char *backup_prefix;
-
-	int is_dir_save;
-	int use_compress;
-
-	u32 period;
-	u8 stack;
-
-	uint task_idx;
-	ullong task_pos;
-};
-
 #define for_each_sav(sav) for (; sav->name; sav++)
 
 char *read_dotsav(const char *name);

@@ -8,15 +8,6 @@
 #ifndef STRBUF_H
 #define STRBUF_H
 
-struct strbuf {
-	char *str;
-	size_t len;
-	size_t cap;
-	size_t baslen;
-
-	int is_const;
-};
-
 #define STRBUF_INIT { 0 }
 
 #define STRBUF_CONSTANT 1 << 0

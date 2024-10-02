@@ -10,6 +10,7 @@
 #include "termas.h"
 #include "dotsav.h"
 #include "debug.h"
+#include "list.h"
 
 #define MAX_OVERLOAD_COUNT 10
 #define OVERLOAD_WINDOW    5

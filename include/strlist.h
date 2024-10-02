@@ -10,15 +10,6 @@
 
 #include "strbuf.h"
 
-struct strlist {
-	struct strbuf *list;
-	size_t uninit;
-	size_t nl;
-	size_t cap;
-
-	int use_ref;
-};
-
 #define STRLIST_INIT { 0 }
 
 #define STRLIST_USEREF 1 << 0

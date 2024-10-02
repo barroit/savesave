@@ -7,6 +7,7 @@
 
 #include "baktimer.h"
 #include "baksched.h"
+#include "list.h"
 #include "dotsav.h"
 #include "alloc.h"
 #include "termas.h"

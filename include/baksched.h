@@ -8,8 +8,6 @@
 #ifndef BAKSCHED_H
 #define BAKSCHED_H
 
-#include "list.h"
-
 struct baksched {
 	ullong *task;	/* bit set of task */
 	uint overload;	/* high traffic count */

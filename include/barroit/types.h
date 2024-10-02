@@ -18,4 +18,43 @@ typedef unsigned long long ullong;
 
 typedef uintmax_t flag_t;
 
+struct list_head {
+	struct list_head *prev;
+	struct list_head *next;
+};
+
+struct strbuf {
+	char *str;
+	size_t len;
+	size_t cap;
+	size_t baslen;
+
+	int is_const;
+};
+
+struct strlist {
+	struct strbuf *list;
+	size_t uninit;
+	size_t nl;
+	size_t cap;
+
+	int use_ref;
+};
+
+struct savesave {
+	char *name;
+
+	char *save_prefix;
+	char *backup_prefix;
+
+	int is_dir_save;
+	int use_compress;
+
+	u32 period;
+	u8 stack;
+
+	uint task_idx;
+	ullong task_pos;
+};
+
 #endif /* BRT_TYPES_H */
