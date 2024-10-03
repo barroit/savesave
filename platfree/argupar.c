@@ -75,7 +75,7 @@ static enum arguret parse_subcommand(struct arguopt *opt, const char *cmd)
 		return AP_SUBCMD;
 	}
 
-	return error("no matching subcommand found for `%s'", cmd);
+	return error("unknown command `%s'", cmd);
 }
 
 static OPTARG_APPLICATOR(subcommand)
@@ -135,7 +135,7 @@ static int dispatch_optarg(struct arguopt *opt, const char *arg, int unset)
 		[ARGUOPT_CALLBACK]   = apply_callback_optarg,
 
 		[ARGUOPT_COUNTUP]    = apply_countup_optarg,
-		[ARGUOPT_UINT]   = apply_uint_optarg,
+		[ARGUOPT_UINT]       = apply_uint_optarg,
 
 		[ARGUOPT_STRING]     = apply_string_optarg,
 	};
@@ -499,6 +499,8 @@ parse_done:
 			sizeof(*ctx->argv) * ctx->argc);
 
 	int nl = ctx->outc + ctx->argc;
+	if (flag & AP_NEED_ARGUMENT && !nl)
+		prompt_shrt_help(ctx);
 
 	ctx->outv[nl] = NULL;
 	ctx->outc = 0;
