@@ -12,8 +12,7 @@
 #include "debug.h"
 #include "path.h"
 
-static inline int dispatch_lnkfile(struct fileiter_file *file,
-				   struct fileiter *ctx)
+static inline int dispatch_lnkfile(struct iterfile *file, struct fileiter *ctx)
 {
 	if (ctx->flag & FITER_USE_STAT) {
 		int err = lstat(file->absname, file->st);
@@ -24,7 +23,7 @@ static inline int dispatch_lnkfile(struct fileiter_file *file,
 	return ctx->cb(file, ctx->data);
 }
 
-static int dispatch_regfile(struct fileiter_file *file, struct fileiter *ctx)
+static int dispatch_regfile(struct iterfile *file, struct fileiter *ctx)
 {
 	int ret;
 
@@ -89,7 +88,7 @@ static int dispatch_file(struct fileiter *ctx, struct dirent *ent)
 		return 0;
 	}
 
-	struct fileiter_file file = {
+	struct iterfile file = {
 		.absname = absname,
 		.dymname = relname,
 		.basname = basname,
@@ -104,7 +103,7 @@ static int dispatch_file(struct fileiter *ctx, struct dirent *ent)
 	return dispatch_regfile(&file, ctx);
 }
 
-int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx)
+int PLATSPECOF(fileiter_loop_dir)(struct fileiter *ctx)
 {
 	DIR *dir = opendir(ctx->sb->str);
 	if (!dir)

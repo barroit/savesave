@@ -11,6 +11,7 @@
 #include "dotsav.h"
 #include "debug.h"
 #include "list.h"
+#include "backup.h"
 
 #define MAX_OVERLOAD_COUNT 10
 #define OVERLOAD_WINDOW    5
@@ -39,10 +40,11 @@ retry:
 		ctx->task[sav->task_idx] ^= sav->task_pos;
 
 		mtx_unlock(&ctx->qmtx);
+
 		free(task);
 
 		// handle compression here
-		puts(sav->name);
+		backup(sav);
 	}
 
 	BUG_ON(1);
@@ -85,7 +87,6 @@ next:
 
 void baksched_init(struct baksched **ctx, size_t nl)
 {
-	int err;
 	struct baksched *bs = xcalloc(sizeof(*bs), 1); 
 
 	bs->task = xcalloc(sizeof(*bs->task),
@@ -93,21 +94,13 @@ void baksched_init(struct baksched **ctx, size_t nl)
 
 	list_head_init(&bs->queue);
 
-	err = mtx_init(&bs->qmtx, mtx_plain);
-	if (err)
-		die(_("failed to create mutex for scheduler"));
+	xmtx_init(&bs->qmtx, mtx_plain);
+	xcnd_init(&bs->qcnd);
 
-	err = cnd_init(&bs->qcnd);
-	if (err)
-		die(_("failed to create thread notifier for scheduler"));
+	xthrd_create(&bs->qthrd[0], routine, bs);
+	xthrd_create(&bs->qthrd[1], routine, bs);
 
-	err = thrd_create(&bs->qthrd[0], routine, bs);
-	if (!err)
-		err = thrd_create(&bs->qthrd[1], routine, bs);
-	if (!err)
-		err = thrd_create(&bs->qthrd[2], watchdog, bs);
-	if (err)
-		die(_("failed to create thread for scheduler"));
+	xthrd_create(&bs->qthrd[2], watchdog, bs);
 
 	*ctx = bs;
 }

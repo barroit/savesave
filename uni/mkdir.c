@@ -22,7 +22,7 @@ int flexremove(const char *name)
 	return warn_errno(_("failed to remove file `%s'"), name);
 }
 
-int PLATSPECOF(sizeof_file)(struct fileiter_file *file, void *data)
+int PLATSPECOF(sizeof_file)(struct iterfile *file, void *data)
 {
 	*((off_t *)data) += file->st->st_size;
 	return 0;

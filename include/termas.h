@@ -65,11 +65,29 @@ const char *strwinerror(void);
 #define ERRMAS_OPEN_FILE(name) \
 	_("failed to open `%s'"), name
 
+#define ERRMAS_CREAT_FILE(name) \
+	_("failed to create file at `%s'"), name
+
+#define ERRMAS_CREAT_DIR(name) \
+	_("failed to make directory `%s'"), name
+
+#define ERRMAS_CREAT_LINK(target, name) \
+	_("failed to make symbolic link `%s' for target `%s'"), name, target
+
 #define ERRMAS_ACCESS_FILE(name) \
 	_("failed to access file `%s'"), name
 
 #define ERRMAS_READ_FILE(name) \
 	_("failed to read file `%s'"), name
+
+#define ERRMAS_READ_LINK(name) \
+	_("unable to read link `%s'"), name
+
+#define ERRMAS_COPY_FILE(src, dest) \
+	_("failed to copy file from `%s' to `%s'"), src, dest
+
+#define ERRMAS_RENAME_FILE(src, dest) \
+	_("failed to rename file `%s' to `%s'"), src, dest
 
 void setup_lr_logging(void);
 

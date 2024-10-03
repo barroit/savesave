@@ -136,8 +136,18 @@ void strbuf_normalize_path(struct strbuf *sb);
  */
 static inline char *strbuf_strrsep(struct strbuf *sb)
 {
+#ifdef __unix__
 	return strrchr(sb->str, '/');
+#else
+	char *sep = strrchr(sb->str, '/');
+	return sep ? : strrchr(sb->str, '\\');
+#endif
 }
+
+/**
+ * strbuf_concat_path - concat '/name' to strbuf
+ */
+size_t strbuf_concat_basename(struct strbuf *sb, const char *name);
 
 /**
  * strbuf_concat_path - concat 'prefix/name' to strbuf
@@ -145,11 +155,16 @@ static inline char *strbuf_strrsep(struct strbuf *sb)
 size_t strbuf_concat_path(struct strbuf *sb,
 			  const char *prefix, const char *name);
 
+extern int mkdirp2(char *name, size_t start);
+
 /**
- * strbuf_mkfdirp - make file directory as well as its parent directories,
- * 		    starting from initial string
+ * strbuf_mkdirp - make directory as well as its parent directories, starting
+ * 		   from initial string
  */
-int strbuf_mkfdirp(struct strbuf *sb);
+static inline int strbuf_mkdirp(struct strbuf *sb)
+{
+	return mkdirp2(sb->str, sb->baslen);
+}
 
 /**
  * strbuf_to_dirname - make strbuf become its parent name

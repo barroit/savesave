@@ -41,7 +41,7 @@ CMDDESCRIP("Calculate file size of given path")
 	size_t savnl = 0;
 
 	if (from_dotsav)
-		savnl = get_dotsav(&savarr);
+		savnl = retrieve_dotsav(&savarr);
 	else if (!argc)
 		die(_("sizeof requires pathspec"));
 

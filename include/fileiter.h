@@ -8,7 +8,7 @@
 #ifndef FILEITER_H
 #define FILEITER_H
 
-struct fileiter_file {
+struct iterfile {
 	const char *absname;
 	const char *dymname; /* dynamic part of absname */
 	const char *basname;
@@ -30,7 +30,7 @@ struct fileiter_file {
 	int fd;
 };
 
-typedef int (*fileiter_function_t)(struct fileiter_file *file, void *data);
+typedef int (*fileiter_function_t)(struct iterfile *file, void *data);
 
 struct fileiter {
 	const char *root;
@@ -59,7 +59,7 @@ void fileiter_init(struct fileiter *ctx,
 		   fileiter_function_t cb, void *data, flag_t flags);
 
 int fileiter_exec(struct fileiter *ctx, const char *root);
-int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx);
+int PLATSPECOF(fileiter_loop_dir)(struct fileiter *ctx);
 
 void fileiter_destroy(struct fileiter *ctx);
 

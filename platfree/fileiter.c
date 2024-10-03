@@ -47,7 +47,7 @@ void fileiter_destroy(struct fileiter *ctx)
 
 static int dispatch_directory(struct fileiter *ctx)
 {
-	struct fileiter_file file = {
+	struct iterfile file = {
 		.absname = ctx->sb->str,
 		.dymname = straftr(file.absname, ctx->root),
 		.is_dir  = 1,
@@ -74,7 +74,7 @@ int fileiter_exec(struct fileiter *ctx, const char *root)
 				return -1;
 		}
 
-		err = PLATSPECOF(fileiter_do_exec)(ctx);
+		err = PLATSPECOF(fileiter_loop_dir)(ctx);
 		if (unlikely(err))
 			return -1;
 

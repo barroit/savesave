@@ -21,7 +21,7 @@ CMDDESCRIP("Start backup task in background")
 	baksched_t schedctx;
 
 	struct savesave *sav;
-	size_t nl = get_dotsav(&sav);
+	size_t nl = retrieve_dotsav(&sav);
 
 	baksched_init(&schedctx, nl);
 

@@ -32,7 +32,7 @@ static int cmd_query_path(int argc, const char **argv)
 		APOPT_END(),
 	};
 	const char *usage[] = {
-		"query path <name>",
+		"savesave query path <name>",
 		NULL,
 	};
 
@@ -103,8 +103,8 @@ CMDDESCRIP("Query default information of Savesave")
 		APOPT_END(),
 	};
 	const char *usage[] = {
-		"query path <name>",
-		"query limit <name>",
+		"savesave query path <name>",
+		"savesave query limit <name>",
 		NULL,
 	};
 

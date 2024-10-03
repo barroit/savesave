@@ -10,7 +10,7 @@
 #ifndef CNTIO_H
 #define CNTIO_H
 
-extern uint cntio_fdcnt;
+extern rlim_t cntio_fdcnt;
 
 int cntcreat(const char *file, mode_t mode);
 #define creat cntcreat

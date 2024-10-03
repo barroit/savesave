@@ -15,6 +15,7 @@
 #include "mkdir.h"
 #include "alloc.h"
 #include "constructor.h"
+#include "cpsched.h"
 
 static char stru8_map[UINT8_MAX + 1][STRU8_MAX];
 
@@ -29,17 +30,20 @@ CONSTRUCTOR(init_u8tstr_table)
 	}
 }
 
+#define SRT_NOROOM -2
+
 /**
  * sort_backup - sort backup files
  *
- * return: -1 on error, 0 on success, 1 if there is no room
+ * return: -1 on error, SRT_NOROOM if there is no room, 0 on success
  */
-static int sort_backup(struct strbuf *src,
-		       struct strbuf *dest, u8 stack, int *n)
+static int backup_fetch_sort(struct strbuf *src,
+			     struct strbuf *dest, u8 stack, u8 *nsrt)
 {
 	int err;
 	u8 i;
-	int room = -1, base;
+	int room = -1;
+	u8 base;
 
 	for_each_idx(i, stack) {
 		strbuf_concatat_base(src, stru8_map[i]);
@@ -55,27 +59,22 @@ static int sort_backup(struct strbuf *src,
 				goto err_rename_file;
 			room++;
 		} else if (errno != ENOENT) {
-			return warn_errno(ERRMAS_ACCESS_FILE(src->str));
-		}
-
-		if (room == -1) {
+			goto err_access_file;
+		} else if (room == -1) {
 			room = i;
 			base = i;
 		}
 	}
 
-	if (room != -1 && n)
-		*n = room - base;
+	if (nsrt)
+		*nsrt = room != -1 ? room - base : 0;
 
-	/*
-	 * You may think this is shit, it is!
-	 * And hooray for semantics!
-	 */
-	return room == -1 ? 1 : 0;
+	return room == -1 ? SRT_NOROOM : 0;
 
 err_rename_file:
-	return warn_errno(_("failed to rename file `%s' to `%s'"),
-			  src->str, dest->str);
+	return warn_errno(ERRMAS_RENAME_FILE(src->str, dest->str));
+err_access_file:
+	return warn_errno(ERRMAS_ACCESS_FILE(src->str));
 }
 
 static int find_next_room(struct strbuf *next, u8 stack)
@@ -99,24 +98,24 @@ static int find_next_room(struct strbuf *next, u8 stack)
 	return 0;
 }
 
-static char *get_next_backup_name(const struct savesave *sav)
+static int next_backup_prefix(const struct savesave *sav, char **pref)
 {
 	int ret;
 	struct strbuf src = strbuf_from2(sav->backup_prefix, 0, STRU8_MAX - 1);
 	struct strbuf dest = strbuf_from2(sav->backup_prefix, 0,
 					  STRU8_MAX - 1);
 
-	ret = sort_backup(&src, &dest, sav->stack, NULL);
+	ret = backup_fetch_sort(&src, &dest, sav->stack, NULL);
 	if (ret == -1)
 		goto err_sort_backup;
 
-	if (ret == 1) {
+	if (ret == SRT_NOROOM) {
 		strbuf_concatat_base(&dest, "0");
 		ret = flexremove(dest.str);
 		if (ret)
 			goto err_drop_backup;
 
-		ret = sort_backup(&src, &dest, sav->stack, NULL);
+		ret = backup_fetch_sort(&src, &dest, sav->stack, NULL);
 		if (ret == -1)
 			goto err_sort_backup;
 	}
@@ -144,93 +143,37 @@ static char *get_next_backup_name(const struct savesave *sav)
 
 	if (ret) {
 		strbuf_destroy(&dest);
-		return NULL;
+		return -1;
 	}
 
-	return dest.str;
+	*pref = dest.str;
+	return 0;
 }
 
-static char *tmpdir_of_backup(const char *backup)
+static void tmpdir_of_backup(const char *backup, char **name)
 {
 	struct strbuf sb = strbuf_from2(backup, 0,
-					sizeof(CONFIG_TMPFILE_EXTENTION) - 1);
+					strlen(CONFIG_TMPFILE_EXTENTION));
 
 	strbuf_concat(&sb, CONFIG_TMPFILE_EXTENTION);
-	return sb.str;
-}
-
-static int backup_file_compress(struct fileiter_file *src, void *data)
-{
-	return *(int *)ACCESS_POISON;
-}
-
-static int backup_file_copy(struct fileiter_file *src, void *data)
-{
-	struct strbuf *dest = &((struct strbuf *)data)[0];
-	struct strbuf *__buf = &((struct strbuf *)data)[1];
-
-	strbuf_concatat_base(dest, src->dymname);
-
-	if (src->is_lnk)
-		return PLATSPECOF(backup_copy_symlink)(src, dest, __buf);
-	else
-		return PLATSPECOF(backup_copy_regfile)(src, dest);
-}
-
-static int do_backup(const char *dest, const char *temp,
-		     const char *save, int use_compress)
-{
-	int ret;
-	fileiter_function_t cb;
-
-	if (use_compress) {
-		cb = backup_file_compress;
-	} else {
-		cb = backup_file_copy;
-
-		char *d = xstrdup(dest);
-		ret = mkdirp(d);
-		free(d);
-		if (ret)
-			return error_errno(_("failed to make directory `%s'"),
-					   dest);
-	}
-
-	struct fileiter iter;
-	struct strbuf data[2] = {
-		[0] = strbuf_from2(dest, 0, PATH_MAX),
-		[1] = strbuf_from2("", 0, PATH_MAX),
-	};
-
-	fileiter_init(&iter, cb, data, FITER_USE_STAT | FITER_USE_FD);
-	ret = fileiter_exec(&iter, save);
-	if (ret)
-		error(_("failed to backup save `%s' to `%s'"), save, dest);
-
-	fileiter_destroy(&iter);
-	strbuf_destroy(&data[0]);
-	strbuf_destroy(&data[1]);
-	return ret;
+	*name = sb.str;
 }
 
 int backup(struct savesave *c)
 {
 	int ret;
+	char *dest;
+	char *tmp;
 
-	char *dest = get_next_backup_name(c);
-	if (!dest)
-		return 1;
+	ret = next_backup_prefix(c, &dest);
+	if (ret)
+		return ret;
 
-	char *temp = tmpdir_of_backup(c->backup_prefix);
+	tmpdir_of_backup(c->backup_prefix, &tmp);
 
-	DEBUG_RUN() {
-		printf(_("next backup name\n\t%s\n\n"), dest);
-		fflush(stdout);
-	}
-
-	ret = do_backup(dest, temp, c->save_prefix, c->use_compress);
+	// ret = start_backup(dest, tmp, c->save_prefix, c->use_compress);
 
 	free(dest);
-	free(temp);
+	free(tmp);
 	return ret;
 }

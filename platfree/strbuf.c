@@ -164,20 +164,15 @@ void strbuf_normalize_path(struct strbuf *sb)
 	for_each_idx(i, sb->len)
 		if (sb->str[i] == '\\')
 			sb->str[i] = '/';
-}
 
-int strbuf_mkfdirp(struct strbuf *sb)
-{
-	int err;
-	char *p = strbuf_strrsep(sb);
+	char *sep = strbuf_strrsep(sb);
+	if (sep && sep[1] == 0) {
+		int need_sync = sb->baslen == sb->len;
 
-	*p = 0;
-	err = mkdirp2(sb->str, sb->baslen);
-	if (err)
-		return err;
-
-	*p = '/';
-	return 0;
+		strbuf_trunc(sb, 1);
+		if (need_sync)
+			sb->baslen = sb->len;
+	}
 }
 
 void strbuf_to_dirname(struct strbuf *sb)
@@ -188,22 +183,38 @@ void strbuf_to_dirname(struct strbuf *sb)
 	strbuf_trunc(sb, sb->len - dirlen);
 }
 
-size_t strbuf_concat_path(struct strbuf *sb,
-			  const char *prefix, const char *name)
+size_t strbuf_concat_basename(struct strbuf *sb, const char *name)
 {
-	size_t plen = strlen(prefix);
-	size_t nlen = strlen(name);
-	size_t len = plen + nlen + 1;
+	size_t namlen = strlen(name);
+	size_t totlen = namlen + 1;
 
-	strbuf_growlen(sb, len);
-	memcpy(&sb->str[sb->len], prefix, plen);
-	sb->len += plen;
+	strbuf_growlen(sb, totlen);
 
 	sb->str[sb->len] = '/';
 	sb->len += 1;
 
-	memcpy(&sb->str[sb->len], name, nlen + 1);
-	sb->len += nlen;
+	memcpy(&sb->str[sb->len], name, namlen + 1);
+	sb->len += namlen;
 
-	return len;
+	return totlen;
+}
+
+size_t strbuf_concat_path(struct strbuf *sb,
+			  const char *prefix, const char *name)
+{
+	size_t dirlen = strlen(prefix);
+	size_t namlen = strlen(name);
+	size_t totlen = dirlen + namlen + 1;
+
+	strbuf_growlen(sb, totlen);
+	memcpy(&sb->str[sb->len], prefix, dirlen);
+	sb->len += dirlen;
+
+	sb->str[sb->len] = '/';
+	sb->len += 1;
+
+	memcpy(&sb->str[sb->len], name, namlen + 1);
+	sb->len += namlen;
+
+	return totlen;
 }

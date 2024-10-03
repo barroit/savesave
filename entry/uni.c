@@ -26,13 +26,11 @@ static void __prepare_longrunning(void)
 
 int main(int argc, const char **argv)
 {
-	setup_message_translation();
-
 	prepare_longrunning = __prepare_longrunning;
-	cmd_main(argc, argv);
+	int ret = cmd_main(argc, argv);
 
 	if (!is_longrunning)
-		exit(0);
+		exit(ret);
 
 	while (39)
 		pause();

@@ -29,7 +29,7 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 	const char *relname = straftr(absname, ctx->root);
 	BUG_ON(!relname);
 
-	struct fileiter_file file = {
+	struct iterfile file = {
 		.absname = absname,
 		.dymname = relname,
 		.basname = basname,
@@ -77,7 +77,7 @@ static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)
 	return 0;
 }
 
-int PLATSPECOF(fileiter_do_exec)(struct fileiter *ctx)
+int PLATSPECOF(fileiter_loop_dir)(struct fileiter *ctx)
 {
 	strbuf_concat(ctx->sb, "/*");
 

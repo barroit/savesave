@@ -41,7 +41,20 @@ int mkdirp2(char *name, size_t start)
 	return 0;
 }
 
-static int do_rmdirr(struct fileiter_file *file, void *data)
+int mkfdirp2(char *name, size_t start)
+{
+	char *p = strrchr(name, '/');
+
+	*p = 0;
+	int err = mkdirp2(name, start);
+	if (err)
+		return err;
+
+	*p = '/';
+	return 0;
+}
+
+static int do_rmdirr(struct iterfile *file, void *data)
 {
 	int err;
 	const char *name = file->absname;

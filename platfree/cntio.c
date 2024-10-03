@@ -12,7 +12,7 @@
 #include "debug.h"
 #include "robio.h"
 
-uint cntio_fdcnt;
+rlim_t cntio_fdcnt;
 
 int cntcreat(const char *file, mode_t mode)
 {

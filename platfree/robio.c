@@ -7,7 +7,7 @@
 
 #include "robio.h"
 
-static void handle_nonblock(int fd, short events)
+static void handle_nonblocking(int fd, short events)
 {
 	struct pollfd pfd = {
 		.fd     = fd,
@@ -28,7 +28,7 @@ ssize_t robread(int fd, void *buf, size_t n)
 		if (unlikely(nr < 0)) {
 			switch (errno) {
 			case EAGAIN:
-				handle_nonblock(fd, POLLOUT);
+				handle_nonblocking(fd, POLLOUT);
 			case EINTR:
 				continue;
 			}
@@ -49,7 +49,7 @@ ssize_t robwrite(int fd, const void *buf, size_t n)
 		if (unlikely(nr < 0)) {
 			switch (errno) {
 			case EAGAIN:
-				handle_nonblock(fd, POLLOUT);
+				handle_nonblocking(fd, POLLOUT);
 			case EINTR:
 				continue;
 			}

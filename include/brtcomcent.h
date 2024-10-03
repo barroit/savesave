@@ -56,6 +56,7 @@
 # include <libgen.h>
 # include <dirent.h>
 # include <sys/select.h>
+# include <sys/resource.h>
 #endif
 
 #include "ansidecl.h"
@@ -71,6 +72,8 @@
 
 #include "barroit/string.h"
 #include "barroit/time.h"
+#include "barroit/resource.h"
+#include "barroit/threads.h"
 #include "barroit/zstd.h"
 
 #ifdef HAVE_INTL

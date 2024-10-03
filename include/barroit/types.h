@@ -57,4 +57,17 @@ struct savesave {
 	ullong task_pos;
 };
 
+enum {
+	SCHED_ERROR      = -1,
+	SCHED_SUCCESS    = 0,
+	SCHED_BUSY       = 1,
+	SCHED_TERMINATED = 39,
+};
+
+enum {
+	POOL_RUNNING = 0,
+	POOL_CLOSED  = 39,
+	POOL_ERROR   = 128,
+};
+
 #endif /* BRT_TYPES_H */

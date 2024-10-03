@@ -21,6 +21,7 @@
 #define CMDDESCRIP(usage)
 
 int cmd_backup(int argc, const char **argv);
+int cmd_copy(int argc, const char **argv);
 int cmd_help(int argc, const char **argv);
 int cmd_query(int argc, const char **argv);
 int cmd_sizeof(int argc, const char **argv);
@@ -28,8 +29,9 @@ int cmd_version(int argc, const char **argv);
 
 #define APOPT_MAINCOMMAND(v) \
 	APOPT_SUBCOMMAND("backup", (v), N_("Start backup task in background"), cmd_backup, CMD_LONGRUNNING | CMD_USEDOTSAV | CMD_UNIQUEPROC), \
+	APOPT_SUBCOMMAND("copy", (v), N_("Copy a file"), cmd_copy, 0), \
 	APOPT_SUBCOMMAND("help", (v), N_("Display help information about Savesave"), cmd_help, 0), \
-	APOPT_SUBCOMMAND("query", (v), N_("Query default information of Savesave (e.g. log path)"), cmd_query, 0), \
+	APOPT_SUBCOMMAND("query", (v), N_("Query default information of Savesave"), cmd_query, 0), \
 	APOPT_SUBCOMMAND("sizeof", (v), N_("Calculate file size of given path"), cmd_sizeof, 0), \
 	APOPT_SUBCOMMAND("version", (v), N_("Display version information about Savesave"), cmd_version, 0)
 

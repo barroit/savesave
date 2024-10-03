@@ -13,6 +13,7 @@
 #include "debug.h"
 #include "proc.h"
 #include "path.h"
+#include "cpsched.h"
 
 struct userspec_argument userspec;
 
@@ -100,11 +101,11 @@ int cmd_main(int argc, const char **argv)
 	return runcmd(argc, argv);
 }
 
-size_t get_dotsav(struct savesave **ret)
+size_t retrieve_dotsav(struct savesave **sav)
 {
 	if (!savarr)
 		prepare_dotsav();
 
-	*ret = savarr;
+	*sav = savarr;
 	return savnl;
 }

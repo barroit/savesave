@@ -14,7 +14,7 @@ extern int is_longrunning;
 extern void (*prepare_longrunning)(void);
 
 struct savesave;
-size_t get_dotsav(struct savesave **ret);
+size_t retrieve_dotsav(struct savesave **sav);
 
 struct userspec_argument {
 	const char *dotsav_path;

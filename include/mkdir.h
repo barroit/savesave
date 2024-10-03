@@ -20,6 +20,13 @@ static inline int mkdirp(char *name)
 	return mkdirp2(name, 0);
 }
 
+int mkfdirp2(char *name, size_t start);
+
+static inline int mkfdirp(char *name)
+{
+	return mkfdirp2(name, 0);
+}
+
 /**
  * rmdirr - remove directory as well as subdirectory
  *
@@ -27,10 +34,13 @@ static inline int mkdirp(char *name)
  */
 int rmdirr(const char *name);
 
+/**
+ * flexremove - remove file or directory
+ */
 int flexremove(const char *name);
 
-struct fileiter_file;
-int PLATSPECOF(sizeof_file)(struct fileiter_file *file, void *data);
+struct iterfile;
+int PLATSPECOF(sizeof_file)(struct iterfile *file, void *data);
 
 /**
  * calc_dir_size - calc. directory size

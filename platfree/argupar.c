@@ -496,11 +496,14 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 parse_done:
 	if (ctx->argc)
 		memmove(&ctx->outv[ctx->outc], ctx->argv,
-			sizeof(*ctx->argv) * ctx->argc);
+			st_mult(sizeof(*ctx->argv), ctx->argc));
 
 	int nl = ctx->outc + ctx->argc;
-	if (flag & AP_NEED_ARGUMENT && !nl)
+
+	if (flag & AP_NEED_ARGUMENT && !nl) {
+		error(_("command requires an argument"));
 		prompt_shrt_help(ctx);
+	}
 
 	ctx->outv[nl] = NULL;
 	ctx->outc = 0;
