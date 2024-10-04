@@ -88,6 +88,18 @@ static OPTARG_APPLICATOR(callback)
 	BUG_ON("not implemented");
 }
 
+static OPTARG_APPLICATOR(switch)
+{
+	int *p = opt->value;
+
+	if (unset)
+		*p = 0;
+	else
+		*p = 1;
+
+	return 0;
+}
+
 static OPTARG_APPLICATOR(countup)
 {
 	int *p = opt->value;
@@ -134,6 +146,7 @@ static int dispatch_optarg(struct arguopt *opt, const char *arg, int unset)
 		[ARGUOPT_SUBCOMMAND] = apply_subcommand_optarg,
 		[ARGUOPT_CALLBACK]   = apply_callback_optarg,
 
+		[ARGUOPT_SWITCH]     = apply_switch_optarg,
 		[ARGUOPT_COUNTUP]    = apply_countup_optarg,
 		[ARGUOPT_UINT]       = apply_uint_optarg,
 

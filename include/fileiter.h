@@ -15,7 +15,7 @@ struct iterfile {
 
 	/*
 	 * not available when
-	 *  - absname points to symlink on windows
+	 *  - absname points to a symlink on windows
 	 */
 	struct stat *st;
 

@@ -37,7 +37,7 @@ static int iterfunc(struct iterfile *src, void *data)
 	if (src->is_lnk)
 		return copy_symlink(src->absname, dest->str);
 	else
-		return copy_regfile(src->absname, dest->str);
+		return copy_regfile_async(src->absname, dest->str);
 }
 
 static int copy(const char *src, const char *dest)

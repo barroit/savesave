@@ -9,20 +9,6 @@
 #include "termas.h"
 #include "alloc.h"
 
-static int copy(int src, int dest, off_t len)
-{
-	ssize_t copied;
-	do {
-		copied = copy_file_range(src, NULL, dest, NULL, len, 0);
-		if (copied == -1)
-			return -1;
-
-		len -= copied;
-	} while (len > 0 && copied > 0);
-
-	return 0;
-}
-
 int copy_regfile(const char *srcname, const char *destname)
 {
 	int ret;
@@ -41,7 +27,7 @@ int copy_regfile(const char *srcname, const char *destname)
 	if (dest == -1)
 		goto err_creat_dest;
 
-	ret = copy(src, dest, st.st_size);
+	ret = PLATSPECOF(fd2fd_copy)(src, dest, st.st_size);
 	if (ret)
 		goto err_copy_file;
 
@@ -107,10 +93,4 @@ int copy_symlink(const char *srcname, const char *destname)
 
 	free(buf);
 	return ret;
-}
-
-
-int copy_regfile_async(const char *srcname, const char *destname)
-{
-	return 0;
 }

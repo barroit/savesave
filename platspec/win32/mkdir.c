@@ -25,20 +25,3 @@ int flexremove(const char *name)
 
 	return warn_errno(_("failed to remove file `%s'"), name);
 }
-
-int PLATSPECOF(sizeof_file)(struct iterfile *file, void *data)
-{
-	off_t size;
-
-	if (file->is_lnk)
-		/*
-		 * we don’t handle symbolic links; a constant is given
-		 * that is large enough for most symbolic link files
-		 */
-		size = 64;
-	else
-		size = file->st->st_size;
-
-	*((off_t *)data) += size;
-	return 0;
-}

@@ -39,14 +39,4 @@ int rmdirr(const char *name);
  */
 int flexremove(const char *name);
 
-struct iterfile;
-int PLATSPECOF(sizeof_file)(struct iterfile *file, void *data);
-
-/**
- * calc_dir_size - calc. directory size
- *
- * note: this function handles error
- */
-int calc_dir_size(const char *name, off_t *size);
-
 #endif /* MKDIR_H */

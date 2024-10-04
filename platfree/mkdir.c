@@ -54,7 +54,7 @@ int mkfdirp2(char *name, size_t start)
 	return 0;
 }
 
-static int do_rmdirr(struct iterfile *file, void *data)
+static int rmdirrfunc(struct iterfile *file, void *data)
 {
 	int err;
 	const char *name = file->absname;
@@ -75,28 +75,9 @@ int rmdirr(const char *name)
 	int ret;
 	struct fileiter iter;
 
-	fileiter_init(&iter, do_rmdirr, NULL, FITER_RECUR_DIR);
+	fileiter_init(&iter, rmdirrfunc, NULL, FITER_RECUR_DIR);
 	ret = fileiter_exec(&iter, name);
 	fileiter_destroy(&iter);
 
 	return ret;
-}
-
-int calc_dir_size(const char *name, off_t *size)
-{
-	int err;
-	struct fileiter ctx;
-
-	fileiter_init(&ctx, PLATSPECOF(sizeof_file), size,
-		      FITER_USE_STAT | FITER_LIST_UNSUP);
-
-	err = fileiter_exec(&ctx, name);
-	if (err)
-		goto err_calc_size;
-
-	fileiter_destroy(&ctx);
-	return 0;
-
-err_calc_size:
-	return error(_("unable to calculate size for directory `%s'"), name);
 }

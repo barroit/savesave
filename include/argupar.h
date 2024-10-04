@@ -17,6 +17,7 @@ enum arguopt_type {
 	ARGUOPT_SUBCOMMAND,	/* subcmd */
 	ARGUOPT_CALLBACK,	/* callback */
 
+	ARGUOPT_SWITCH,		/* switch */
 	ARGUOPT_COUNTUP,	/* count up */
 	ARGUOPT_UINT,		/* unsigned integer */
 
@@ -103,6 +104,17 @@ extern int command_usage_no_newline;
 #define __APOPT_COUNTUP(s, l, v, h, f)		\
 {						\
 	.type     = ARGUOPT_COUNTUP,		\
+	.shrtname = (s),			\
+	.longname = (l),			\
+	.value    = (v),			\
+	.usage    = (h),			\
+	.flag     = ARGUOPT_NOARG | (f),	\
+}
+
+#define APOPT_SWITCH(s, l, v, h) __APOPT_SWITCH(s, l, v, h, 0)
+#define __APOPT_SWITCH(s, l, v, h, f)		\
+{						\
+	.type     = ARGUOPT_SWITCH,		\
 	.shrtname = (s),			\
 	.longname = (l),			\
 	.value    = (v),			\
