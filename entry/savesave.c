@@ -35,9 +35,6 @@ static void prepare_dotsav(void)
 		die(_("no dotsav (.savesave) was provided"));
 
 	char *savstr = read_dotsav(userspec.dotsav_path);
-	if (!savstr)
-		die(_("unable to retrieve content for dotsav `%s'"),
-		    userspec.dotsav_path);
 
 	savnl = dotsav_parse(savstr, &savarr);
 	free(savstr);

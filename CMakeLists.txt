@@ -1,19 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 cmake_minimum_required(VERSION 3.21)
 
-# ----------------------------- build profile ------------------------------
 set(ARCH  $ENV{ARCH})
-set(BUILD $ENV{BUILD})
-
-# follow the gcc concepts:
-#   build is the machine you are building on
-#   host  is the machine you are building for
-if(BUILD STREQUAL linux)
-  set(HOST linux)
-else()
-  set(HOST windows)
-endif()
-
 set(ROOT ${CMAKE_SOURCE_DIR})
 
 # -------------------------- generated directory ---------------------------
@@ -61,7 +49,7 @@ add_compile_options("SHELL:-include ${ROOT}/include/brtcomcent.h")
 include_directories(${ROOT}/include)
 
 # -------------------------------- manifest --------------------------------
-if(BUILD STREQUAL windows)
+if(WIN32)
   configure_file(${ROOT}/savesave.manifest.in ${ROOT}/savesave.manifest)
 endif()
 
@@ -92,33 +80,51 @@ else()
 endif()
 
 # -------------------------------- platspec --------------------------------
-if(HOST STREQUAL linux)
-  file(GLOB platspec_src LIST_DIRECTORIES false uni/*.c)
-else()
-  file(GLOB platspec_src LIST_DIRECTORIES false win/*.c)
+if(UNIX)
+  list(APPEND pathspec unix/*.c)
+elseif(WIN32)
+  list(APPEND pathspec win32/*.c)
 endif()
-add_library(platspec OBJECT ${platspec_src})
+
+if(LINUX)
+  list(APPEND pathspec linux/*.c)
+endif()
+
+list(TRANSFORM pathspec PREPEND platspec/)
+file(GLOB source LIST_DIRECTORIES false ${pathspec})
+
+add_library(platspec OBJECT ${source})
 
 # -------------------------------- platfree --------------------------------
-file(GLOB platfree_src LIST_DIRECTORIES false platfree/*.c commands/*.c)
-add_library(platfree OBJECT ${platfree_src})
+file(GLOB source LIST_DIRECTORIES false platfree/*.c commands/*.c)
+add_library(platfree OBJECT ${source})
 
 # -------------------------------- savesave --------------------------------
-list(APPEND savesave_src ${ROOT}/entry/savesave.c)
-if(HOST STREQUAL linux)
-  add_executable(savesave ${ROOT}/entry/uni.c ${savesave_src})
-else()
-  list(APPEND savesave_src ${ROOT}/savesave.rc)
+list(APPEND mainsrc savesave.c)
+if(UNIX)
+  list(APPEND mainsrc uni.c)
+elseif(WIN32)
   if(CONFIG_IS_CONSOLE_APP)
-    add_executable(savesave ${ROOT}/entry/wincon.c ${savesave_src})
+    list(APPEND mainsrc wincon.c)
   else()
-    add_executable(savesave WIN32 ${ROOT}/entry/wingui.c ${savesave_src})
+    list(APPEND mainsrc wingui.c)
   endif()
 endif()
+list(TRANSFORM mainsrc PREPEND ${ROOT}/entry/)
+
+if(WIN32)
+  list(APPEND mainsrc ${ROOT}/savesave.rc)
+  if(NOT CONFIG_IS_CONSOLE_APP)
+    list(PREPEND mainsrc WIN32)
+  endif()
+endif()
+
+add_executable(savesave ${mainsrc})
+
 target_link_libraries(savesave platfree platspec)
 
 # ---------------------------------- dll -----------------------------------
-if(HOST STREQUAL windows)
+if(WIN32)
   target_link_libraries(savesave ws2_32 comctl32 shlwapi)
   if (NOT CONFIG_SOURCE_NDEBUG)
     target_link_libraries(savesave dbghelp)
@@ -132,11 +138,11 @@ if(CONFIG_SOURCE_NDEBUG)
   add_compile_definitions(NDEBUG)
 endif()
 
-if(HOST STREQUAL windows)
+if(WIN32)
   add_compile_definitions(NTDDI_WIN7
 			  WINVER=_WIN32_WINNT_WIN7
-			  _WIN32_WINNT=_WIN32_WINNT_WIN7)
-  add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+			  _WIN32_WINNT=_WIN32_WINNT_WIN7
+			  _CRT_SECURE_NO_WARNINGS)
 endif()
 
 # ------------------------------ installation ------------------------------
@@ -144,7 +150,7 @@ install(TARGETS savesave DESTINATION ".")
 install(DIRECTORY ${ROOT}/locale/ DESTINATION locale
 	FILES_MATCHING PATTERN *.mo PERMISSIONS OWNER_READ)
 
-if(BUILD STREQUAL windows)
+if(WIN32)
   file(GLOB dlls ${CMAKE_BINARY_DIR}/*.dll)
   install(FILES ${dlls} DESTINATION ".")
 endif()

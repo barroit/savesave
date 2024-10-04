@@ -36,4 +36,9 @@
  */
 #define STRPID_MAX 11
 
+#ifdef _WIN32
+# define SSIZE_MAX INT64_MAX
+# define PATH_MAX MAX_PATH
+#endif
+
 #endif /* BRT_LIMIT_H */

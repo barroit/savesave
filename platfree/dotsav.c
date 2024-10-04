@@ -83,24 +83,21 @@ char *read_dotsav(const char *name)
 	if (nr == -1)
 		goto err_read_file;
 
-	if (0) {
-	err_open_file:
-		error_errno(ERRMAS_OPEN_FILE(name));
-	} else if (0) {
-	err_stat_file:
-		error_errno(ERRMAS_STAT_FILE(name));
-	} else if (0) {
-	err_read_file:
-		error_errno(ERRMAS_READ_FILE(name));
-	}
-
-	if (err) {
-		free(buf);
-		buf = NULL;
-	}
-
 	close(fd);
 	return buf;
+
+	if (0) {
+	err_open_file:
+		warn_errno(ERRMAS_OPEN_FILE(name));
+	} else if (0) {
+	err_stat_file:
+		warn_errno(ERRMAS_STAT_FILE(name));
+	} else if (0) {
+	err_read_file:
+		warn_errno(ERRMAS_READ_FILE(name));
+	}
+
+	die(_("cannot retrieve content for dotsav `%s'"), name);
 }
 
 static int interpret_save(struct savesave *sav, void *data)

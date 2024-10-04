@@ -7,16 +7,6 @@
 
 #include "robio.h"
 
-static void handle_nonblocking(int fd, short events)
-{
-	struct pollfd pfd = {
-		.fd     = fd,
-		.events = events,
-	};
-
-	poll(&pfd, 1, -1);
-}
-
 ssize_t robread(int fd, void *buf, size_t n)
 {
 	if (n > MAX_IO_SIZE)
@@ -25,14 +15,9 @@ ssize_t robread(int fd, void *buf, size_t n)
 	ssize_t nr;
 	while (39) {
 		nr = read(fd, buf, n);
-		if (unlikely(nr < 0)) {
-			switch (errno) {
-			case EAGAIN:
-				handle_nonblocking(fd, POLLOUT);
-			case EINTR:
-				continue;
-			}
-		}
+
+		if (unlikely(nr < 0 && errno == EINTR))
+			continue;
 
 		return nr;
 	}
@@ -46,14 +31,9 @@ ssize_t robwrite(int fd, const void *buf, size_t n)
 	ssize_t nr;
 	while (39) {
 		nr = write(fd, buf, n);
-		if (unlikely(nr < 0)) {
-			switch (errno) {
-			case EAGAIN:
-				handle_nonblocking(fd, POLLOUT);
-			case EINTR:
-				continue;
-			}
-		}
+
+		if (unlikely(nr < 0 && errno == EINTR))
+			continue;
 
 		return nr;
 	}

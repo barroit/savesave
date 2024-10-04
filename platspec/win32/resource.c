@@ -22,13 +22,13 @@ static SYSTEM_INFO *getsysinfo(void)
 {
 	static SYSTEM_INFO info;
 
-	if (unlikely(!info))
+	if (unlikely(!info.dwPageSize))
 		GetSystemInfo(&info);
 
 	return &info;
 }
 
-uint getcpucore(void)
+uint getcpucores(void)
 {
 	SYSTEM_INFO *info = getsysinfo();
 	return info->dwNumberOfProcessors;

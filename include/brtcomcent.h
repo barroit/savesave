@@ -10,6 +10,8 @@
 #ifndef BRTCOMCENT_H
 #define BRTCOMCENT_H
 
+#include "ansidecl.h"
+
 #include <stddef.h>
 #include <stdint.h>
 #include <inttypes.h>
@@ -30,7 +32,16 @@
 #include <signal.h>
 #include <threads.h>
 
-#ifdef _WIN32
+#if defined(__unix__)
+# include <unistd.h>
+# include <pwd.h>
+# include <sys/socket.h>
+# include <sys/time.h>
+# include <libgen.h>
+# include <dirent.h>
+# include <sys/select.h>
+# include <sys/resource.h>
+#elif defined(_WIN32)
 # include <sdkddkver.h>
 # include <io.h>
 # include <conio.h>
@@ -48,22 +59,14 @@
 #  include <crtdbg.h>
 # endif
 # include <process.h>
-#else /* linux */
-# include <unistd.h>
-# include <pwd.h>
-# include <sys/socket.h>
-# include <sys/time.h>
-# include <libgen.h>
-# include <dirent.h>
-# include <sys/select.h>
-# include <sys/resource.h>
 #endif
 
-#include "ansidecl.h"
+#ifdef __linux__
+# include <linux/io_uring.h>
+#endif
+
 #include "compiler.h"
 #include "poison.h"
-
-#include "poll.h"
 
 #include "barroit/types.h"
 #include "barroit/limits.h"
@@ -86,10 +89,20 @@
 
 #include "i18n.h"
 
-#ifdef _WIN32
+#if defined(__unix__)
 
-#define STDOUT_FILENO ({ fileno(stdout); })
-#define STDERR_FILENO ({ fileno(stderr); })
+#define MKDIR(path) mkdir(path, 0775)
+
+#elif defined(_WIN32)
+
+char *strchrnul(const char *s, int c);
+
+char *dirname(char *path);
+char *basename(char *path);
+
+int setenv(const char *name, const char *value, int overwrite);
+
+NORETURN winexit(int code);
 
 #define read   _read
 #define write  _write
@@ -102,48 +115,27 @@
 #define rmdir  _rmdir
 #define getpid _getpid
 
-#define F_OK 00
-#define W_OK 02
-#define R_OK 04
-/*
- * Microsoft documentation does not specify executable mode value, we better
- * define this to 00 instead of posix defined value 01
- */
-#define X_OK 00
-
-#define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
-#define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
-
-#define SSIZE_MAX INT64_MAX
-typedef SSIZE_T ssize_t;
-
-#define PATH_MAX MAX_PATH
-
-typedef unsigned int uint;
-typedef unsigned short ushort;
-
-typedef uint mode_t;
-
-typedef off_t off64_t;
-
-typedef int pid_t;
-
-char *strchrnul(const char *s, int c);
-char *dirname(char *path);
-int setenv(const char *name, const char *value, int overwrite);
-
 #ifndef CONFIG_IS_CONSOLE_APP
-NORETURN winexit(int code);
 # define exit winexit
 #endif
 
 #define MKDIR mkdir
 
-#else /* ---- linux ----- */
+/*
+ * Microsoft documentation does not specify executable mode value, we better
+ * define this to 00 instead of posix defined value 01
+ */
+#define X_OK 00
+#define F_OK 00
+#define W_OK 02
+#define R_OK 04
 
-#define MKDIR(path) mkdir(path, 0775)
+#define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
+#define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
 
-#endif /* ---- _WIN32 ----- */
+#define STDOUT_FILENO ({ fileno(stdout); })
+#define STDERR_FILENO ({ fileno(stderr); })
+#endif
 
 #include "cntio.h"
 

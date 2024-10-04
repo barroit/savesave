@@ -16,6 +16,20 @@ typedef uint64_t u64;
 typedef long long llong;
 typedef unsigned long long ullong;
 
+#ifdef _WIN32
+typedef unsigned int uint;
+typedef unsigned short ushort;
+typedef unsigned long ulong;
+
+typedef SSIZE_T ssize_t;
+
+typedef uint mode_t;
+
+typedef int pid_t;
+
+typedef ulong rlim_t;
+#endif
+
 typedef uintmax_t flag_t;
 
 struct list_head {
