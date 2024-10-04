@@ -6,7 +6,6 @@
  */
 
 #include "trace.h"
-#include "debug.h"
 
 struct trace_timer {
 	timestamp_t start;

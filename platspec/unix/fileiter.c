@@ -9,7 +9,6 @@
 #include "strbuf.h"
 #include "strlist.h"
 #include "termas.h"
-#include "debug.h"
 #include "path.h"
 
 static inline int dispatch_lnkfile(struct iterfile *file, struct fileiter *ctx)

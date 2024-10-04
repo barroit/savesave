@@ -10,7 +10,6 @@
 #include "compress.h"
 #include "constructor.h"
 #include "termas.h"
-#include "debug.h"
 
 USESTDIO CONSTRUCTOR(check_libzstd_compat)
 {

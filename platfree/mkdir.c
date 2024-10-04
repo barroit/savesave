@@ -7,7 +7,6 @@
 
 #include "mkdir.h"
 #include "path.h"
-#include "debug.h"
 #include "fileiter.h"
 #include "termas.h"
 

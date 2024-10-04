@@ -8,6 +8,14 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
+#ifdef NDEBUG
+# define DEBUG_RUN() if (0)
+# define BUG_ON(cond) do {} while (0)
+#else
+# define DEBUG_RUN() if (1)
+# define BUG_ON(cond) assert(!(cond))
+#endif
+
 #define FORMAT(sta, fir) __attribute__((format(printf, sta, fir)))
 
 #define NORETURN void __attribute__((noreturn))

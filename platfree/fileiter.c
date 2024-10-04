@@ -9,7 +9,6 @@
 #include "alloc.h"
 #include "strbuf.h"
 #include "strlist.h"
-#include "debug.h"
 
 static void check_flag(flag_t flag)
 {

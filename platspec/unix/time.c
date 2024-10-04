@@ -5,8 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#include "debug.h"
-
 timestamp_t gettimestamp(void)
 {
 	struct timespec ts;

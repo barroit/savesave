@@ -12,7 +12,6 @@
 #include "strbuf.h"
 #include "strlist.h"
 #include "termas.h"
-#include "debug.h"
 #include "path.h"
 
 static int dispatch_file(struct fileiter *ctx, WIN32_FIND_DATA *ent)

@@ -115,9 +115,7 @@ NORETURN winexit(int code);
 #define rmdir  _rmdir
 #define getpid _getpid
 
-#ifndef CONFIG_IS_CONSOLE_APP
-# define exit winexit
-#endif
+#define exit winexit
 
 #define MKDIR mkdir
 

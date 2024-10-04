@@ -7,7 +7,6 @@
 
 #include "backup.h"
 #include "dotsav.h"
-#include "debug.h"
 #include "strbuf.h"
 #include "list.h"
 #include "termas.h"

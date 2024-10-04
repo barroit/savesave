@@ -9,7 +9,6 @@
 #include "alloc.h"
 #include "termas.h"
 #include "dotsav.h"
-#include "debug.h"
 #include "list.h"
 #include "backup.h"
 

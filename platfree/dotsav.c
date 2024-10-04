@@ -11,7 +11,6 @@
 #include "strbuf.h"
 #include "alloc.h"
 #include "list.h"
-#include "debug.h"
 #include "path.h"
 #include "fileiter.h"
 #include "mkdir.h"

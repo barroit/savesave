@@ -8,7 +8,6 @@
 #include "cpsched.h"
 #include "list.h"
 #include "alloc.h"
-#include "debug.h"
 #include "fcpy.h"
 
 #define MAX_PENDING 5

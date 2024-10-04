@@ -7,7 +7,6 @@
 
 #include "termas.h"
 #include "calc.h"
-#include "debug.h"
 
 void strrepl(char *str, int c, int r)
 {

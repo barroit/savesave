@@ -11,7 +11,7 @@
 #include "dotsav.h"
 #include "alloc.h"
 #include "termas.h"
-#include "debug.h"
+
 
 static void tmrfunc(sigval_t sv)
 {

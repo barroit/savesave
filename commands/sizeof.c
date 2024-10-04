@@ -17,7 +17,7 @@
 #include "fileiter.h"
 
 struct dirinfo {
-	off_t size;
+	ullong size;
 	uint files;
 	uint dirs;
 };
@@ -117,7 +117,7 @@ CMDDESCRIP("Calculate file size of given path")
 		}
 
 		uint uidx = 0;
-		off_t scale = 1;
+		ullong scale = 1;
 
 		while (info.size / (scale * SZ_1K) != 0) {
 			scale *= SZ_1K;

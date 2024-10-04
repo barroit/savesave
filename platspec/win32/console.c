@@ -7,7 +7,6 @@
 
 #include "console.h"
 #include "termas.h"
-#include "debug.h"
 
 static void adjust_console_size(short size)
 {

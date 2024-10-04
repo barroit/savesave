@@ -11,7 +11,6 @@
 #include "alloc.h"
 #include "list.h"
 #include "termas.h"
-#include "debug.h"
 
 void PLATSPECOF(baktimer_init)(struct baktimer *ctx, struct baksched *bs)
 {

@@ -9,7 +9,6 @@
 # pragma GCC diagnostic ignored "-Wsometimes-uninitialized"
 #endif
 
-#include "debug.h"
 #include "robio.h"
 
 rlim_t cntio_fdcnt;

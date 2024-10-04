@@ -6,7 +6,6 @@
  */
 
 #include "path.h"
-#include "debug.h"
 #include "alloc.h"
 #include "termas.h"
 

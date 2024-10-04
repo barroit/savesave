@@ -14,7 +14,6 @@
 #include "strlist.h"
 #include "list.h"
 #include "termas.h"
-#include "debug.h"
 #include "alloc.h"
 
 int getargv(const char ***argv)

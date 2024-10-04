@@ -7,7 +7,6 @@
 
 #include "notifyicon.h"
 #include "resid.h"
-#include "debug.h"
 
 NOTIFYICONDATA notifyicon_init(HINSTANCE app, HWND window)
 {

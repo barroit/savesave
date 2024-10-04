@@ -10,7 +10,6 @@
 #include "termas.h"
 #include "strlist.h"
 #include "list.h"
-#include "debug.h"
 #include "constructor.h"
 
 static void assert_failure_routine(void)

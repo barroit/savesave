@@ -9,7 +9,6 @@
 
 #include "console.h"
 #include "termas.h"
-#include "debug.h"
 
 void winexit(int code)
 {

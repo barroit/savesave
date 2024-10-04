@@ -10,7 +10,6 @@
 #include "termas.h"
 #include "dotsav.h"
 #include "list.h"
-#include "debug.h"
 #include "proc.h"
 #include "path.h"
 #include "cpsched.h"

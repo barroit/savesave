@@ -8,7 +8,6 @@
 #include "proc.h"
 #include "strbuf.h"
 #include "robio.h"
-#include "debug.h"
 #include "path.h"
 #include "list.h"
 #include "termas.h"

@@ -7,7 +7,6 @@
 
 #include "path.h"
 #include "list.h"
-#include "debug.h"
 #include "strbuf.h"
 #include "maincmd.h"
 

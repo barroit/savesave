@@ -6,7 +6,6 @@
  */
 
 #include "argupar.h"
-#include "debug.h"
 #include "termas.h"
 #include "strlist.h"
 #include "list.h"

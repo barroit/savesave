@@ -7,7 +7,6 @@
 
 #include "path.h"
 #include "termas.h"
-#include "debug.h"
 #include "alloc.h"
 #include "strbuf.h"
 

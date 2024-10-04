@@ -10,7 +10,6 @@
 #include "list.h"
 #include "alloc.h"
 #include "strbuf.h"
-#include "debug.h"
 #include "path.h"
 
 #define UPDATE_BUF(buf, n, len)	\

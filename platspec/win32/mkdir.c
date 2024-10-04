@@ -6,7 +6,6 @@
  */
 
 #include "mkdir.h"
-#include "debug.h"
 #include "termas.h"
 #include "fileiter.h"
 

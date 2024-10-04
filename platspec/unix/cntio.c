@@ -5,8 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#include "debug.h"
-
 #ifdef opendir
 # undef opendir
 #endif
