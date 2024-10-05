@@ -60,6 +60,7 @@ int fileiter_exec(struct fileiter *ctx, const char *root)
 {
 	int err;
 	const char *dir = root;
+	size_t rootlen = strlen(root);
 	size_t baslen = strlen(dir);
 	size_t ndrlen;
 
@@ -113,6 +114,9 @@ iter_done:
 			err = dispatch_directory(ctx);
 			if (unlikely(err))
 				return -1;
+
+			if (unlikely(ctx->sb->len == rootlen))
+				return 0;
 
 			strbuf_to_dirname(ctx->sb);
 			if (ctx->sb->len == ndrlen) {
