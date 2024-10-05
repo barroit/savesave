@@ -38,12 +38,15 @@ static int cpyfile(struct iterfile *src, void *data)
 	struct strbuf *dest = &((struct strbuf *)data)[0];
 	strbuf_concatat_base(dest, src->dymname);
 
-	// return cpsched_schedule(src->absname, dest->str,
-	// 			S_ISLNK(src->st.st_mode));
-	if (S_ISLNK(src->st.st_mode))
-		return copy_symlink(src->absname, dest->str);
-	else
+	int ret = cpsched_schedule(src->absname, dest->str,
+				   S_ISLNK(src->st.st_mode));
+	if (ret != SCHED_BUSY)
+		return ret;
+
+	if (S_ISREG(src->st.st_mode))
 		return copy_regfile(src->absname, dest->str);
+	else
+		return copy_symlink(src->absname, dest->str);
 }
 
 static int copy(const char *src, const char *dest)
