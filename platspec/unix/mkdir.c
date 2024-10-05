@@ -7,7 +7,6 @@
 
 #include "mkdir.h"
 #include "termas.h"
-#include "fileiter.h"
 
 int flexremove(const char *name)
 {
@@ -19,5 +18,5 @@ int flexremove(const char *name)
 	else if (errno == EISDIR)
 		return rmdirr(name);
 
-	return warn_errno(_("failed to remove file `%s'"), name);
+	return warn_errno(ERRMAS_REMOVE_FILE(name));
 }

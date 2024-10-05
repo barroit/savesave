@@ -11,18 +11,18 @@
 #include "termas.h"
 #include "path.h"
 
-static inline int dispatch_lnkfile(struct iterfile *file, struct fileiter *ctx)
+static int dispatch_lnkfile(struct iterfile *file, struct __fileiter *ctx)
 {
 	if (ctx->flag & FITER_USE_STAT) {
-		int err = lstat(file->absname, file->st);
-		if (err)
+		int err = lstat(file->absname, &file->st);
+		if (unlikely(err))
 			return warn_errno(ERRMAS_STAT_FILE(file->absname));
 	}
 
-	return ctx->cb(file, ctx->data);
+	return ctx->func(file, ctx->data);
 }
 
-static int dispatch_regfile(struct iterfile *file, struct fileiter *ctx)
+static int dispatch_regfile(struct iterfile *file, struct __fileiter *ctx)
 {
 	int ret;
 
@@ -34,11 +34,11 @@ static int dispatch_regfile(struct iterfile *file, struct fileiter *ctx)
 
 	if (ctx->flag & FITER_USE_STAT) {
 		if (ctx->flag & FITER_USE_FD)
-			ret = fstat(file->fd, file->st);
+			ret = fstat(file->fd, &file->st);
 		else
-			ret = stat(file->absname, file->st);
+			ret = stat(file->absname, &file->st);
 
-		if (ret) {
+		if (unlikely(ret)) {
 			int errnum = errno;
 
 			close(file->fd);
@@ -48,24 +48,27 @@ static int dispatch_regfile(struct iterfile *file, struct fileiter *ctx)
 		}
 	}
 
-	ret = ctx->cb(file, ctx->data);
+	ret = ctx->func(file, ctx->data);
 	if (ctx->flag & FITER_USE_FD)
 		close(file->fd);
 
 	return ret;
 }
 
-static int dispatch_file(struct fileiter *ctx, struct dirent *ent)
+static int dispatch_file(struct __fileiter *ctx, struct dirent *ent)
 {
+	if (ctx->flag & FITER_DIR_ONLY && ent->d_type != DT_DIR)
+		return 0;
+
 	const char *basname = ent->d_name;
 	if (is_dir_indicator(basname))
 		return 0;
 
-	if (ctx->sb->str[ctx->sb->len - 1] != '/')
-		strbuf_concat(ctx->sb, "/");
-	strbuf_concat(ctx->sb, basname);
+	if (ctx->sb.str[ctx->sb.len - 1] != '/')
+		strbuf_concat(&ctx->sb, "/");
+	strbuf_concat(&ctx->sb, basname);
 
-	const char *absname = ctx->sb->str;
+	const char *absname = ctx->sb.str;
 	const char *relname = straftr(absname, ctx->root);
 	BUG_ON(!relname);
 
@@ -73,7 +76,7 @@ static int dispatch_file(struct fileiter *ctx, struct dirent *ent)
 	case DT_REG:
 		break;
 	case DT_DIR:
-		strlist_push2(ctx->sl, absname, 32);
+		strlist_push2(&ctx->sl, absname, 32);
 		return 0;
 	case DT_LNK:
 		break;
@@ -91,9 +94,10 @@ static int dispatch_file(struct fileiter *ctx, struct dirent *ent)
 		.absname = absname,
 		.dymname = relname,
 		.basname = basname,
-		.st      = &(struct stat){ 0 },
-		.is_lnk  = ent->d_type == DT_LNK,
 		.fd      = -1,
+		.st      = {
+			.st_mode = ent->d_type == DT_LNK ? S_IFLNK : S_IFREG,
+		},
 	};
 
 	if (ent->d_type == DT_LNK)
@@ -102,11 +106,11 @@ static int dispatch_file(struct fileiter *ctx, struct dirent *ent)
 	return dispatch_regfile(&file, ctx);
 }
 
-int PLATSPECOF(fileiter_loop_dir)(struct fileiter *ctx)
+int PLATSPECOF(fileiter_loop_dir)(struct __fileiter *ctx)
 {
-	DIR *dir = opendir(ctx->sb->str);
+	DIR *dir = opendir(ctx->sb.str);
 	if (!dir)
-		return warn_errno(ERRMAS_OPEN_FILE(ctx->sb->str));
+		return warn_errno(ERRMAS_OPEN_FILE(ctx->sb.str));
 
 	int ret;
 	struct dirent *ent;
@@ -116,7 +120,7 @@ int PLATSPECOF(fileiter_loop_dir)(struct fileiter *ctx)
 		if (ret)
 			break;
 
-		strbuf_reset(ctx->sb);
+		strbuf_reset(&ctx->sb);
 	}
 
 	closedir(dir);

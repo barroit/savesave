@@ -9,10 +9,10 @@
 #define COMPILER_H
 
 #ifdef NDEBUG
-# define DEBUG_RUN() if (0)
+# define DEBUGGING() if (0)
 # define BUG_ON(cond) do {} while (0)
 #else
-# define DEBUG_RUN() if (1)
+# define DEBUGGING() if (1)
 # define BUG_ON(cond) assert(!(cond))
 #endif
 

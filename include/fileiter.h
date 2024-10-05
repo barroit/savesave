@@ -9,39 +9,27 @@
 #define FILEITER_H
 
 struct iterfile {
-	const char *absname;
-	const char *dymname; /* dynamic part of absname */
-	const char *basname;
+	const char *absname;	/* full name of file */
+	const char *dymname;	/* dynamic part (not necessarily a basename) of
+				   path */
+	const char *basname;	/* basename of path */
 
-	/*
-	 * not available when
-	 *  - absname points to a symlink on windows
-	 */
-	struct stat *st;
-
-	int is_lnk;
-	int is_dir;
-
-	/*
-	 * not available when
-	 *  - on windows, due to the significant performance impact
-	 *  - absname points to symlink
-	 */
 	int fd;
+	struct stat st;
 };
 
 typedef int (*fileiter_function_t)(struct iterfile *file, void *data);
 
-struct fileiter {
+struct __fileiter {
 	const char *root;
 
-	struct strbuf *sb;
-	struct strlist *sl;
-
-	fileiter_function_t cb;
+	fileiter_function_t func;
 	void *data;
 
 	flag_t flag;
+
+	struct strbuf sb;
+	struct strlist sl;
 };
 
 #define FITER_USE_STAT   (1 << 0)	/* make st member available */
@@ -51,16 +39,10 @@ struct fileiter {
 					   call, useful for implementing
 					   recursive directories deletion */
 #define FITER_LIST_UNSUP (1 << 4)	/* list unsupported files */
+#define FITER_DIR_ONLY   (1 << 5)	/* only list directories */
 
-/**
- * fileiter_init - Initialize file iterator
- */
-void fileiter_init(struct fileiter *ctx,
-		   fileiter_function_t cb, void *data, flag_t flags);
-
-int fileiter_exec(struct fileiter *ctx, const char *root);
-int PLATSPECOF(fileiter_loop_dir)(struct fileiter *ctx);
-
-void fileiter_destroy(struct fileiter *ctx);
+int fileiter(const char *root,
+	     fileiter_function_t func, void *data, flag_t flag);
+int PLATSPECOF(fileiter_loop_dir)(struct __fileiter *ctx);
 
 #endif /* FILEITER_H */

@@ -53,17 +53,17 @@ int mkfdirp2(char *name, size_t start)
 	return 0;
 }
 
-static int rmdirrfunc(struct iterfile *file, void *data)
+static int do_rmdirr(struct iterfile *file, void *data)
 {
 	int err;
 	const char *name = file->absname;
 
-	if (file->is_dir)
+	if (S_ISDIR(file->st.st_mode))
 		err = rmdir(name);
 	else
 		err = unlink(name);
 
-	if (err)
+	if (unlikely(err))
 		return warn_errno("failed to remove file `%s'", name);
 
 	return 0;
@@ -71,12 +71,5 @@ static int rmdirrfunc(struct iterfile *file, void *data)
 
 int rmdirr(const char *name)
 {
-	int ret;
-	struct fileiter iter;
-
-	fileiter_init(&iter, rmdirrfunc, NULL, FITER_RECUR_DIR);
-	ret = fileiter_exec(&iter, name);
-	fileiter_destroy(&iter);
-
-	return ret;
+	return fileiter(name, do_rmdirr, NULL, FITER_RECUR_DIR);
 }

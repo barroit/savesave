@@ -21,16 +21,29 @@
 static uint thrd_numb = -1;
 static int force_exec;
 
-static int iterfunc(struct iterfile *src, void *data)
+static int makedir(struct iterfile *src, void *data)
 {
 	struct strbuf *dest = &((struct strbuf *)data)[0];
-
 	strbuf_concatat_base(dest, src->dymname);
 
-	if (src->is_dir)
-		return strbuf_mkdirp(dest);
+	int err = MKDIR(dest->str);
+	if (unlikely(err))
+		return warn_errno(ERRMAS_CREAT_DIR(dest->str));
 
-	return cpsched_schedule(src->absname, dest->str, src->is_lnk);
+	return 0;
+}
+
+static int cpyfile(struct iterfile *src, void *data)
+{
+	struct strbuf *dest = &((struct strbuf *)data)[0];
+	strbuf_concatat_base(dest, src->dymname);
+
+	// return cpsched_schedule(src->absname, dest->str,
+	// 			S_ISLNK(src->st.st_mode));
+	if (S_ISLNK(src->st.st_mode))
+		return copy_symlink(src->absname, dest->str);
+	else
+		return copy_regfile(src->absname, dest->str);
 }
 
 static int copy(const char *src, const char *dest)
@@ -47,31 +60,35 @@ static int copy(const char *src, const char *dest)
 
 	char *dir = xstrdup(dest);
 
-	err = mkdirp(dir);
+	err = mkfdirp(dir);
 	free(dir);
 	if (err)
 		return error_errno(ERRMAS_CREAT_DIR(dest));
 
-	struct fileiter iter;
+	int ret[2];
 	struct strbuf data[1] = {
 		[0] = strbuf_from2(dest, 0, PATH_MAX),
 	};
-	int iter_err;
-	int thrd_err;
+
+	ret[0] = fileiter(src, makedir, data, FITER_LIST_DIR | FITER_DIR_ONLY);
+	if (ret[0])
+		goto err_cpy_file;
 
 	cpsched_deploy(thrd_numb);
-	fileiter_init(&iter, iterfunc, data, FITER_LIST_DIR);
+	ret[0] = fileiter(src, cpyfile, data, 0);
+	cpsched_join(&ret[1]);
 
-	iter_err = fileiter_exec(&iter, src);
-	cpsched_join(&thrd_err);
+	if (ret[0] || ret[1])
+		goto err_cpy_file;
 
-	fileiter_destroy(&iter);
+	if (0) {
+	err_cpy_file:
+		error(ERRMAS_COPY_FILE(src, dest));
+		ret[0] = -1;
+	}
+
 	strbuf_destroy(&data[0]);
-
-	if (iter_err || thrd_err)
-		return error(ERRMAS_COPY_FILE(src, dest));
-
-	return 0;
+	return ret[0];
 }
 
 static int copy_sav(const char *name)

@@ -129,8 +129,14 @@ NORETURN winexit(int code);
 #define W_OK 02
 #define R_OK 04
 
-#define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
-#define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
+#define S_IFREG _S_IFREG
+#define S_IFLNK 0x3939
+#define S_IFDIR _S_IFDIR
+#define S_IFMT  _S_IFMT
+
+#define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+#define S_ISLNK(m) (((m) & S_IFMT) == S_IFLNK)
+#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 
 #define STDOUT_FILENO ({ fileno(stdout); })
 #define STDERR_FILENO ({ fileno(stderr); })

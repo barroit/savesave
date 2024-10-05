@@ -89,6 +89,9 @@ const char *strwinerror(void);
 #define ERRMAS_RENAME_FILE(src, dest) \
 	_("failed to rename file `%s' to `%s'"), src, dest
 
+#define ERRMAS_REMOVE_FILE(name) \
+	_("failed to remove file `%s'"), name
+
 void setup_lr_logging(void);
 
 void teardown_lr_logging(void);

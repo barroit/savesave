@@ -22,32 +22,18 @@ struct dirinfo {
 	uint dirs;
 };
 
-int iterfunc(struct iterfile *file, void *data)
+int accumsize(struct iterfile *file, void *data)
 {
 	struct dirinfo *info = data;
 
-	if (!file->is_dir) {
-		info->size += file->st->st_size ? : 64;
-		info->files += 1;
-	} else {
+	if (S_ISDIR(file->st.st_mode)) {
 		info->dirs += 1;
+	} else {
+		info->size += file->st.st_size ? : 64;
+		info->files += 1;
 	}
 
 	return 0;
-}
-
-int sizeof_directory(const char *name, struct dirinfo *info)
-{
-	int ret;
-	struct fileiter ctx;
-
-	fileiter_init(&ctx, iterfunc, info,
-		      FITER_LIST_DIR | FITER_USE_STAT | FITER_LIST_UNSUP);
-
-	ret = fileiter_exec(&ctx, name);
-	fileiter_destroy(&ctx);
-
-	return ret;
 }
 
 int cmd_sizeof(int argc, const char **argv)
@@ -109,7 +95,10 @@ CMDDESCRIP("Calculate file size of given path")
 		};
 
 		if (S_ISDIR(st.st_mode)) {
-			err = sizeof_directory(path, &info);
+			err = fileiter(path, accumsize, &info,
+				       FITER_LIST_DIR |
+					FITER_USE_STAT |
+					FITER_LIST_UNSUP);
 			if (err)
 				goto err_calc_dir;
 		} else if (!info.size) {
