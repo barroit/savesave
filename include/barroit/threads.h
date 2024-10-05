@@ -14,4 +14,6 @@ int xcnd_init(cnd_t *cond);
 
 int xthrd_create(thrd_t *thr, thrd_start_t func, void *arg);
 
+void thrd_affinity_all(size_t n);
+
 #endif /* BRT_THREADS_H */

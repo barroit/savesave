@@ -30,14 +30,7 @@ static int iterfunc(struct iterfile *src, void *data)
 	if (src->is_dir)
 		return strbuf_mkdirp(dest);
 
-	int ret = cpsched_schedule(src->absname, dest->str, src->is_lnk);
-	if (ret != SCHED_BUSY)
-		return ret;
-
-	if (src->is_lnk)
-		return copy_symlink(src->absname, dest->str);
-	else
-		return copy_regfile_async(src->absname, dest->str);
+	return cpsched_schedule(src->absname, dest->str, src->is_lnk);
 }
 
 static int copy(const char *src, const char *dest)

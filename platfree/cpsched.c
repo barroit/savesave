@@ -26,7 +26,8 @@ struct cpthrd {
 	uint pending;
 
 	mtx_t mtx;
-	cnd_t cnd;
+	cnd_t created;
+	cnd_t released;
 
 	size_t nl;
 	thrd_t *thrd;
@@ -46,15 +47,22 @@ static void release_task(struct cptask *task)
 static int cpsched_task(void *data)
 {
 	int err;
+	int prev_done = 0;
 
 	while (39) {
 		mtx_lock(&pool.mtx);
 		if (pool.state != POOL_RUNNING)
 			goto terminate_thread;
 
+		if (prev_done) {
+			cnd_signal(&pool.released);
+			pool.pending -= 1;
+			prev_done = 0;
+		}
+
 retry:
-		cnd_wait(&pool.cnd, &pool.mtx);
-		if (pool.state != POOL_RUNNING)
+		cnd_wait(&pool.created, &pool.mtx);
+		if (unlikely(pool.state != POOL_RUNNING))
 			goto terminate_thread;
 
 		if (unlikely(list_is_empty(&pool.queue)))
@@ -63,7 +71,6 @@ retry:
 		struct cptask *task = list_last_entry(&pool.queue,
 						      typeof(*task), list);
 		list_del(&task->list);
-		pool.pending -= 1;
 
 		mtx_unlock(&pool.mtx);
 
@@ -73,11 +80,13 @@ retry:
 			err = copy_regfile(task->src, task->dest);
 
 		release_task(task);
+		prev_done = 1;
+
 		if (likely(!err))
 			continue;
 
 		__atomic_store_n(&pool.state, POOL_ERROR, __ATOMIC_RELEASE);
-		cnd_broadcast(&pool.cnd);
+		cnd_broadcast(&pool.created);
 		thrd_exit(POOL_ERROR);
 	}
 
@@ -91,30 +100,25 @@ terminate_thread:
 void cpsched_deploy(size_t nl)
 {
 	BUG_ON(pool.thrd);
-
 	list_head_init(&pool.queue);
 
-	pool.thrd = xcalloc(sizeof(*pool.thrd), nl);
 	pool.nl = nl;
+	pool.thrd = xcalloc(sizeof(*pool.thrd), pool.nl);
 
 	xmtx_init(&pool.mtx, mtx_plain);
-	xcnd_init(&pool.cnd);
+	xcnd_init(&pool.created);
+	xcnd_init(&pool.released);
+
+	thrd_affinity_all(nl);
 
 	size_t i;
-	for_each_idx(i, nl)
+	for_each_idx(i, pool.nl)
 		xthrd_create(&pool.thrd[i], cpsched_task, NULL);
 }
 
 int cpsched_schedule(const char *src, const char *dest, int is_lnk)
 {
-	int state = __atomic_load_n(&pool.state, __ATOMIC_RELAXED);
-	if (unlikely(state != POOL_RUNNING))
-		goto return_state;
-
-	uint pending = __atomic_load_n(&pool.pending, __ATOMIC_RELAXED);
-	if (pending > MAX_PENDING)
-		return SCHED_BUSY;
-
+	int state;
 	struct cptask *task = xmalloc(sizeof(*task));
 
 	task->src = xstrdup(src);
@@ -122,6 +126,9 @@ int cpsched_schedule(const char *src, const char *dest, int is_lnk)
 	task->is_lnk = is_lnk;
 
 	mtx_lock(&pool.mtx);
+
+	while (pool.pending > MAX_PENDING)
+		cnd_wait(&pool.released, &pool.mtx);
 
 	state = pool.state;
 	if (unlikely(state != POOL_RUNNING)) {
@@ -133,7 +140,7 @@ int cpsched_schedule(const char *src, const char *dest, int is_lnk)
 	list_add_tail(&task->list, &pool.queue);
 	pool.pending += 1;
 
-	cnd_signal(&pool.cnd);
+	cnd_signal(&pool.created);
 	mtx_unlock(&pool.mtx);
 	return 0;
 
@@ -154,11 +161,13 @@ void cpsched_join(int *res)
 	int state = __atomic_exchange_n(&pool.state, POOL_CLOSED,
 					__ATOMIC_ACQ_REL);
 
-	cnd_broadcast(&pool.cnd);
+	cnd_broadcast(&pool.created);
 	for_each_idx(i, pool.nl)
 		thrd_join(pool.thrd[i], NULL);
 
-	cnd_destroy(&pool.cnd);
+	cnd_destroy(&pool.created);
+	cnd_destroy(&pool.released);
 	mtx_destroy(&pool.mtx);
+
 	*res = state;
 }
