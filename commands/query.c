@@ -76,7 +76,7 @@ static int cmd_query_path(int argc, const char **argv)
 			goto next;
 		}
 
-		warn("unkown query name `%s'", name);
+		warn("unknown query name `%s'", name);
 next:
 	}
 

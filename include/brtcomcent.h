@@ -42,6 +42,7 @@
 # include <sys/select.h>
 # include <sys/resource.h>
 # include <pthread.h>
+# include <sys/utsname.h>
 #elif defined(_WIN32)
 # include <sdkddkver.h>
 # include <io.h>

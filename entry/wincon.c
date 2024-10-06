@@ -27,8 +27,8 @@ static void __prepare_longrunning(void)
 
 int main(int argc, const char **argv)
 {
-	do_setup();
-	do_delayed_setup();
+	setup_program();
+	post_setup_program();
 
 	setup_message_translation();
 

@@ -61,7 +61,7 @@ static int watchdog(void *data)
 	uint last = 0;
 
 	while (39) {
-		uint new = __atomic_load_n(&ctx->overload, __ATOMIC_RELAXED);
+		uint new = __atomic_load_n(&ctx->overload, __ATOMIC_ACQUIRE);
 		if (!new)
 			goto next;
 
@@ -73,7 +73,7 @@ static int watchdog(void *data)
 
 		timespec_get(&cts, TIME_UTC);
 		if (cts.tv_sec - lts.tv_sec > OVERLOAD_WINDOW) {
-			__atomic_store_n(&ctx->overload, 0, __ATOMIC_RELAXED);
+			__atomic_store_n(&ctx->overload, 0, __ATOMIC_RELEASE);
 			last = 0;
 		}
 

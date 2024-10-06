@@ -10,13 +10,14 @@
 #include "constructor.h"
 #include "list.h"
 
-USESTDIO CONSTRUCTOR(check_os_version)
+USESTDIO
+CONSTRUCTOR(check_os_version)
 {
 	if (!IsWindows7OrGreater())
 		die(_("unsupported windows version (at least win7)"));
 }
 
-void do_setup(void)
+void setup_program(void)
 {
 	uint i;
 	constructor_t constructors[] = CONSTRUCTOR_LIST_INIT;
@@ -25,10 +26,10 @@ void do_setup(void)
 		constructors[i]();
 }
 
-void do_delayed_setup(void)
+void post_setup_program(void)
 {
 	uint i;
-	constructor_t constructors[] = CONSTRUCTOR_USESTDIO_LIST_INIT;
+	constructor_t constructors[] = CONSTRUCTOR_LIST_INIT_USESTDIO;
 
 	for_each_idx(i, sizeof_array(constructors))
 		constructors[i]();

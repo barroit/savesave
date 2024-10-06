@@ -29,9 +29,9 @@ static void __prepare_longrunning(void)
 
 int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int __)
 {
-	do_setup();
+	setup_program();
 	setup_console();
-	do_delayed_setup();
+	post_setup_program();
 
 	const char *defargv[] = { "savesave", "backup" };
 	int argc = sizeof_array(defargv);
