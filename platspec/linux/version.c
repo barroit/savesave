@@ -8,6 +8,9 @@
 #include "constructor.h"
 #include "termas.h"
 
+#define MIN_VERSION    5
+#define MIN_PATCHLEVEL 19
+
 CONSTRUCTOR(check_kernel_version)
 {
 	struct utsname un;
@@ -23,11 +26,14 @@ CONSTRUCTOR(check_kernel_version)
 	err = str2ullong(str, sep - str, &version, -1);
 	if (err)
 		goto err_malformed;
-	if (version < 5)
+	if (version < MIN_VERSION)
 		goto err_too_old;
-	else if (version > 5)
+	else if (version > MIN_VERSION)
 		return;
 
+	/*
+	 * Check patch level for version equal to MIN_VERSION.
+	 */
 	str = sep + 1;
 	sep = strchr(str, '.');
 
@@ -36,7 +42,7 @@ CONSTRUCTOR(check_kernel_version)
 	err = str2ullong(str, sep - str, &patchlevel, -1);
 	if (err)
 		goto err_malformed;
-	if (patchlevel < 6)
+	if (patchlevel < MIN_PATCHLEVEL)
 		goto err_too_old;
 
 	return;
