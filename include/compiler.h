@@ -69,4 +69,12 @@
 
 #define LONGRUNNING
 
+/*
+ * Returns the number of arguments (up to 6) passed to this macro. Useful for
+ * implementing flexible function calls.
+ */
+#define get_arg_cnt(...) __get_arg_cnt(, ##__VA_ARGS__, 6, 5, 4, 3, 2, 1, 0)
+#define __get_arg_cnt(...) ___get_arg_cnt(__VA_ARGS__)
+#define ___get_arg_cnt(a1, a2, a3, a4, a5, a6, a7, cnt, ...) cnt
+
 #endif /* COMPILER_H */
