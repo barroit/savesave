@@ -4,7 +4,7 @@
  *
  * Contact: barroit@linux.com
  *
- * include/arch/generic/syscall.h
+ * arch/generic/syscall.h
  */
 
 #ifndef ARCH_SYSCALL_H

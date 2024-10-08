@@ -4,7 +4,7 @@
  *
  * Contact: barroit@linux.com
  *
- * include/arch/riscv/syscall.h
+ * arch/riscv/syscall.h
  */
 
 #ifndef ARCH_SYSCALL_H
