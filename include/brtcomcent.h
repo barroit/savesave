@@ -43,6 +43,8 @@
 # include <sys/resource.h>
 # include <pthread.h>
 # include <sys/utsname.h>
+# include <sys/syscall.h>
+# include <sys/mman.h>
 #elif defined(_WIN32)
 # include <sdkddkver.h>
 # include <io.h>
@@ -80,6 +82,10 @@
 #include "barroit/resource.h"
 #include "barroit/threads.h"
 #include "barroit/zstd.h"
+
+#ifdef __linux__
+# include <arch/syscall.h>
+#endif
 
 #ifdef HAVE_INTL
 # ifdef CONFIG_DEBUG_INTLDLL
@@ -130,8 +136,10 @@ NORETURN winexit(int code);
 #define W_OK 02
 #define R_OK 04
 
+#define _S_IFLNK 0x3939
+
 #define S_IFREG _S_IFREG
-#define S_IFLNK 0x3939
+#define S_IFLNK _S_IFLNK
 #define S_IFDIR _S_IFDIR
 #define S_IFMT  _S_IFMT
 

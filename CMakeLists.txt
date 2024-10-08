@@ -1,8 +1,32 @@
 # SPDX-License-Identifier: GPL-3.0-only
 cmake_minimum_required(VERSION 3.21)
 
-set(ARCH $ENV{ARCH})
 set(ROOT ${CMAKE_SOURCE_DIR})
+
+# ------------------------------ architecture ------------------------------
+# We use the first item in the list as real architecture name
+# Also include/arch
+set(ARCH_X86 "x86 x86_64 amd64 x64")
+set(ARCH_RISCV "riscv riscv riscv64")
+set(ARCH_ARM64 "arm64 arm64 aarch64")
+
+string(TOLOWER $ENV{ARCH} ARCH)
+foreach(AHCHLIST IN LISTS ARCH_X86 ARCH_RISCV ARCH_ARM64)
+  string(REGEX MATCH ${ARCH} FINDARCH ${AHCHLIST})
+  if(NOT FINDARCH)
+    continue()
+  endif()
+
+  string(REPLACE " " ";" AHCHLIST ${AHCHLIST})
+  list(GET AHCHLIST 0 ARCH)
+  set(ARCH_FOUND 1)
+endforeach()
+
+if(NOT ARCH_FOUND)
+  set(ARCH generic)
+endif()
+
+file(CREATE_LINK ${ROOT}/arch/${ARCH} ${ROOT}/include/arch SYMBOLIC)
 
 # -------------------------- generated directory ---------------------------
 set(GENERATED ${ROOT}/include/generated)
@@ -46,7 +70,7 @@ add_compile_options("SHELL:-include ${GENERATED}/autoconf.h")
 add_compile_options("SHELL:-include ${GENERATED}/appinfo.h")
 add_compile_options("SHELL:-include ${ROOT}/include/brtcomcent.h")
 
-include_directories(${ROOT}/include)
+include_directories(${ROOT}/include ${ROOT}/include/arch/${ARCH})
 
 # -------------------------------- manifest --------------------------------
 if(WIN32)
@@ -61,7 +85,7 @@ if(NOT CONFIG_DISALBE_GETTEXT AND Intl_FOUND)
 
   if(NOT Intl_VERSION)
     find_package(Gettext)
-    if (GETTEXT_FOUND)
+    if(GETTEXT_FOUND)
       set(GETTEXT_VERSION ${GETTEXT_VERSION_STRING})
     else()
       set(GETTEXT_VERSION "unknown")
@@ -126,7 +150,7 @@ target_link_libraries(savesave platfree platspec)
 # ---------------------------------- dll -----------------------------------
 if(WIN32)
   target_link_libraries(savesave ws2_32 comctl32 shlwapi)
-  if (NOT CONFIG_SOURCE_NDEBUG)
+  if(NOT CONFIG_SOURCE_NDEBUG)
     target_link_libraries(savesave dbghelp)
   endif()
 endif()

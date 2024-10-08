@@ -77,4 +77,36 @@
 #define __get_arg_cnt(...) ___get_arg_cnt(__VA_ARGS__)
 #define ___get_arg_cnt(a1, a2, a3, a4, a5, a6, a7, cnt, ...) cnt
 
+/*
+ * Another version of syscall(2). This version does not convert the return
+ * value to errno if an error occurs.
+ */
+#define __syscall(number, ...) \
+	___syscall(get_arg_cnt(__VA_ARGS__), number, ##__VA_ARGS__)
+#define ___syscall(...) \
+	____syscall(__VA_ARGS__)
+#define ____syscall(count, number, ...) \
+	__syscall##count(number, ##__VA_ARGS__)
+
+/* glibc/sysdeps/unix/sysv/linux/x86_64/sysdep.h */
+/*
+ * This also works when v is an array. For an array v, type of (v) - (v) is
+ * ptrdiff_t, which is signed, since size of ptrdiff_t == size of pointer, cast
+ * is a NOP.
+ */
+#define TYPEFY(v) typeof((v) - (v))
+
+/* glibc/sysdeps/unix/sysv/linux/x86_64/sysdep.h */
+/*
+ * Explicit cast the argument.
+ */
+#define ARGIFY(v) ((TYPEFY (v)) (v))
+
+/* glibc/sysdeps/unix/sysv/linux/x86_64/sysdep.h */
+/*
+ * Create a variable 'name' based on type of variable 'v' to avoid explicit
+ * types.
+ */
+#define VARAFY(v, name) typeof(ARGIFY(v)) name
+
 #endif /* COMPILER_H */

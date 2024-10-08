@@ -10,8 +10,11 @@
 
 build/*
 !build/locale
+
 savesave.manifest
 include/generated
+include/arch
+
 locale/*~
 locale/generated.pot
 
