@@ -49,6 +49,40 @@ foreach(line ${lines})
   list(APPEND DOTCONFIG_VARIABLES "${CMAKE_MATCH_1}")
 endforeach()
 
+# --------------------------------- Sanitizer ---------------------------------
+if(CONFIG_USE_ASAN AND (CONFIG_USE_TSAN OR CONFIG_USE_MSAN))
+  message(FATAL_ERROR "AddressSanitizer is "
+	  "incompatible with ThreadSanitizer and MemorySanitizer.")
+endif()
+
+if(CONFIG_USE_UBSAN AND CONFIG_USE_MSAN)
+  message(FATAL_ERROR "AddressSanitizer is "
+	  "incompatible with MemorySanitizer.")
+endif()
+
+if(CONFIG_USE_TSAN AND (CONFIG_USE_ASAN OR CONFIG_USE_MSAN))
+  message(FATAL_ERROR "ThreadSanitizer is "
+	  "incompatible with AddressSanitizer and MemorySanitizer.")
+endif()
+
+if(CONFIG_USE_MSAN AND (CONFIG_USE_ASAN OR
+			CONFIG_USE_UBSAN OR CONFIG_USE_TSAN))
+  message(FATAL_ERROR "MemorySanitizer is "
+	  "incompatible with all other sanitizers.")
+endif()
+
+test_add_complie_options(CONFIG_USE_ASAN -fsanitize=address)
+test_add_link_options(CONFIG_USE_ASAN -fsanitize=address)
+
+test_add_complie_options(CONFIG_USE_UBSAN -fsanitize=undefined)
+test_add_link_options(CONFIG_USE_UBSAN -fsanitize=undefined)
+
+test_add_complie_options(CONFIG_USE_TSAN -fsanitize=thread)
+test_add_link_options(CONFIG_USE_TSAN -fsanitize=thread)
+
+test_add_complie_options(CONFIG_USE_MSAN -fsanitize=memory)
+test_add_link_options(CONFIG_USE_MSAN -fsanitize=memory)
+
 # --------------------------------- Compiler ----------------------------------
 set(CMAKE_C_COMPILER ${CONFIG_CC_NAME})
 

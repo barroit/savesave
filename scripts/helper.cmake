@@ -18,6 +18,16 @@ function(test_add_compile_definitions cond)
   endif()
 endfunction()
 
+function(test_add_link_options cond)
+  if(${cond})
+    list(POP_FRONT ARGV)
+    list(JOIN ARGV " " opt)
+
+    message(${ARGV})
+    add_link_options(${ARGV})
+  endif()
+endfunction()
+
 function (kselect conf)
   if(NOT DOTCONFIG_VARIABLES)
     message(FATAL_ERROR "BUG!!! DOTCONFIG_VARIABLES not found")
