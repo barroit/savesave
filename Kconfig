@@ -15,24 +15,10 @@ config CC_IS_CLANG
 
 endchoice
 
-choice
-	prompt "CXX"
-	depends on $(BUILD) != "linux"
-
-config CXX_IS_CLANG
-	bool "clang++"
-
-endchoice
-
 config CC_NAME
 	string
 	default "gcc" if CC_IS_GCC
 	default "clang" if CC_IS_CLANG
-
-config CXX_NAME
-	string
-	default "g++" if CXX_IS_GCC
-	default "clang++" if CXX_IS_CLANG
 
 choice
 	prompt "Debug level"
