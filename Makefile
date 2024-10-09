@@ -5,10 +5,11 @@ MAKEFLAGS += --no-print-directory
 abs_root  := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 abs_build := $(abs_root)/build
 
-BUILD := linux
+UNIX  := y
+BUILD := $(shell uname -s)
 ARCH  := $(shell uname -m)
 SAVESAVE_VERSION := $(shell cat $(abs_root)/version)
-export BUILD ARCH SAVESAVE_VERSION
+export UNIX BUILD ARCH SAVESAVE_VERSION
 
 .PHONY: build clean distclean
 

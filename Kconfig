@@ -1,14 +1,36 @@
 # SPDX-License-Identifier: GPL-3.0-only
 mainmenu "Savesave/$(BUILD)-$(ARCH) $(SAVESAVE_VERSION) Configuration"
 
-menu "Compiling"
+menu "Debugging"
+
+config NO_LONGRUNNING_DAEMON
+	bool "disable daemonized longrunning"
+
+config SUPPRESS_ANNOTATED_LEAKS
+	bool "suppress annotated leaks"
+
+config SOURCE_NDEBUG
+	bool "define NDEBUG"
+
+if "$(WIN32)"
+config DEBUG_INTLDLL
+	bool "debug libintl"
+
+config MAX_DUMP_STACK
+	int "max dump stack (up to USHRT_MAX)"
+	default 64
+endif # "$(WIN32)"
+
+endmenu # "Debugging"
+
+menu "Compiler"
 
 choice
 	prompt "CC"
 
 config CC_IS_GCC
 	bool "gcc"
-	depends on $(BUILD) = "linux"
+	depends on "$(UNIX)"
 
 config CC_IS_CLANG
 	bool "clang"
@@ -63,17 +85,13 @@ config COMPILER_WARNING_ALL
 config COMPILER_WARNING_EXTRA
 	bool "use -Wextra"
 
-config LINK_LIBZSTD_STATIC
-	bool "link against libzstd static library"
-	depends on $(BUILD) = "linux"
-
-endmenu # "Compiling"
+endmenu # "Compiler"
 
 menu "Feature"
 
 config IS_CONSOLE_APP
 	bool "build console version of savesave"
-	depends on $(BUILD) = "windows"
+	depends on "$(WIN32)"
 
 config ARCHIVE_EXTENTION
 	string "file extension for archive file (no dot)"
@@ -87,39 +105,16 @@ config LINEWRAP_THRESHOLD
 	int "character threshold for line wrap"
 	default 80
 
-endmenu # "Feature"
-
-menu "Gettext"
-
 config DISALBE_GETTEXT
 	bool "disable i18n features"
 
+if !DISALBE_GETTEXT
 config TARGET_LOCALE
 	string "user locale for gettext"
 
-endmenu # "Gettext"
+config LINK_LIBZSTD_STATIC
+	bool "link against libzstd static library"
+	depends on "$(UNIX)"
+endif # DISALBE_GETTEXT
 
-menu "Debugging"
-
-config SOURCE_NDEBUG
-	bool "define NDEBUG"
-
-config SUPPRESS_ANNOTATED_LEAKS
-	bool "suppress annotated leaks"
-
-config NO_LONGRUNNING_DAEMON
-	bool "disable daemonized longrunning"
-
-menu "Windows"
-	depends on $(BUILD) = "windows"
-
-config DEBUG_INTLDLL
-	bool "debug libintl"
-
-config MAX_DUMP_STACK
-	int "max dump stack (up to USHRT_MAX)"
-	default 64
-
-endmenu # "Windows"
-
-endmenu # "Debugging"
+endmenu # "Feature"
