@@ -2,8 +2,12 @@
 cmake_minimum_required(VERSION 3.21)
 
 set(ROOT ${CMAKE_SOURCE_DIR})
+set(GENERATED ${ROOT}/include/generated)
 
-# ------------------------------ architecture ------------------------------
+include(${ROOT}/scripts/helper.cmake)
+file(MAKE_DIRECTORY ${GENERATED})
+
+# ------------------------------- Architecture --------------------------------
 # We use the first item in the list as real architecture name
 # Also include/arch
 set(ARCH_X86 "x86 x86_64 amd64 x64")
@@ -28,42 +32,48 @@ endif()
 
 file(CREATE_LINK ${ROOT}/arch/${ARCH} ${ROOT}/include/arch SYMBOLIC)
 
-# -------------------------- generated directory ---------------------------
-set(GENERATED ${ROOT}/include/generated)
-file(MAKE_DIRECTORY ${GENERATED})
+# ---------------------------------- Kconfig ----------------------------------
+execute_process(COMMAND genconfig --header-path ${GENERATED}/autoconf.h
+		--config-out ${ROOT}/.config)
 
-# -------------------------------- kconfig ---------------------------------
-include(${ROOT}/scripts/kconfig.cmake)
+file(STRINGS ${ROOT}/.config lines ENCODING UTF-8)
 
-# -------------------------------- compiler --------------------------------
+foreach(line ${lines})
+  if (line MATCHES "^#")
+    continue()
+  endif()
+
+  string(REGEX MATCH "^(CONFIG_[^=]+)=(\"?)([^\"]*)(\"?)$" __unused ${line})
+
+  set(${CMAKE_MATCH_1} ${CMAKE_MATCH_3})
+  list(APPEND DOTCONFIG_VARIABLES "${CMAKE_MATCH_1}")
+endforeach()
+
+# --------------------------------- Compiler ----------------------------------
 set(CMAKE_C_COMPILER ${CONFIG_CC_NAME})
 
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_EXTENSIONS true)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-if(CONFIG_COMPILER_WARNING_ALL)
-  add_compile_options(-Wall)
-endif()
+test_add_complie_options(CONFIG_COMPILER_WARNING_ALL -Wall)
 
-if(CONFIG_COMPILER_WARNING_EXTRA)
-  add_compile_options(-Wextra)
-endif()
+test_add_complie_options(CONFIG_COMPILER_WARNING_EXTRA -Wextra)
 
-set_choiced_value(CONFIG_COMPILER_DEBUG)
+kselect(CONFIG_COMPILER_DEBUG)
 add_compile_options(-g${CONFIG_COMPILER_DEBUG})
 
-set_choiced_value(CONFIG_COMPILER_OPTIMIZE)
+kselect(CONFIG_COMPILER_OPTIMIZE)
 add_compile_options(-O${CONFIG_COMPILER_OPTIMIZE})
 
-# ---------------------------- project profile -----------------------------
+# ---------------------------------- Profile ----------------------------------
 set(SAVESAVE_NAME savesave)
 set(SAVESAVE_VERSION $ENV{SAVESAVE_VERSION})
 string(REPLACE -rc . SAVESAVE_VERSION_CMAKE ${SAVESAVE_VERSION})
 
 project(${SAVESAVE_NAME} VERSION ${SAVESAVE_VERSION_CMAKE} LANGUAGES C)
 
-# -------------------------------- include ---------------------------------
+# ---------------------------------- Include ----------------------------------
 # By specifying a SHELL and quoting our options, we can disable Option
 # De-duplication
 add_compile_options("SHELL:-include ${GENERATED}/autoconf.h")
@@ -72,12 +82,12 @@ add_compile_options("SHELL:-include ${ROOT}/include/brtcomcent.h")
 
 include_directories(${ROOT}/include ${ROOT}/include/arch/${ARCH})
 
-# -------------------------------- manifest --------------------------------
+# --------------------------------- Manifest ----------------------------------
 if(WIN32)
   configure_file(${ROOT}/savesave.manifest.in ${ROOT}/savesave.manifest)
 endif()
 
-# -------------------------------- gettext ---------------------------------
+# ---------------------------------- Gettext ----------------------------------
 find_package(Intl)
 if(NOT CONFIG_DISALBE_GETTEXT AND Intl_FOUND)
   link_libraries(Intl::Intl)
@@ -95,7 +105,7 @@ if(NOT CONFIG_DISALBE_GETTEXT AND Intl_FOUND)
   endif()
 endif()
 
-# ---------------------------------- zstd ----------------------------------
+# ----------------------------------- Zstd ------------------------------------
 find_package(zstd CONFIG REQUIRED)
 if(CONFIG_LINK_LIBZSTD_STATIC)
   link_libraries(zstd::libzstd_static)
@@ -103,7 +113,7 @@ else()
   link_libraries(zstd::libzstd_shared)
 endif()
 
-# -------------------------------- platspec --------------------------------
+# --------------------------------- Platspec ----------------------------------
 if(UNIX)
   list(APPEND pathspec unix/*.c)
 elseif(WIN32)
@@ -119,11 +129,11 @@ file(GLOB source LIST_DIRECTORIES false ${pathspec})
 
 add_library(platspec OBJECT ${source})
 
-# -------------------------------- platfree --------------------------------
+# --------------------------------- Platfree ----------------------------------
 file(GLOB source LIST_DIRECTORIES false platfree/*.c commands/*.c)
 add_library(platfree OBJECT ${source})
 
-# -------------------------------- savesave --------------------------------
+# --------------------------------- Savesave ----------------------------------
 list(APPEND mainsrc savesave.c)
 if(UNIX)
   list(APPEND mainsrc uni.c)
@@ -147,7 +157,7 @@ add_executable(savesave ${mainsrc})
 
 target_link_libraries(savesave platfree platspec)
 
-# ---------------------------------- dll -----------------------------------
+# ------------------------------------ Dll ------------------------------------
 if(WIN32)
   target_link_libraries(savesave ws2_32 comctl32 shlwapi)
   if(NOT CONFIG_SOURCE_NDEBUG)
@@ -155,21 +165,18 @@ if(WIN32)
   endif()
 endif()
 
-# ------------------------------- definition -------------------------------
+# -------------------------------- Definition ---------------------------------
 add_compile_definitions(_GNU_SOURCE)
 
-if(CONFIG_SOURCE_NDEBUG)
-  add_compile_definitions(NDEBUG)
-endif()
+test_add_compile_definitions(CONFIG_SOURCE_NDEBUG NDEBUG)
 
-if(WIN32)
-  add_compile_definitions(NTDDI_WIN7
-			  WINVER=_WIN32_WINNT_WIN7
-			  _WIN32_WINNT=_WIN32_WINNT_WIN7
-			  _CRT_SECURE_NO_WARNINGS)
-endif()
+test_add_compile_definitions(WIN32
+			     NTDDI_WIN7
+			     WINVER=_WIN32_WINNT_WIN7
+			     _WIN32_WINNT=_WIN32_WINNT_WIN7
+			     _CRT_SECURE_NO_WARNINGS)
 
-# ------------------------------ installation ------------------------------
+# ------------------------------- Installation --------------------------------
 install(TARGETS savesave DESTINATION ".")
 install(DIRECTORY ${ROOT}/locale/ DESTINATION locale
 	FILES_MATCHING PATTERN *.mo PERMISSIONS OWNER_READ)
@@ -179,5 +186,10 @@ if(WIN32)
   install(FILES ${dlls} DESTINATION ".")
 endif()
 
-# ---------------------------- generated header ----------------------------
-include(${ROOT}/scripts/genheader.cmake)
+# ----------------------------- Generated Headers -----------------------------
+file(GLOB files ${ROOT}/include/*.in)
+
+foreach(conf ${files})
+  cmake_path(GET conf STEM LAST_ONLY name)
+  configure_file(${conf} ${GENERATED}/${name})
+endforeach()

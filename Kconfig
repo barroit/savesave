@@ -3,6 +3,32 @@ mainmenu "Savesave/$(BUILD)-$(ARCH) $(SAVESAVE_VERSION) Configuration"
 
 menu "Debugging"
 
+menu "Sanitizers"
+	depends on "$(UNIX)"
+
+config USE_ASAN
+	bool "address - memory-related bugs"
+
+config USE_UBSAN
+	bool "undefined - various kinds of undefined behavior"
+
+config USE_TSAN
+	bool "thread - data races and thread-related bugs"
+
+config USE_MSAN
+	bool "memory - uninitialized memory reads"
+
+config USE_LSAN
+	bool "leak - memory leaks"
+
+config USE_CFI
+	bool "cfi - indirect function call issues and type mismatches"
+
+config USE_ISAN
+	bool "signed-integer-overflow - integer overflows and underflows"
+
+endmenu # "Sanitizers"
+
 config NO_LONGRUNNING_DAEMON
 	bool "disable daemonized longrunning"
 
@@ -87,7 +113,7 @@ config COMPILER_WARNING_EXTRA
 
 endmenu # "Compiler"
 
-menu "Feature"
+menu "Features"
 
 config IS_CONSOLE_APP
 	bool "build console version of savesave"
@@ -117,4 +143,4 @@ config LINK_LIBZSTD_STATIC
 	depends on "$(UNIX)"
 endif # DISALBE_GETTEXT
 
-endmenu # "Feature"
+endmenu # "Features"

@@ -30,6 +30,7 @@ $abs_build = "$abs_root/build"
 
 $install_dest = "$env:LOCALAPPDATA".Replace('\','/') + "/Programs/savesave"
 
+$env:WIN32 = 'y'
 $env:BUILD = 'windows'
 $env:ARCH  = $env:PROCESSOR_ARCHITECTURE
 $env:SAVESAVE_VERSION = cat version
