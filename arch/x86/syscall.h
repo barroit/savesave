@@ -26,7 +26,7 @@
 #define __syscall1(nr, arg1)					\
 ({								\
 	long res;						\
-	register VARAFY(arg1, rdi) asm("rdi") = arg1;		\
+	register VARAFY(arg1, rdi) asm("rdi") = ARGIFY(arg1);	\
 	asm volatile(						\
 		"syscall"					\
 		: "=a" (res)					\
@@ -39,8 +39,8 @@
 #define __syscall2(nr, arg1, arg2)				\
 ({								\
 	long res;						\
-	register VARAFY(arg2, rsi) asm("rsi") = arg2;		\
-	register VARAFY(arg1, rdi) asm("rdi") = arg1;		\
+	register VARAFY(arg2, rsi) asm("rsi") = ARGIFY(arg2);	\
+	register VARAFY(arg1, rdi) asm("rdi") = ARGIFY(arg1);	\
 	asm volatile(						\
 		"syscall"					\
 		: "=a" (res)					\
@@ -53,9 +53,9 @@
 #define __syscall3(nr, arg1, arg2, arg3)			\
 ({								\
 	long res;						\
-	register VARAFY(arg3, rdx) asm("rdx") = arg3;		\
-	register VARAFY(arg2, rsi) asm("rsi") = arg2;		\
-	register VARAFY(arg1, rdi) asm("rdi") = arg1;		\
+	register VARAFY(arg3, rdx) asm("rdx") = ARGIFY(arg3);	\
+	register VARAFY(arg2, rsi) asm("rsi") = ARGIFY(arg2);	\
+	register VARAFY(arg1, rdi) asm("rdi") = ARGIFY(arg1);	\
 	asm volatile(						\
 		"syscall"					\
 		: "=a" (res)					\
@@ -68,10 +68,10 @@
 #define __syscall4(nr, arg1, arg2, arg3, arg4)			\
 ({								\
 	long res;						\
-	register VARAFY(arg4, r10) asm("r10") = arg4;		\
-	register VARAFY(arg3, rdx) asm("rdx") = arg3;		\
-	register VARAFY(arg2, rsi) asm("rsi") = arg2;		\
-	register VARAFY(arg1, rdi) asm("rdi") = arg1;		\
+	register VARAFY(arg4, r10) asm("r10") = ARGIFY(arg4);	\
+	register VARAFY(arg3, rdx) asm("rdx") = ARGIFY(arg3);	\
+	register VARAFY(arg2, rsi) asm("rsi") = ARGIFY(arg2);	\
+	register VARAFY(arg1, rdi) asm("rdi") = ARGIFY(arg1);	\
 	asm volatile(						\
 		"syscall"					\
 		: "=a" (res)					\
@@ -85,11 +85,11 @@
 #define __syscall5(nr, arg1, arg2, arg3, arg4, arg5)		\
 ({								\
 	long res;						\
-	register VARAFY(arg5, r8)  asm("r8")  = arg5;		\
-	register VARAFY(arg4, r10) asm("r10") = arg4;		\
-	register VARAFY(arg3, rdx) asm("rdx") = arg3;		\
-	register VARAFY(arg2, rsi) asm("rsi") = arg2;		\
-	register VARAFY(arg1, rdi) asm("rdi") = arg1;		\
+	register VARAFY(arg5, r8)  asm("r8")  = ARGIFY(arg5);	\
+	register VARAFY(arg4, r10) asm("r10") = ARGIFY(arg4);	\
+	register VARAFY(arg3, rdx) asm("rdx") = ARGIFY(arg3);	\
+	register VARAFY(arg2, rsi) asm("rsi") = ARGIFY(arg2);	\
+	register VARAFY(arg1, rdi) asm("rdi") = ARGIFY(arg1);	\
 	asm volatile(						\
 		"syscall"					\
 		: "=a" (res)					\
@@ -103,12 +103,12 @@
 #define __syscall6(nr, arg1, arg2, arg3, arg4, arg5, arg6)	\
 ({								\
 	long res;						\
-	register VARAFY(arg6, r9)  asm("r9")  = arg6;		\
-	register VARAFY(arg5, r8)  asm("r8")  = arg5;		\
-	register VARAFY(arg4, r10) asm("r10") = arg4;		\
-	register VARAFY(arg3, rdx) asm("rdx") = arg3;		\
-	register VARAFY(arg2, rsi) asm("rsi") = arg2;		\
-	register VARAFY(arg1, rdi) asm("rdi") = arg1;		\
+	register VARAFY(arg6, r9)  asm("r9")  = ARGIFY(arg6);	\
+	register VARAFY(arg5, r8)  asm("r8")  = ARGIFY(arg5);	\
+	register VARAFY(arg4, r10) asm("r10") = ARGIFY(arg4);	\
+	register VARAFY(arg3, rdx) asm("rdx") = ARGIFY(arg3);	\
+	register VARAFY(arg2, rsi) asm("rsi") = ARGIFY(arg2);	\
+	register VARAFY(arg1, rdi) asm("rdi") = ARGIFY(arg1);	\
 	asm volatile(						\
 		"syscall"					\
 		: "=a" (res)					\

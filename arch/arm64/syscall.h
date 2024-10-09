@@ -26,7 +26,7 @@
 
 #define __syscall1(number, arg1)				\
 ({								\
-	register VARAFY(arg1, x0) asm("x0") = arg1;		\
+	register VARAFY(arg1, x0) asm("x0") = ARGIFY(arg1);	\
 	register VARAFY(number, x8) asm("x8") = number;		\
 	asm volatile(						\
 		"svc 0"						\
@@ -39,8 +39,8 @@
 
 #define __syscall2(number, arg1, arg2)				\
 ({								\
-	register VARAFY(arg2, x1) asm("x1") = arg2;		\
-	register VARAFY(arg1, x0) asm("x0") = arg1;		\
+	register VARAFY(arg2, x1) asm("x1") = ARGIFY(arg2);	\
+	register VARAFY(arg1, x0) asm("x0") = ARGIFY(arg1);	\
 	register VARAFY(number, x8) asm("x8") = number;		\
 	asm volatile(						\
 		"svc 0"						\
@@ -53,9 +53,9 @@
 
 #define __syscall3(number, arg1, arg2, arg3)			\
 ({								\
-	register VARAFY(arg3, x2) asm("x2") = arg3;		\
-	register VARAFY(arg2, x1) asm("x1") = arg2;		\
-	register VARAFY(arg1, x0) asm("x0") = arg1;		\
+	register VARAFY(arg3, x2) asm("x2") = ARGIFY(arg3);	\
+	register VARAFY(arg2, x1) asm("x1") = ARGIFY(arg2);	\
+	register VARAFY(arg1, x0) asm("x0") = ARGIFY(arg1);	\
 	register VARAFY(number, x8) asm("x8") = number;		\
 	asm volatile(						\
 		"svc 0"						\
@@ -68,10 +68,10 @@
 
 #define __syscall4(number, arg1, arg2, arg3, arg4)		\
 ({								\
-	register VARAFY(arg4, x3) asm("x3") = arg4;		\
-	register VARAFY(arg3, x2) asm("x2") = arg3;		\
-	register VARAFY(arg2, x1) asm("x1") = arg2;		\
-	register VARAFY(arg1, x0) asm("x0") = arg1;		\
+	register VARAFY(arg4, x3) asm("x3") = ARGIFY(arg4);	\
+	register VARAFY(arg3, x2) asm("x2") = ARGIFY(arg3);	\
+	register VARAFY(arg2, x1) asm("x1") = ARGIFY(arg2);	\
+	register VARAFY(arg1, x0) asm("x0") = ARGIFY(arg1);	\
 	register VARAFY(number, x8) asm("x8") = number;		\
 	asm volatile(						\
 		"svc 0"						\
@@ -85,11 +85,11 @@
 
 #define __syscall5(number, arg1, arg2, arg3, arg4, arg5)	\
 ({								\
-	register VARAFY(arg5, x4) asm("x4") = arg5;		\
-	register VARAFY(arg4, x3) asm("x3") = arg4;		\
-	register VARAFY(arg3, x2) asm("x2") = arg3;		\
-	register VARAFY(arg2, x1) asm("x1") = arg2;		\
-	register VARAFY(arg1, x0) asm("x0") = arg1;		\
+	register VARAFY(arg5, x4) asm("x4") = ARGIFY(arg5);	\
+	register VARAFY(arg4, x3) asm("x3") = ARGIFY(arg4);	\
+	register VARAFY(arg3, x2) asm("x2") = ARGIFY(arg3);	\
+	register VARAFY(arg2, x1) asm("x1") = ARGIFY(arg2);	\
+	register VARAFY(arg1, x0) asm("x0") = ARGIFY(arg1);	\
 	register VARAFY(number, x8) asm("x8") = number;		\
 	asm volatile(						\
 		"svc 0"						\
@@ -103,12 +103,12 @@
 
 #define __syscall6(number, arg1, arg2, arg3, arg4, arg5, arg6)	\
 ({								\
-	register VARAFY(arg6, x5) asm("x5") = arg6;		\
-	register VARAFY(arg5, x4) asm("x4") = arg5;		\
-	register VARAFY(arg4, x3) asm("x3") = arg4;		\
-	register VARAFY(arg3, x2) asm("x2") = arg3;		\
-	register VARAFY(arg2, x1) asm("x1") = arg2;		\
-	register VARAFY(arg1, x0) asm("x0") = arg1;		\
+	register VARAFY(arg6, x5) asm("x5") = ARGIFY(arg6);	\
+	register VARAFY(arg5, x4) asm("x4") = ARGIFY(arg5);	\
+	register VARAFY(arg4, x3) asm("x3") = ARGIFY(arg4);	\
+	register VARAFY(arg3, x2) asm("x2") = ARGIFY(arg3);	\
+	register VARAFY(arg2, x1) asm("x1") = ARGIFY(arg2);	\
+	register VARAFY(arg1, x0) asm("x0") = ARGIFY(arg1);	\
 	register VARAFY(number, x8) asm("x8") = number;		\
 	asm volatile(						\
 		"svc 0"						\
