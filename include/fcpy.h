@@ -13,6 +13,4 @@ int copy_regfile(const char *srcname, const char *destname);
 
 int copy_symlink(const char *srcname, const char *destname);
 
-int copy_regfile_async(const char *srcname, const char *destname);
-
 #endif /* COPY_H */

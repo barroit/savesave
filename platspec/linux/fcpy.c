@@ -20,8 +20,3 @@ int PLATSPECOF(fd2fd_copy)(int src, int dest, off_t len)
 
 	return 0;
 }
-
-int copy_regfile_async(const char *srcname, const char *destname)
-{
-	return 0;
-}
