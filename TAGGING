@@ -1,0 +1,97 @@
+List of tags
+============
+
+Descriptions of section entries
+-------------------------------
+
+	D: *Description* of the tag
+	S: *Sub-tag* list
+
+General Purpose Tags List
+-------------------------
+
+build
+D:	Build system
+
+scripts
+D:	Scripts used during development or build processes
+S:	gencmd
+	gencst
+
+docs
+D:	Documentations
+
+vscode
+D:	VS Code settings
+
+cleanup
+D:	Code cleanup
+
+arch
+D:	Architecture-specific implementations
+S:	x86
+	arm64
+	riscv
+	generic
+
+cmd
+D:	Commands
+S:	backup
+	copy
+	help
+	version
+	....(same as the command name)
+
+i18n
+D:	Internationalization functionality
+
+termas
+D:	Terminal message handling
+
+.....
+There are many tags beyond the ones listed earlier. In general, each tag
+corresponds to a header basename. You can find them under include/.
+
+Per-platform Tags List
+----------------------
+
+.. note:: When using these tags, the tag itself should be prefixed by the
+	  platform name (e.g., linux/acpy, windows/baksched)
+	  The current available platform:
+
+	  	linux
+	  	windows
+
+fcpy
+D:	File copy handling
+
+acpy
+D:	Asynchronous file copy handling
+
+fiter
+D:	File iterator
+
+bak
+D:	Backup scheduler
+
+dir
+D:	Directory operations
+
+path
+D:	Pathname retrieving
+
+proc
+D:	Process handling
+
+resc
+D:	Resource querying
+
+verc
+D:	Version check
+
+posix
+D:	patch for POSIX function support
+S:	<func-name>
+
+----
+rev 0.1
