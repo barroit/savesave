@@ -8,7 +8,8 @@
 	},
 	"files.associations": {
 		".savesave*": "plaintext",
-		"DRAFT": "plaintext"
+		"DRAFT": "plaintext",
+		"TAGGING": "plaintext"
 	},
 	"search.exclude": {
 		"**/locale/**": true
