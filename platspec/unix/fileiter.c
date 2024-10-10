@@ -57,7 +57,11 @@ static int dispatch_regfile(struct iterfile *file, struct __fileiter *ctx)
 
 static int dispatch_file(struct __fileiter *ctx, struct dirent *ent)
 {
-	if (ctx->flag & FITER_DIR_ONLY && ent->d_type != DT_DIR)
+	if (ctx->flag & FITER_LIST_DIR_ONLY && ent->d_type != DT_DIR)
+		return 0;
+	else if (ctx->flag & FITER_NO_SYMLINK && ent->d_type == DT_LNK)
+		return 0;
+	else if (ctx->flag & FITER_NO_REGFILE && ent->d_type == DT_REG)
 		return 0;
 
 	const char *basname = ent->d_name;
@@ -83,7 +87,7 @@ static int dispatch_file(struct __fileiter *ctx, struct dirent *ent)
 	case DT_UNKNOWN:
 		return warn(_("can't determine file type for `%s'"), absname);
 	default:
-		if (ctx->flag & FITER_LIST_UNSUP)
+		if (!(ctx->flag & FITER_NO_UNSUPPD))
 			break;
 		warn(_("`%s' has unsupported file type `%d', skipped"),
 		     absname, ent->d_type);

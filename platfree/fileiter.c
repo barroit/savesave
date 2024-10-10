@@ -10,14 +10,6 @@
 #include "strbuf.h"
 #include "strlist.h"
 
-static void check_flag(flag_t flag)
-{
-	BUG_ON(flag & FITER_LIST_DIR && (flag & FITER_RECUR_DIR));
-
-	BUG_ON(flag & FITER_DIR_ONLY &&
-	       ((flag & FITER_RECUR_DIR) || !(flag & FITER_LIST_DIR)));
-}
-
 static int dispatch_directory(struct __fileiter *ctx)
 {
 	struct iterfile file = {
@@ -35,8 +27,13 @@ static int dispatch_directory(struct __fileiter *ctx)
 int fileiter(const char *root,
 	     fileiter_function_t func, void *data, flag_t flag)
 {
-	DEBUGGING()
-		check_flag(flag);
+	BUG_ON(flag & FITER_LIST_DIR && (flag & FITER_RECUR_DIR));
+
+	if (flag & FITER_LIST_DIR_ONLY) {
+		BUG_ON(!(flag & FITER_LIST_DIR) && !(flag & FITER_RECUR_DIR));
+		flag &= ~FITER_RECUR_DIR;
+		flag |= FITER_LIST_DIR;
+	}
 
 	struct __fileiter ctx = {
 		.root = root,

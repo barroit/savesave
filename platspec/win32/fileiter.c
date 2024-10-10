@@ -16,11 +16,21 @@
 
 static int dispatch_file(struct __fileiter *ctx, WIN32_FIND_DATA *ent)
 {
-	/* this sucking dwFileAttributes design makes condition check mess */
-	if (ctx->flag & FITER_DIR_ONLY &&
-	    !(ent->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
-	    !(ent->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT))
+	int is_lnk = ent->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT;
+
+	/*
+	 * This fucking dwFileAttributes design makes condition check mess.
+	 */
+	if (!is_lnk) {
+		if (ctx->flag & FITER_LIST_DIR_ONLY &&
+		    !(ent->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			return 0;
+		else if (ctx->flag & FITER_NO_REGFILE)
+			return 0;
+	} else if (ctx->flag & FITER_NO_SYMLINK) {
 		return 0;
+	}
+	
 
 	const char *basname = ent->cFileName;
 	if (is_dir_indicator(basname))
@@ -46,7 +56,7 @@ static int dispatch_file(struct __fileiter *ctx, WIN32_FIND_DATA *ent)
 	 * we need to figure out whether it is a symlink FIRST since we don't
 	 * want to open/traverse files/directories pointed by a symlink
 	 */
-	if (ent->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
+	if (is_lnk) {
 		file.st.st_mode = S_IFLNK;
 		return ctx->func(&file, ctx->data);
 	} else if (ent->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
@@ -64,10 +74,13 @@ static int dispatch_file(struct __fileiter *ctx, WIN32_FIND_DATA *ent)
 		}
 	}
 
-	if (S_ISREG(file.st.st_mode))
+	if (S_ISREG(file.st.st_mode)) {
+		if (ctx->flag & FITER_NO_REGFILE)
+			return 0;
 		return ctx->func(&file, ctx->data);
+	}
 
-	if (ctx->flag & FITER_LIST_UNSUP ||
+	if (!(ctx->flag & FITER_NO_UNSUPPD) ||
 	    (ent->dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)) {
 		file.st.st_mode = S_IFREG;
 		return ctx->func(&file, ctx->data);

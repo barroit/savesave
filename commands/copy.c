@@ -73,7 +73,8 @@ static int copy(const char *src, const char *dest)
 		[0] = strbuf_from2(dest, 0, PATH_MAX),
 	};
 
-	ret[0] = fileiter(src, makedir, data, FITER_LIST_DIR | FITER_DIR_ONLY);
+	ret[0] = fileiter(src, makedir, data,
+			  FITER_LIST_DIR | FITER_LIST_DIR_ONLY);
 	if (ret[0])
 		goto err_cpy_file;
 

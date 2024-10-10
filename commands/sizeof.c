@@ -96,9 +96,7 @@ CMDDESCRIP("Calculate file size of given path")
 
 		if (S_ISDIR(st.st_mode)) {
 			err = fileiter(path, accumsize, &info,
-				       FITER_LIST_DIR |
-					FITER_USE_STAT |
-					FITER_LIST_UNSUP);
+				       FITER_LIST_DIR | FITER_USE_STAT);
 			if (err)
 				goto err_calc_dir;
 		} else if (!info.size) {
