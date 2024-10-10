@@ -56,7 +56,7 @@ Per-platform Tags List
 ----------------------
 
 .. note:: When using these tags, the tag itself should be prefixed by the
-	  platform name (e.g., linux/acpy, windows/baksched)
+	  platform name (e.g., unix: path:, linux: acpy:, windows: bak:)
 	  The current available platform:
 
 	  	linux
@@ -94,4 +94,4 @@ D:	patch for POSIX function support
 S:	<func-name>
 
 ----
-rev 0.1
+rev 0.2-rc1
