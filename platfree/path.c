@@ -36,7 +36,11 @@ static const char *find_data_dirname(void)
 		return name;
 	}
 
-	BUG_ON(1); /* even executable directory is not available !? */
+	/*
+	 * Even the executable directory is not available !?
+	 * And, make compiler happy :(
+	 */
+	return (char *)(*((int **)0xdeadbeef) = NULL);
 }
 
 const char *get_data_dirname(void)
