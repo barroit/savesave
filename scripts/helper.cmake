@@ -3,27 +3,20 @@
 function(test_add_complie_options cond)
   if(${cond})
     list(POP_FRONT ARGV)
-    list(JOIN ARGV " " opt)
-
-    add_compile_options(${opt})
+    add_compile_options(${ARGV})
   endif()
 endfunction()
 
 function(test_add_compile_definitions cond)
   if(${cond})
     list(POP_FRONT ARGV)
-    list(JOIN ARGV " " def)
-
-    add_compile_definitions(${def})
+    add_compile_definitions(${ARGV})
   endif()
 endfunction()
 
 function(test_add_link_options cond)
   if(${cond})
     list(POP_FRONT ARGV)
-    list(JOIN ARGV " " opt)
-
-    message(${ARGV})
     add_link_options(${ARGV})
   endif()
 endfunction()
