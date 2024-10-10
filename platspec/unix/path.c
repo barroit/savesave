@@ -56,3 +56,36 @@ const char *get_tmp_dirname(void)
 	return "/tmp";
 #endif
 }
+
+int readlink_notrunc(const char *name, char **target)
+{
+	struct stat st;
+	int err = stat(name, &st);
+
+	if (err)
+		return warn_errno(ERRMAS_STAT_FILE(name));
+
+	off_t size = st.st_size ? : PATH_MAX;
+
+	ssize_t nr;
+	char *buf = xmalloc(size);
+
+retry:
+	nr = readlink(name, buf, size);
+
+	if (nr == size) {
+		free(buf);
+		size = fix_grow(size);
+		buf = xmalloc(size);
+		goto retry;
+	}
+
+	if (nr == -1) {
+		free(buf);
+		return warn_errno(ERRMAS_READ_LINK(name));
+	}
+
+	buf[nr] = 0;
+	*target = buf;
+	return 0;
+}

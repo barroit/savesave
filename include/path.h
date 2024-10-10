@@ -40,4 +40,7 @@ const char *get_dotsav_filename(void);
 
 const char *get_log_filename(void);
 
+int readlink_notrunc(const char *name, char **target);
+#define READLINK readlink_notrunc
+
 #endif /* PATH_H */
