@@ -42,25 +42,6 @@ const char *get_home_dirname(void)
 	return home;
 }
 
-const char *get_executable_dirname(void)
-{
-	static const char *path;
-
-	if (!path) {
-		char buf[PATH_MAX];
-
-		ssize_t nr = readlink("/proc/self/exe",
-				      buf, sizeof_array(buf));
-		BUG_ON(nr == -1 || nr == sizeof_array(buf));
-
-		buf[nr] = 0;
-		path = dirname(buf);
-		path = xstrdup(path);
-	}
-
-	return path;
-}
-
 const char *get_tmp_dirname(void)
 {
 	if (getuid() == geteuid() && getgid() == getegid()) {
