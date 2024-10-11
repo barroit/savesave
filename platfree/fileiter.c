@@ -5,6 +5,8 @@
  * Contact: barroit@linux.com
  */
 
+/* do not use FITER_LIST_DIR_ONLY in fileiter, do flag & FITER_NO_* instead */
+
 #include "fileiter.h"
 #include "alloc.h"
 #include "strbuf.h"
@@ -29,7 +31,10 @@ int fileiter(const char *root,
 {
 	BUG_ON(flag & FITER_LIST_DIR && (flag & FITER_RECUR_DIR));
 
-	if (flag & FITER_LIST_DIR_ONLY) {
+	if (__fileiter_is_list_dir_only(flag)) {
+		/*
+		 * We can only list the directories (FITER_LIST_DIR_ONLY)
+		 */
 		BUG_ON(!(flag & FITER_LIST_DIR) && !(flag & FITER_RECUR_DIR));
 		flag &= ~FITER_RECUR_DIR;
 		flag |= FITER_LIST_DIR;

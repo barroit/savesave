@@ -50,6 +50,13 @@ struct __fileiter {
 					   FITER_NO_REGFILE ORed
 					   FITER_NO_UNSUPPD */
 
+static inline int __fileiter_is_list_dir_only(flag_t flags)
+{
+	return flags & FITER_NO_UNSUPPD &&
+	       (flags & FITER_NO_SYMLINK) &&
+	       (flags & FITER_NO_REGFILE);
+}
+
 int fileiter(const char *root,
 	     fileiter_function_t func, void *data, flag_t flag);
 int PLATSPECOF(fileiter_loop_dir)(struct __fileiter *ctx);

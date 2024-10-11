@@ -22,7 +22,7 @@ static int dispatch_file(struct __fileiter *ctx, WIN32_FIND_DATA *ent)
 	 * This fucking dwFileAttributes design makes condition check mess.
 	 */
 	if (!is_lnk) {
-		if (ctx->flag & FITER_LIST_DIR_ONLY &&
+		if (__fileiter_is_list_dir_only(ctx->flag) &&
 		    !(ent->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			return 0;
 		else if (ctx->flag & FITER_NO_REGFILE)

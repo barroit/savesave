@@ -57,7 +57,7 @@ static int dispatch_regfile(struct iterfile *file, struct __fileiter *ctx)
 
 static int dispatch_file(struct __fileiter *ctx, struct dirent *ent)
 {
-	if (ctx->flag & FITER_LIST_DIR_ONLY && ent->d_type != DT_DIR)
+	if (__fileiter_is_list_dir_only(ctx->flag) && ent->d_type != DT_DIR)
 		return 0;
 	else if (ctx->flag & FITER_NO_SYMLINK && ent->d_type == DT_LNK)
 		return 0;
