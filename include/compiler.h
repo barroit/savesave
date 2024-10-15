@@ -109,4 +109,6 @@
  */
 #define VARAFY(v, name) typeof(ARGIFY(v)) name
 
+#define __cold __attribute__((__cold__))
+
 #endif /* COMPILER_H */
