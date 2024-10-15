@@ -59,17 +59,13 @@ int cmd_main(int argc, const char **argv)
 		"savesave [--dotsav=<path>] <command> [<args>]",
 		NULL,
 	};
-	const char *argfb[] = { "savesave", "-h", NULL };
 
-	if (argc == 0) {
-		argv = argfb;
-		argc = 2;
-	}
+	if (argc < 2)
+		prompt_shrt_help(usage, option);
 
-	argc = argupar_parse(argc, argv, option, usage, AP_COMMAND_MODE);
-
-	if (!runcmd)
-		die(_("savesave requires a command"));
+	argupar_parse(&argc, &argv, option, usage,
+		      AP_COMMAND_MODE | AP_NEED_ARGUMENT);
+	BUG_ON(!runcmd);
 
 	struct arguopt *cmd = option;
 	for_each_option(cmd) {

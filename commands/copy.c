@@ -180,7 +180,7 @@ CMDDESCRIP("Copy a file")
 		NULL,
 	};
 
-	argc = argupar_parse(argc, argv, option, usage, AP_NEED_ARGUMENT);
+	argupar_parse(&argc, &argv, option, usage, AP_NEED_ARGUMENT);
 
 	if (thrd_numb == 0)
 		die(_("thread number can't be zero"));

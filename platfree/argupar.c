@@ -31,13 +31,15 @@ struct argupar {
 	const char **argv;
 
 	struct arguopt *option;
-	const char *const *usage;
+	const char **usage;
 
 	flag_t flag;
 
 	int outc;
 	const char **outv;
 };
+
+const char *argupar_cmd_prefix = "savesave";
 
 static void check_compatibility(struct argupar *ctx)
 {
@@ -77,7 +79,8 @@ static enum arguret parse_subcommand(struct arguopt *opt, const char *cmd)
 		return AP_DONE;
 	}
 
-	return error("unknown command `%s'", cmd);
+	return error(_("unknown command `%s', see '%s -h'"),
+		     cmd, argupar_cmd_prefix);
 }
 
 static OPTARG_APPLICATOR(subcommand)
@@ -418,15 +421,15 @@ next:
 /* I fucked this up :( */
 int command_usage_no_newline;
 
-static NORETURN prompt_shrt_help(struct argupar *ctx)
+__cold NORETURN prompt_shrt_help(const char **usage, struct arguopt *option)
 {
 	struct strlist sl = STRLIST_INIT;
 
-	print_command_usage(ctx->usage, &sl);
+	print_command_usage(usage, &sl);
 	if (!command_usage_no_newline)
 		putchar('\n');
 
-	size_t cnt = print_option_usage(ctx->option, &sl);
+	size_t cnt = print_option_usage(option, &sl);
 	if (cnt > 0)
 		putchar('\n');
 
@@ -452,7 +455,7 @@ static enum arguret do_parse(struct argupar *ctx)
 		str += 1;
 
 		if (str[0] == 'h' && str[1] == 0)
-			prompt_shrt_help(ctx);
+			prompt_shrt_help(ctx->usage, ctx->option);
 
 		*ctx->argv = str;
 		return parse_shrtopt(ctx);
@@ -468,25 +471,23 @@ static enum arguret do_parse(struct argupar *ctx)
 		}
 
 		if (strcmp(str, "help") == 0)
-			prompt_shrt_help(ctx);
+			prompt_shrt_help(ctx->usage, ctx->option);
 
 		*ctx->argv = str;
 		return parse_longopt(ctx);
 	}
 }
 
-int __cold argupar_parse(int argc,
-			 const char **argv,
-			 struct arguopt *option,
-			 const char **usage,
-			 flag_t flag)
+void __cold argupar_parse(int *argc,
+			  const char ***argv,
+			  struct arguopt *option,
+			  const char **usage,
+			  flag_t flag)
 {
-	BUG_ON(!argc);
-
-	const char *name = argv[0];
+	const char *name = (*argv)[0];
 	struct argupar ctx = {
-		.argc = argc - 1,
-		.argv = argv + 1,
+		.argc = *argc - 1,
+		.argv = *argv + 1,
 		.outv = ctx.argv,
 
 		.option = option,
@@ -499,7 +500,7 @@ int __cold argupar_parse(int argc,
 
 	if (!ctx.argc) {
 		if (!(flag & AP_NEED_ARGUMENT))
-			return 0;
+			return;
 		goto help_no_arg;
 	}
 
@@ -524,14 +525,14 @@ parse_done:
 		memmove(&ctx.outv[ctx.outc], ctx.argv,
 			st_mult(sizeof(*ctx.argv), ctx.argc));
 
-	int nl = ctx.outc + ctx.argc;
-
-	if (flag & AP_NEED_ARGUMENT && !nl) {
+	int n = ctx.outc + ctx.argc;
+	if (flag & AP_NEED_ARGUMENT && !n) {
 help_no_arg:
 		error(_("command '%s' requires an argument"), name);
-		prompt_shrt_help(&ctx);
+		prompt_shrt_help(ctx.usage, ctx.option);
 	}
 
-	ctx.outv[nl] = NULL;
-	return nl;
+	ctx.outv[n] = NULL;
+	*argv = ctx.outv;
+	*argc = n;
 }

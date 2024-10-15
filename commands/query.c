@@ -37,7 +37,8 @@ static int cmd_query_path(int argc, const char **argv)
 	};
 
 	command_usage_no_newline = 1;
-	argc = argupar_parse(argc, argv, option, usage, AP_NEED_ARGUMENT);
+	argupar_cmd_prefix = "savesave query";
+	argupar_parse(&argc, &argv, option, usage, AP_NEED_ARGUMENT);
 
 	struct pathinfo info[] = {
 		{ "log",      get_log_filename },
@@ -100,12 +101,12 @@ CMDDESCRIP("Query default information of Savesave")
 		APOPT_END(),
 	};
 	const char *usage[] = {
-		"savesave query path <name>",
-		"savesave query limit <name>",
+		"savesave query path [-h] <name>",
+		"savesave query limit [-h] <name>",
 		NULL,
 	};
 
-	argc = argupar_parse(argc, argv, option, usage,
-			     AP_COMMAND_MODE | AP_NEED_ARGUMENT);
+	argupar_parse(&argc, &argv, option, usage,
+		      AP_COMMAND_MODE | AP_NEED_ARGUMENT);
 	return subcmd(argc, argv);
 }
