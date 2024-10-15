@@ -80,6 +80,9 @@ const char *strwinerror(void);
 #define ERRMAS_READ_FILE(name) \
 	_("failed to read file `%s'"), name
 
+#define ERRMAS_WRITE_FILE(name) \
+	_("failed to write to file `%s'"), name
+
 #define ERRMAS_READ_LINK(name) \
 	_("unable to read link `%s'"), name
 
