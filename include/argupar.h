@@ -65,27 +65,13 @@ typedef typeof(((struct arguopt *)0)->subcmd) argupar_subcommand_t;
 #define AP_COMMAND_MODE  (1 << 1) /* stop *after* command */
 #define AP_NEED_ARGUMENT (1 << 2) /* need argument (not option!) */
 
-struct argupar {
-	int argc;
-	const char **argv;
-
-	struct arguopt *option;
-	const char *const *usage;
-
-	flag_t flag;
-
-	int outc;
-	const char **outv;
-};
-
 #define for_each_option(opt) for (; opt->type != ARGUOPT_END; opt++)
 
-typedef struct argupar argupar_t;
-
-void argupar_init(struct argupar *ctx, int argc, const char **argv);
-
-int argupar_parse(struct argupar *ctx, struct arguopt *option,
-		  const char *const *usage, flag_t flag);
+int __cold argupar_parse(int argc,
+			 const char **argv,
+			 struct arguopt *option,
+			 const char **usage,
+			 flag_t flag);
 
 extern int command_usage_no_newline;
 

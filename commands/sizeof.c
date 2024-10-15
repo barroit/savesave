@@ -58,10 +58,7 @@ CMDDESCRIP("Calculate file size of given path")
 		NULL,
 	};
 
-	argupar_t ap;
-	argupar_init(&ap, argc, argv);
-
-	argc = argupar_parse(&ap, option, usage, AP_STOPAT_NONOPT);
+	argc = argupar_parse(argc, argv, option, usage, AP_STOPAT_NONOPT);
 
 	struct savesave *savarr;
 	size_t savnl = 0;

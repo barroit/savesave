@@ -59,18 +59,14 @@ int cmd_main(int argc, const char **argv)
 		"savesave [--dotsav=<path>] <command> [<args>]",
 		NULL,
 	};
-	const char *argfb[] = { "-h", NULL };
-	argupar_t ap;
+	const char *argfb[] = { "savesave", "-h", NULL };
 
-	argc--;
-	argv++;
 	if (argc == 0) {
 		argv = argfb;
-		argc = 1;
+		argc = 2;
 	}
 
-	argupar_init(&ap, argc, argv);
-	argc = argupar_parse(&ap, option, usage, AP_COMMAND_MODE);
+	argc = argupar_parse(argc, argv, option, usage, AP_COMMAND_MODE);
 
 	if (!runcmd)
 		die(_("savesave requires a command"));

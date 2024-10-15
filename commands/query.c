@@ -36,11 +36,8 @@ static int cmd_query_path(int argc, const char **argv)
 		NULL,
 	};
 
-	argupar_t ap;
-	argupar_init(&ap, argc, argv);
-
 	command_usage_no_newline = 1;
-	argc = argupar_parse(&ap, option, usage, AP_NEED_ARGUMENT);
+	argc = argupar_parse(argc, argv, option, usage, AP_NEED_ARGUMENT);
 
 	struct pathinfo info[] = {
 		{ "log",      get_log_filename },
@@ -108,10 +105,7 @@ CMDDESCRIP("Query default information of Savesave")
 		NULL,
 	};
 
-	argupar_t ap;
-	argupar_init(&ap, argc, argv);
-
-	argc = argupar_parse(&ap, option, usage,
+	argc = argupar_parse(argc, argv, option, usage,
 			     AP_COMMAND_MODE | AP_NEED_ARGUMENT);
 	return subcmd(argc, argv);
 }

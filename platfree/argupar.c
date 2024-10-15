@@ -21,22 +21,25 @@
 				  const char *arg, int unset)
 
 enum arguret {
-	AP_ERROR   = -1, /* equals to error() */
-	AP_SUCCESS = 0,
-	AP_DONE,	 /* no more options to be parsed */
-	AP_SUBCMD
+	AP_ERROR   = -1,	/* equals to error() */
+	AP_SUCCESS = 0,		/* success */
+	AP_DONE    = 39,	/* no more options to be parsed */
 };
 
-void argupar_init(struct argupar *ctx, int argc, const char **argv)
-{
-	memset(ctx, 0, sizeof(*ctx));
+struct argupar {
+	int argc;
+	const char **argv;
 
-	ctx->argc = argc;
-	ctx->argv = argv;
-	ctx->outv = argv;
-}
+	struct arguopt *option;
+	const char *const *usage;
 
-static void debug_check_argupar(struct argupar *ctx)
+	flag_t flag;
+
+	int outc;
+	const char **outv;
+};
+
+static void check_compatibility(struct argupar *ctx)
 {
 	BUG_ON(!ctx->usage);
 
@@ -71,7 +74,7 @@ static enum arguret parse_subcommand(struct arguopt *opt, const char *cmd)
 			continue;
 
 		*(argupar_subcommand_t *)opt->value = opt->subcmd;
-		return AP_SUBCMD;
+		return AP_DONE;
 	}
 
 	return error("unknown command `%s'", cmd);
@@ -472,24 +475,38 @@ static enum arguret do_parse(struct argupar *ctx)
 	}
 }
 
-int argupar_parse(struct argupar *ctx, struct arguopt *option,
-		  const char *const *usage, flag_t flag)
+int __cold argupar_parse(int argc,
+			 const char **argv,
+			 struct arguopt *option,
+			 const char **usage,
+			 flag_t flag)
 {
-	ctx->option = option;
-	ctx->usage = usage;
-	ctx->flag = flag;
+	BUG_ON(!argc);
+
+	const char *name = argv[0];
+	struct argupar ctx = {
+		.argc = argc - 1,
+		.argv = argv + 1,
+		.outv = ctx.argv,
+
+		.option = option,
+		.usage = usage,
+		.flag = flag,
+	};
 
 	DEBUGGING()
-		debug_check_argupar(ctx);
+		check_compatibility(&ctx);
 
-	if (flag & AP_NEED_ARGUMENT && !ctx->argc)
-		prompt_shrt_help(ctx);
+	if (!ctx.argc) {
+		if (!(flag & AP_NEED_ARGUMENT))
+			return 0;
+		goto help_no_arg;
+	}
 
 	enum arguret ret;
-	while (ctx->argc) {
-		ret = do_parse(ctx);
+	while (ctx.argc) {
+		ret = do_parse(&ctx);
 		switch (ret) {
-		case AP_SUBCMD:
 		case AP_SUCCESS:
 			break;
 		case AP_ERROR:
@@ -498,28 +515,23 @@ int argupar_parse(struct argupar *ctx, struct arguopt *option,
 			goto parse_done;
 		}
 
-		ctx->argc--;
-		ctx->argv++;
-
-		if (ret == AP_SUBCMD)
-			goto parse_done;
+		ctx.argc--;
+		ctx.argv++;
 	}
 
 parse_done:
-	if (ctx->argc)
-		memmove(&ctx->outv[ctx->outc], ctx->argv,
-			st_mult(sizeof(*ctx->argv), ctx->argc));
+	if (ctx.argc)
+		memmove(&ctx.outv[ctx.outc], ctx.argv,
+			st_mult(sizeof(*ctx.argv), ctx.argc));
 
-	int nl = ctx->outc + ctx->argc;
+	int nl = ctx.outc + ctx.argc;
 
 	if (flag & AP_NEED_ARGUMENT && !nl) {
-		error(_("command requires an argument"));
-		prompt_shrt_help(ctx);
+help_no_arg:
+		error(_("command '%s' requires an argument"), name);
+		prompt_shrt_help(&ctx);
 	}
 
-	ctx->outv[nl] = NULL;
-	ctx->outc = 0;
-	ctx->argv = ctx->outv;
-
+	ctx.outv[nl] = NULL;
 	return nl;
 }
