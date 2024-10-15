@@ -67,7 +67,7 @@ static void check_compatibility(struct argupar *ctx)
 static enum arguret parse_subcommand(struct arguopt *opt, const char *cmd)
 {
 	for_each_option(opt) {
-		if (opt->type == ARGUOPT_GROUP)
+		if (opt->type != ARGUOPT_SUBCOMMAND)
 			continue;
 
 		if (strcmp(opt->longname, cmd))
