@@ -41,6 +41,9 @@ int cntclosedir(DIR *dirp);
 
 #endif /* __linux__ */
 
+int cntdup(int oldfd);
+#define dup cntdup
+
 int cntdup2(int oldfd, int newfd);
 #define dup2 cntdup2
 

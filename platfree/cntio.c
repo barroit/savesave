@@ -53,6 +53,16 @@ int cntclose(int fd)
 	return ret;
 }
 
+int cntdup(int oldfd)
+{
+	int fd = robdup(oldfd);
+
+	if (likely(fd != -1))
+		__atomic_fetch_add(&cntio_fdcnt, 1, __ATOMIC_RELAXED);
+
+	return fd;
+}
+
 int cntdup2(int oldfd, int newfd)
 {
 	int fd = robdup2(oldfd, newfd);
