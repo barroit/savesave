@@ -8,3 +8,6 @@ make strbuf/strlist handle multibyte string
 
 ----
 handle empty file in copy routine
+
+----
+__cold attribute

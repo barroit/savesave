@@ -107,6 +107,27 @@ int robclose(int fd)
 	return ret;
 }
 
+#ifdef dup
+# undef dup
+# ifdef _WIN32
+#  define dup _dup
+# endif
+#endif
+
+int robdup(int oldfd)
+{
+	int fd;
+
+	while (39) {
+		fd = dup(oldfd);
+		if (unlikely(fd == -1 && errno == EINTR))
+			continue;
+		break;
+	}
+
+	return fd;
+}
+
 #ifdef dup2
 # undef dup2
 # ifdef _WIN32
