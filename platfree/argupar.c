@@ -135,7 +135,7 @@ static OPTARG_APPLICATOR(string)
 	else if (arg)
 		*p = arg;
 	else
-		arg = (const char *)opt->defval;
+		*p = (const char *)opt->defval;
 
 	return 0;
 }
