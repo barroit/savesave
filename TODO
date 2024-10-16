@@ -10,4 +10,4 @@ make strbuf/strlist handle multibyte string
 handle empty file in copy routine
 
 ----
-__cold attribute
+add newline between "error: command 'X' requires..." and "usage: ..."

@@ -5,10 +5,13 @@
  * Contact: barroit@linux.com
  */
 
+#pragma GCC diagnostic ignored "-Wunused-function"
+
 #include "argupar.h"
 #include "termas.h"
 #include "strlist.h"
 #include "list.h"
+#include "alloc.h"
 
 #define OPTMAS_INDENT_OPT  "    "
 #define OPTMAS_INDENT_CMD  "   "
@@ -26,6 +29,16 @@ enum arguret {
 	AP_DONE    = 39,	/* no more options to be parsed */
 };
 
+struct cmdmode {
+	int val;		/* value */
+	int *addr;		/* address of variable that stores value */
+
+	struct arguopt *opt;	/* arguopt reference */
+	flag_t flags;		/* flags of arguopt */
+
+	struct list_head list;
+};
+
 struct argupar {
 	int argc;
 	const char **argv;
@@ -37,9 +50,11 @@ struct argupar {
 
 	int outc;
 	const char **outv;
+
+	struct list_head cml;	/* cmdmode list */
 };
 
-const char *argupar_cmd_prefix = "savesave";
+const char *argupar_cmd_prefix = SAVESAVE_NAME;
 
 static void check_compatibility(struct argupar *ctx)
 {
@@ -81,6 +96,31 @@ static enum arguret parse_subcommand(struct arguopt *opt, const char *cmd)
 
 	return error(_("unknown command `%s', see '%s -h'"),
 		     cmd, argupar_cmd_prefix);
+}
+
+#define OPT_SHRT (1 << 0)
+#define OPT_LONG (1 << 1)
+#define OPT_USET (1 << 2)
+
+static char *pretty_optname(struct arguopt *opt, flag_t flags)
+{
+	struct strbuf sb = STRBUF_INIT;
+
+	strbuf_require_cap(&sb, 8);
+
+	/*
+	 * Short options never have a negated version.
+	 */
+	if (flags & OPT_SHRT) {
+		strbuf_printf(&sb, "-%c", opt->shrtname);
+		goto out;
+	}
+
+	strbuf_printf(&sb, "--%s%s",
+		      flags & OPT_USET ? "no-" : "", opt->longname);
+
+out:
+	return sb.str;
 }
 
 static OPTARG_APPLICATOR(subcommand)
@@ -140,11 +180,48 @@ static OPTARG_APPLICATOR(string)
 	return 0;
 }
 
-static int dispatch_optarg(struct arguopt *opt, const char *arg, int unset)
+static OPTARG_APPLICATOR(cmdmode)
 {
-	BUG_ON(unset && arg);
+	*(int *)opt->value = opt->defval;
+	return 0;
+}
 
-	static typeof(dispatch_optarg) *map[ARGUOPT_TYPEMAX] = {
+static int check_cmdmode_collision(struct arguopt *opt,
+				   flag_t flags, struct list_head *cml)
+{
+	struct cmdmode *cm;
+	list_for_each_entry(cm, cml, list) {
+		if (*cm->addr == cm->val || cm->opt == opt)
+			continue;
+
+		if (cm->opt)
+			break;
+
+		cm->opt = opt;
+		cm->flags = flags;
+	}
+
+	if (list_entry_is_head(cm, cml, list))
+		return 0;
+
+	char *n1 = pretty_optname(cm->opt, cm->flags);
+	char *n2 = pretty_optname(opt, flags);
+
+	error(_("options '%s' and '%s' cannot be used together"), n1, n2);
+
+	free(n1);
+	free(n2);
+	return -1;
+}
+
+static int __apply_optarg(struct arguopt *opt, const char *arg, int unset);
+
+static int dispatch_optarg(struct arguopt *opt, const char *arg,
+			   flag_t flags, struct list_head *cml)
+{
+	BUG_ON(flags & OPT_USET && arg);
+
+	static typeof(__apply_optarg) *map[ARGUOPT_TYPEMAX] = {
 		[ARGUOPT_END]        = CALLBACK_MAP_POISON1,
 		[ARGUOPT_GROUP]      = CALLBACK_MAP_POISON2,
 
@@ -156,14 +233,19 @@ static int dispatch_optarg(struct arguopt *opt, const char *arg, int unset)
 		[ARGUOPT_UINT]       = apply_uint_optarg,
 
 		[ARGUOPT_STRING]     = apply_string_optarg,
+
+		[ARGUOPT_CMDMODE]    = apply_cmdmode_optarg,
 	};
 
-	int err = map[opt->type](opt, arg, unset);
+	int err = map[opt->type](opt, arg, flags & OPT_USET);
 	if (err)
 		return error(_("failed to parse option `%s' with value `%s'"),
 			     opt->longname, arg); /* unset never fails */
 
-	return 0;
+	if (opt->type != ARGUOPT_CMDMODE)
+		return 0;
+
+	return check_cmdmode_collision(opt, flags, cml);
 }
 
 static int do_parse_shrtopt(struct argupar *ctx, const char **next)
@@ -189,10 +271,11 @@ static int do_parse_shrtopt(struct argupar *ctx, const char **next)
 			goto err_missing_arg;
 		}
 
-		return dispatch_optarg(opt, arg, 0);
+		return dispatch_optarg(opt, arg, OPT_SHRT, &ctx->cml);
 	}
 
 	return error("unknown short option `%c'", *str);
+
 err_missing_arg:
 	return error(_("short option `%c' requires a value"), *str);
 }
@@ -270,7 +353,8 @@ prepare_optarg:
 				goto err_missing_arg;
 			}
 
-			return dispatch_optarg(opt, arg, arg_unset);
+			flag_t flags = (arg_unset ? OPT_USET : 0) | OPT_LONG;
+			return dispatch_optarg(opt, arg, flags, &ctx->cml);
 		}
 
 		if (strncmp(optname, argstr, argsep - argstr) == 0)
@@ -287,6 +371,7 @@ prepare_optarg:
 	if (abbrev.opt) {
 		argval = argsep;
 		opt = abbrev.opt;
+		arg_unset = abbrev.unset;
 		goto prepare_optarg; /* ah...... what a fucking mess */
 	}
 
@@ -478,6 +563,29 @@ static enum arguret do_parse(struct argupar *ctx)
 	}
 }
 
+static void create_cmdmode_list(struct argupar *ctx, struct arguopt *option)
+{
+	for_each_option(option) {
+		if (option->type != ARGUOPT_CMDMODE)
+			continue;
+
+		struct cmdmode *cm = xcalloc(sizeof(*cm), 1);
+		list_add(&cm->list, &ctx->cml);
+
+		cm->val = *(int *)option->value;
+		cm->addr = option->value;
+	}
+}
+
+static void cleanup_cmdmode_list(struct argupar *ctx)
+{
+	struct cmdmode *cm, *tmp;
+	list_for_each_entry_safe(cm, tmp, &ctx->cml, list) {
+		list_del(&cm->list);
+		free(cm);
+	}
+}
+
 void __cold argupar_parse(int *argc,
 			  const char ***argv,
 			  struct arguopt *option,
@@ -493,6 +601,8 @@ void __cold argupar_parse(int *argc,
 		.option = option,
 		.usage = usage,
 		.flag = flag,
+
+		.cml = LIST_HEAD_INIT(ctx.cml),
 	};
 
 	DEBUGGING()
@@ -504,9 +614,9 @@ void __cold argupar_parse(int *argc,
 		goto help_no_arg;
 	}
 
-	enum arguret ret;
+	create_cmdmode_list(&ctx, option);
 	while (ctx.argc) {
-		ret = do_parse(&ctx);
+		enum arguret ret = do_parse(&ctx);
 		switch (ret) {
 		case AP_SUCCESS:
 			break;
@@ -521,6 +631,9 @@ void __cold argupar_parse(int *argc,
 	}
 
 parse_done:
+	if (!list_is_empty(&ctx.cml))
+		cleanup_cmdmode_list(&ctx);
+
 	if (ctx.argc)
 		memmove(&ctx.outv[ctx.outc], ctx.argv,
 			st_mult(sizeof(*ctx.argv), ctx.argc));

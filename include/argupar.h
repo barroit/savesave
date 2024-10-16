@@ -25,6 +25,8 @@ enum arguopt_type {
 
 	ARGUOPT_MEMBINFO,	/* member information (print usage) */
 
+	ARGUOPT_CMDMODE,	/* command mode */
+
 	ARGUOPT_TYPEMAX,
 };
 
@@ -154,6 +156,18 @@ extern int command_usage_no_newline;
 	.type     = ARGUOPT_MEMBINFO,		\
 	.longname = (l),			\
 	.usage    = (h),			\
+}
+
+#define APOPT_CMDMODE(s, l, v, d, h) __APOPT_CMDMODE(s, l, v, d, h, 0)
+#define __APOPT_CMDMODE(s, l, v, d, h, f)	\
+{						\
+	.type     = ARGUOPT_CMDMODE,		\
+	.shrtname = (s),			\
+	.longname = (l),			\
+	.value    = (v),			\
+	.defval   = (d),			\
+	.usage    = (h),			\
+	.flag     = ARGUOPT_NOARG | (f),	\
 }
 
 #include "command.h"

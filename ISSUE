@@ -2,3 +2,6 @@
 
 ----
 strlist_split_word lacks on bound range check
+
+----
+argupar help message printing is messy (group line wrapping...)
