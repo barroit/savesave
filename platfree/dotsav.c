@@ -105,7 +105,7 @@ static int interpret_save(struct savesave *sav, void *data)
 	int err;
 	struct stat st;
 
-	if (!is_absolute_path(save))
+	if (!path_is_abs(save))
 		return error(_("save `%s' must be absolute path"), save);
 
 	err = stat(save, &st);

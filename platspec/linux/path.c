@@ -7,13 +7,13 @@
 
 #include "path.h"
 
-const char *get_executable_dirname(void)
+const char *exec_dir(void)
 {
 	static const char *path;
 
 	if (!path) {
 		char *target;
-		int err = readlink_notrunc("/proc/self/exe", &target);
+		int err = readlink_nt("/proc/self/exe", &target);
 
 		BUG_ON(err);
 		path = target;

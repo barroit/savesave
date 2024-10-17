@@ -15,7 +15,7 @@ int mkdirp2(char *name, size_t start)
 	int err;
 	char *next = &name[start];
 
-	if (is_absolute_path(name)) {
+	if (path_is_abs(name)) {
 		char *p = strchr(&name[start], '/');
 		if (p)
 			next = p + 1;

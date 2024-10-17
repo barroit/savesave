@@ -16,7 +16,7 @@
 
 static void setup_gettext(void)
 {
-	const char *name = get_locale_dirname();
+	const char *name = locale_dir();
 
 	textdomain(TEXTDOMAIN);
 	bindtextdomain(TEXTDOMAIN, name);

@@ -40,14 +40,14 @@ static int cmd_query_path(int argc, const char **argv)
 	argupar_parse(&argc, &argv, option, usage, AP_NEED_ARGUMENT);
 
 	struct pathinfo info[] = {
-		{ "log",      get_log_filename },
-		{ "home",     get_home_dirname },
-		{ "dotsav",   get_dotsav_filename },
-		{ "proc-id",  get_procid_filename },
-		{ "data-dir", get_data_dirname },
-		{ "tmp-dir",  get_tmp_dirname },
-		{ "exe-dir",  get_executable_dirname },
-		{ "locale",   get_locale_dirname },
+		{ "log",      log_path },
+		{ "home",     home_dir },
+		{ "dotsav",   dotsav_path },
+		{ "proc-id",  pid_path },
+		{ "data-dir", data_dir },
+		{ "tmp-dir",  tmp_dir },
+		{ "exe-dir",  exec_dir },
+		{ "locale",   locale_dir },
 	};
 
 	int i;

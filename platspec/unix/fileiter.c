@@ -65,7 +65,7 @@ static int dispatch_file(struct __fileiter *ctx, struct dirent *ent)
 		return 0;
 
 	const char *basname = ent->d_name;
-	if (is_dir_indicator(basname))
+	if (path_is_dir_ind(basname))
 		return 0;
 
 	if (ctx->sb.str[ctx->sb.len - 1] != '/')

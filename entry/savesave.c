@@ -29,7 +29,7 @@ void (*prepare_longrunning)(void);
 static void prepare_dotsav(void)
 {
 	if (!userspec.dotsav_path)
-		userspec.dotsav_path = get_dotsav_filename();
+		userspec.dotsav_path = dotsav_path();
 	if (access(userspec.dotsav_path, F_OK | R_OK) != 0)
 		die(_("no dotsav (.savesave) was provided"));
 

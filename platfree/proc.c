@@ -48,7 +48,7 @@ void check_unique_process(void)
 	pid_t pid;
 	int err;
 	struct strbuf path = STRBUF_INIT;
-	const char *piddir[] = DATA_DIRLIST_INIT;
+	const char *piddir[] = DATA_DIR_LIST_INIT;
 	size_t i;
 
 	for_each_idx(i, sizeof_array(piddir)) {
@@ -77,7 +77,7 @@ err_not_unique:
 
 void push_process_id(void)
 {
-	const char *name = get_procid_filename();
+	const char *name = pid_path();
 	pid_t pid = getpid();
 	char buf[STRPID_MAX];
 
@@ -103,6 +103,6 @@ err_init_pidfile:
 
 void pop_process_id(void)
 {
-	const char *name = get_procid_filename();
+	const char *name = pid_path();
 	unlink(name);
 }

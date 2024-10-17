@@ -33,7 +33,7 @@ static int dispatch_file(struct __fileiter *ctx, WIN32_FIND_DATA *ent)
 	
 
 	const char *basname = ent->cFileName;
-	if (is_dir_indicator(basname))
+	if (path_is_dir_ind(basname))
 		return 0;
 
 	if (ctx->sb.str[ctx->sb.len - 1] != '/')

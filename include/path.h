@@ -8,39 +8,42 @@
 #ifndef PATH_H
 #define PATH_H
 
-int is_absolute_path(const char *path);
+int path_is_abs(const char *path);
 
-static inline int is_dir_indicator(const char *name)
+static inline int path_is_dir_ind(const char *name)
 {
 	return strcmp(name, ".") == 0 || strcmp(name, "..") == 0;
 }
 
-const char *get_home_dirname(void);
+const char *home_dir(void);
 
-const char *get_executable_dirname(void);
+const char *exec_dir(void);
 
-const char *get_tmp_dirname(void);
+const char *tmp_dir(void);
 
 #define PROCID_NAME "savesave.pid"
 #define SAVLOG_NAME "savesave.log"
 
-#define DATA_DIRLIST_INIT {			\
+#define DATA_DIR_LIST_INIT {			\
 	[0] = getenv("XDG_RUNTIME_DIR"),	\
-	[1] = get_tmp_dirname(),		\
-	[2] = get_executable_dirname(),		\
+	[1] = tmp_dir(),			\
+	[2] = exec_dir(),		\
 }
 
-const char *get_data_dirname(void);
+const char *data_dir(void);
 
-const char *get_procid_filename(void);
+const char *pid_path(void);
 
-const char *get_locale_dirname(void);
+const char *locale_dir(void);
 
-const char *get_dotsav_filename(void);
+const char *dotsav_path(void);
 
-const char *get_log_filename(void);
+const char *log_path(void);
 
-int readlink_notrunc(const char *name, char **target);
-#define READLINK readlink_notrunc
+/*
+ * Same as readlink(2) but no truncation happens (target is intact)
+ */
+int readlink_nt(const char *name, char **target);
+#define READLINK readlink_nt
 
 #endif /* PATH_H */

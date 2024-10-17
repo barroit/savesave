@@ -14,7 +14,7 @@ static const char *find_data_dirname(void)
 {
 	int err;
 	size_t i;
-	const char *dir[] = DATA_DIRLIST_INIT;
+	const char *dir[] = DATA_DIR_LIST_INIT;
 
 	for_each_idx(i, sizeof_array(dir)) {
 		const char *name = dir[i];
@@ -43,7 +43,7 @@ static const char *find_data_dirname(void)
 	return (char *)(*((int **)0xdeadbeef) = NULL);
 }
 
-const char *get_data_dirname(void)
+const char *data_dir(void)
 {
 	static const char *dir;
 
@@ -55,14 +55,14 @@ const char *get_data_dirname(void)
 
 static char *filename_at_datadir(const char *name)
 {
-	const char *prefix = get_data_dirname();
+	const char *prefix = data_dir();
 	struct strbuf sb = STRBUF_INIT;
 
 	strbuf_concat_path(&sb, prefix, name);
 	return sb.str;
 }
 
-const char *get_procid_filename(void)
+const char *pid_path(void)
 {
 	static const char *path;
 
@@ -72,12 +72,12 @@ const char *get_procid_filename(void)
 	return path;
 }
 
-const char *get_locale_dirname(void)
+const char *locale_dir(void)
 {
 	static const char *path;
 
 	if (!path) {
-		const char *dir = get_executable_dirname();
+		const char *dir = exec_dir();
 		struct strbuf sb = STRBUF_INIT;
 
 		strbuf_concat_path(&sb, dir, "locale");
@@ -92,7 +92,7 @@ const char *get_locale_dirname(void)
 	return path;
 }
 
-const char *get_dotsav_filename(void)
+const char *dotsav_path(void)
 {
 	static const char *path;
 
@@ -101,7 +101,7 @@ const char *get_dotsav_filename(void)
 
 	if (!path) {
 		struct strbuf sb = STRBUF_INIT;
-		const char *home = get_home_dirname();
+		const char *home = home_dir();
 
 		strbuf_concat_path(&sb, home, ".savesave");
 		path = sb.str;
@@ -110,7 +110,7 @@ const char *get_dotsav_filename(void)
 	return path;
 }
 
-const char *get_log_filename(void)
+const char *log_path(void)
 {
 	static const char *path;
 

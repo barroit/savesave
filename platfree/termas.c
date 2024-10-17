@@ -232,7 +232,7 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 
 void setup_lr_logging(void)
 {
-	const char *name = get_log_filename();
+	const char *name = log_path();
 	int fd = flexcreat(name);
 
 	setbuf(stdout, NULL);
@@ -253,7 +253,7 @@ void setup_lr_logging(void)
 
 void teardown_lr_logging(void)
 {
-	const char *name = get_log_filename();
+	const char *name = log_path();
 
 	struct stat st;
 	int err;

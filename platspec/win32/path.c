@@ -9,17 +9,17 @@
 #include "alloc.h"
 #include "termas.h"
 
-int is_absolute_path(const char *path)
+int path_is_abs(const char *path)
 {
 	return !PathIsRelative(path);
 }
 
-const char *get_home_dirname(void)
+const char *home_dir(void)
 {
 	return getenv("USERPROFILE");
 }
 
-const char *get_executable_dirname(void)
+const char *exec_dir(void)
 {
 	static char path[PATH_MAX + 1];
 	if (!*path) {
@@ -30,7 +30,7 @@ const char *get_executable_dirname(void)
 	return path;
 }
 
-const char *get_tmp_dirname(void)
+const char *tmp_dir(void)
 {
 	static char path[PATH_MAX + 1];
 	if (!*path) {

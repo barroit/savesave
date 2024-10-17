@@ -10,7 +10,7 @@
 #include "alloc.h"
 #include "strbuf.h"
 
-int is_absolute_path(const char *path)
+int path_is_abs(const char *path)
 {
 	return *path == '/';
 }
@@ -26,7 +26,7 @@ static char *get_homedir_of(const char *user)
 	return NULL;
 }
 
-const char *get_home_dirname(void)
+const char *home_dir(void)
 {
 	const char *home;
 	const char *user = getenv("SUDO_USER");
@@ -42,7 +42,7 @@ const char *get_home_dirname(void)
 	return home;
 }
 
-const char *get_tmp_dirname(void)
+const char *tmp_dir(void)
 {
 	if (getuid() == geteuid() && getgid() == getegid()) {
 		const char *path = getenv("TMPDIR");
@@ -57,7 +57,7 @@ const char *get_tmp_dirname(void)
 #endif
 }
 
-int readlink_notrunc(const char *name, char **target)
+int readlink_nt(const char *name, char **target)
 {
 	struct stat st;
 	int err = stat(name, &st);
