@@ -113,9 +113,9 @@ static int interpret_save(struct savesave *sav, void *data)
 		return error_errno(ERRMAS_STAT_FILE(save));
 
 	if (S_ISREG(st.st_mode))
-		sav->is_dir_save = 0;
+		sav->is_dir = 0;
 	else if (S_ISDIR(st.st_mode))
-		sav->is_dir_save = 1;
+		sav->is_dir = 1;
 	else if (!st.st_size)
 		return error(_("unsupported save file `%s'"), save);
 
@@ -282,7 +282,7 @@ static void finalize_parsing(struct savesave *sav)
 	for_each_sav(sav) {
 		check_valid_savent(sav);
 
-		if (sav->use_compress == -1 && sav->is_dir_save)
+		if (sav->use_compress == -1 && sav->is_dir)
 			sav->use_compress = 1;
 
 		update_backup_prefix(sav);
@@ -352,7 +352,7 @@ void dotsav_print(struct savesave *sav)
 		puts(sav->name);
 		printf("	save	 %s\n", sav->save_prefix);
 		printf("	backup	 %s\n", sav->backup_prefix);
-		printf("	dirsave	 %d\n", sav->is_dir_save);
+		printf("	dirsave	 %d\n", sav->is_dir);
 		printf("	compress %d\n", sav->use_compress);
 		printf("	period	 %" PRIu32 "\n", sav->period);
 		printf("	stack	 %" PRIu8 "\n", sav->stack);

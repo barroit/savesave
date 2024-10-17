@@ -56,19 +56,25 @@ struct strlist {
 };
 
 struct savesave {
-	char *name;
+	char *name;		/* sav name */
 
-	char *save_prefix;
-	char *backup_prefix;
+	char *save_prefix;	/* prefix of save path */
+	char *backup_prefix;	/* prefix of backup path */
 
-	int is_dir_save;
-	int use_compress;
+	int is_dir;		/* save file is directory */
+	int use_compress;	/* compress save file */
 
-	u32 period;
-	u8 stack;
+	u32 period;		/* backup period (in seconds) */
+	u8 stack;		/* maximum number of backups
+				   exist at the same time */
 
-	uint task_idx;
-	ullong task_pos;
+	/*
+	 * task_* is used by baksched
+	 */
+	uint task_idx;		/* index of task array */
+	ullong task_pos;	/* position of a task array element */
+
+	struct list_head head;
 };
 
 enum {
