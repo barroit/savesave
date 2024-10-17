@@ -87,7 +87,7 @@ const char *strwinerror(void);
 	_("unable to read link `%s'"), name
 
 #define ERRMAS_COPY_FILE(src, dest) \
-	_("failed to copy file from `%s' to `%s'"), src, dest
+	_("unable to copy file from `%s' to `%s'"), src, dest
 
 #define ERRMAS_RENAME_FILE(src, dest) \
 	_("failed to rename file `%s' to `%s'"), src, dest

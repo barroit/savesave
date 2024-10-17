@@ -13,12 +13,9 @@
 #define MAX_PENDING 5
 
 struct cptask {
-	struct list_head list;
-
 	char *src;
 	char *dest;
-
-	int is_lnk;
+	struct list_head list;
 };
 
 struct cpthrd {
@@ -67,10 +64,10 @@ retry:
 
 		mtx_unlock(&pool.lock);
 
-		if (task->is_lnk)
-			err = copy_symlink(task->src, task->dest);
-		else
 			err = copy_regfile(task->src, task->dest);
+			err = copy_regfile(task->src, task->dest);
+
+		err = copy_regfile(task->src, task->dest);
 
 		release_task(task);
 
@@ -107,7 +104,7 @@ void cpsched_deploy(size_t nl)
 		xthrd_create(&pool.thrd[i], cpsched_task, NULL);
 }
 
-int cpsched_schedule(const char *src, const char *dest, int is_lnk)
+int cpsched_schedule(const char *src, const char *dest)
 {
 	int state = __atomic_load_n(&pool.state, __ATOMIC_RELAXED);
 	if (unlikely(state != POOL_RUNNING))
@@ -121,7 +118,6 @@ int cpsched_schedule(const char *src, const char *dest, int is_lnk)
 
 	task->src = xstrdup(src);
 	task->dest = xstrdup(dest);
-	task->is_lnk = is_lnk;
 
 	mtx_lock(&pool.lock);
 

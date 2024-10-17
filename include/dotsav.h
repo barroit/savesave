@@ -8,7 +8,12 @@
 #ifndef SAVCONF_H
 #define SAVCONF_H
 
-#define for_each_sav(sav) for (; sav->name; sav++)
+static inline int sav_is_last(struct savesave *sav)
+{
+	return sav->name == NULL;
+}
+
+#define for_each_sav(sav) for (; !sav_is_last(sav); sav++)
 
 char *read_dotsav(const char *name);
 

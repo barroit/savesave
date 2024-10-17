@@ -19,6 +19,11 @@ int copy_symlink(const char *srcname, const char *destname);
  * contains the prefix of destination.
  */
 struct iterfile;
-int fileiter_copy_nonreg_func(struct iterfile *src, void *data);
+int __fiter_cpy_nonreg(struct iterfile *src, void *data);
+
+#ifdef FILEITER_H
+# define __FITER_CPY_NONREG \
+	(FITER_LIST_DIR | (FITER_LIST_DIR_ONLY & ~FITER_NO_SYMLINK))
+#endif
 
 #endif /* COPY_H */

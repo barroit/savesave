@@ -10,7 +10,7 @@
 #include "strbuf.h"
 #include "termas.h"
 
-int fileiter_copy_nonreg_func(struct iterfile *src, void *data)
+int __fiter_cpy_nonreg(struct iterfile *src, void *data)
 {
 	struct strbuf *dest = &(((struct strbuf *)data)[0]);
 	strbuf_concatat_base(dest, src->dymname);

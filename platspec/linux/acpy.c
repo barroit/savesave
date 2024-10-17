@@ -12,8 +12,6 @@
  * kernel versions in sqpoll mode.
  */
 
-#pragma GCC diagnostic ignored "-Wparentheses"
-
 #include "acpy.h"
 #include "termas.h"
 #include "fileiter.h"
@@ -571,9 +569,7 @@ int acpy_copy(const char *src, const char *dest)
 	int ret;
 	struct strbuf data = strbuf_from2(dest, 0, PATH_MAX);
 
-	ret = fileiter(src, fileiter_copy_nonreg_func, &data,
-		       FITER_LIST_DIR |
-		       FITER_LIST_DIR_ONLY & ~FITER_NO_SYMLINK);
+	ret = fileiter(src, __fiter_cpy_nonreg, &data, __FITER_CPY_NONREG);
 	if (ret)
 		goto err_cpy;
 
