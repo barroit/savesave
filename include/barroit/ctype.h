@@ -18,4 +18,13 @@ static inline int isln(int c)
 	return c == '\n';
 }
 
+static inline int issep(int ch)
+{
+#ifdef _WIN32
+	return ch == '\\' || ch == '/';
+#else
+	return ch == '/';
+#endif
+}
+
 #endif /* BRT_CTYPE_H */
