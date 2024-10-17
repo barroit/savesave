@@ -13,7 +13,7 @@ static inline int istab(int c)
 	return c == '\t';
 }
 
-static inline int isnewline(int c)
+static inline int isln(int c)
 {
 	return c == '\n';
 }
