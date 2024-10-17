@@ -79,8 +79,6 @@ void __cold argupar_parse(int *argc,
 			  const char **usage,
 			  flag_t flag);
 
-extern int command_usage_no_newline;
-
 #define APOPT_END()		\
 {				\
 	.type = ARGUOPT_END,	\

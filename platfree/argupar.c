@@ -434,9 +434,14 @@ static size_t print_option_usage(struct arguopt *option, struct strlist *sl)
 
 		cnt++;
 		if (opt->type == ARGUOPT_GROUP) {
-			printf("\n");
+			size_t i = cnt - 1;
+
+			if (i && option[i - 1].type != ARGUOPT_GROUP)
+				putchar('\n');
+
 			if (opt->longname)
 				puts(opt->longname);
+
 			continue;
 		}
 
@@ -503,19 +508,15 @@ next:
 	return cnt;
 }
 
-/* I fucked this up :( */
-int command_usage_no_newline;
-
 __cold NORETURN prompt_shrt_help(const char **usage, struct arguopt *option)
 {
 	struct strlist sl = STRLIST_INIT;
 
 	print_command_usage(usage, &sl);
-	if (!command_usage_no_newline)
-		putchar('\n');
+	putchar('\n');
 
 	size_t cnt = print_option_usage(option, &sl);
-	if (cnt > 0)
+	if (cnt)
 		putchar('\n');
 
 	exit(128);
@@ -592,7 +593,6 @@ void __cold argupar_parse(int *argc,
 			  const char **usage,
 			  flag_t flag)
 {
-	const char *name = (*argv)[0];
 	struct argupar ctx = {
 		.argc = *argc - 1,
 		.argv = *argv + 1,
@@ -641,7 +641,6 @@ parse_done:
 	int n = ctx.outc + ctx.argc;
 	if (flag & AP_NEED_ARGUMENT && !n) {
 help_no_arg:
-		error(_("command '%s' requires an argument"), name);
 		prompt_shrt_help(ctx.usage, ctx.option);
 	}
 

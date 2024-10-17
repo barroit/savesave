@@ -36,7 +36,6 @@ static int cmd_query_path(int argc, const char **argv)
 		NULL,
 	};
 
-	command_usage_no_newline = 1;
 	argupar_cmd_prefix = "savesave query";
 	argupar_parse(&argc, &argv, option, usage, AP_NEED_ARGUMENT);
 
