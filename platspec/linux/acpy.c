@@ -566,27 +566,12 @@ static int cp_reg_and_unsuppd(struct iterfile *src, void *data)
 	return acpyreg(src->absname, dest->str);
 }
 
-static int cp_dir_and_lnk(struct iterfile *src, void *data)
-{
-	struct strbuf *dest = data;
-	strbuf_concatat_base(dest, src->dymname);
-
-	if (S_ISLNK(src->st.st_mode))
-		return copy_symlink(src->absname, dest->str);
-
-	int err = MKDIR(dest->str);
-	if (unlikely(err))
-		return warn_errno(ERRMAS_CREAT_DIR(dest->str));
-
-	return 0;
-}
-
 int acpy_copy(const char *src, const char *dest)
 {
 	int ret;
 	struct strbuf data = strbuf_from2(dest, 0, PATH_MAX);
 
-	ret = fileiter(src, cp_dir_and_lnk, &data,
+	ret = fileiter(src, fileiter_copy_nonreg_func, &data,
 		       FITER_LIST_DIR |
 		       FITER_LIST_DIR_ONLY & ~FITER_NO_SYMLINK);
 	if (ret)
