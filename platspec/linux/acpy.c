@@ -8,8 +8,7 @@
  * https://man7.org/linux/man-pages/man7/io_uring.7.html
  *
  * Unfortunately, this io_uring does not speed up file copying. It even slows
- * the speed down compared to file_copy_range(2). And buggy across different
- * kernel versions in sqpoll mode.
+ * the speed down compared to file_copy_range(2).
  */
 
 #include "acpy.h"
@@ -47,8 +46,9 @@ struct acpy_ud {
 	int fd[2];	/* file descriptors input and output, order is the same
 			   as pipe(2). NB: fd[0] and fd[1] maybe shared across
 			   user data */
-	u32 *fd_usage;	/* usage count of these two fds between different uds */
-	int is_last;	/* 1 if this ud is the last ud of that file */
+	u32 *fd_ref;	/* fd_ref[0] and fd_ref[1] are usage count of these two
+			   fds, and fd_ref[2] is set to 1 to indicate the
+			   request submission of current file is done */
 
 	void *buf;	/* buffer for both read and write */
 	u32 len;	/* number of bytes to read/write */
@@ -298,8 +298,7 @@ static void inform_sq(void)
  * Submit a asynchronous io request.
  * Return -EBUSY if there's no room to make this request.
  */
-static int submit_request(int *fd, u32 len, u64 off,
-			  u32 *fd_usage, int is_last)
+static int submit_request(int *fd, u32 len, u64 off, u32 *fd_usage)
 {
 	if (is_ring_heavy_load)
 		return -EBUSY;
@@ -320,14 +319,13 @@ static int submit_request(int *fd, u32 len, u64 off,
 
 	ud->fd[0] = fd[0];
 	ud->fd[1] = fd[1];
-	ud->fd_usage = fd_usage;
+
+	ud->fd_ref = fd_usage;
+	ud->fd_ref[ud->fd_idx]++;
 
 	ud->buf = buf;
 	ud->len = len;
 	ud->off = off;
-
-	ud->is_last = is_last;
-	ud->fd_usage[ud->fd_idx]++;
 
 	describe_sqe(sqe, ud);
 
@@ -344,7 +342,7 @@ static void resubmit_request(struct acpy_ud *ud)
 	BUG_ON(!sqe);
 
 	describe_sqe(sqe, ud);
-	ud->fd_usage[ud->fd_idx]++;
+	ud->fd_ref[ud->fd_idx]++;
 
 	push_sqe();
 	inform_sq();
@@ -352,13 +350,13 @@ static void resubmit_request(struct acpy_ud *ud)
 
 static void drop_user_data(struct acpy_ud *ud)
 {
-	ud->fd_usage[ud->fd_idx]--;
+	ud->fd_ref[ud->fd_idx]--;
 	acpy.entries--;
 
-	if (unlikely(!ud->fd_usage[0] && !ud->fd_usage[1] && ud->is_last)) {
+	if (unlikely(!ud->fd_ref[0] && !ud->fd_ref[1] && ud->fd_ref[2])) {
 		close(ud->fd[0]);
 		close(ud->fd[1]);
-		free(ud->fd_usage);
+		free(ud->fd_ref);
 	}
 
 	free(ud->buf);
@@ -424,7 +422,7 @@ again:
 			ud->len -= cqe->res;
 			resubmit_request(ud);
 		} else if (ud->fd_idx == ACPY_READ) {
-			ud->fd_usage[ud->fd_idx]--;
+			ud->fd_ref[ud->fd_idx]--;
 			ud->fd_idx = ACPY_WRITE;
 			resubmit_request(ud);
 		} else {
@@ -523,8 +521,7 @@ static int acpyreg(const char *srcname, const char *destname)
 	u32 len = 0;
 	u64 off = 0;
 	off_t remain = st.st_size;
-	u32 *fd_usage = xcalloc(sizeof(*fd_usage), 2);
-	int is_last;
+	u32 *fd_usage = xcalloc(sizeof(*fd_usage), 3);
 
 again:
 	off += len;
@@ -532,15 +529,13 @@ again:
 	if (remain <= BS) {
 		len = remain;
 		remain = 0;
-		is_last = 1;
 	} else {
 		len = BS;
 		remain -= BS;
-		is_last = 0;
 	}
 
 retry:
-	err = submit_request(fd, len, off, fd_usage, is_last);
+	err = submit_request(fd, len, off, fd_usage);
 	if (unlikely(err)) {
 		err = release_heavy_load();
 		if (err) {
@@ -553,6 +548,7 @@ retry:
 	if (unlikely(remain))
 		goto again;
 
+	fd_usage[2] = 1;
 	return 0;
 }
 
