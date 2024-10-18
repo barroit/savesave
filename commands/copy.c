@@ -17,6 +17,7 @@
 #include "list.h"
 #include "cpsched.h"
 #include "fcpy.h"
+#include "acpy.h"
 #include "path.h"
 
 enum cpymode {
@@ -261,6 +262,27 @@ static void mt_copy(void)
 
 static void aio_copy(void)
 {
+	struct cpytsk *ct, *tmp;
+	struct strbuf sb = STRBUF_INIT;
+
+	acpy_deploy();
+	if (acpy_disabled)
+		die(_("cannot call async copy"));
+
+	list_for_each_entry_safe(ct, tmp, &tskl, list) {
+		prepare_dest_dir(ct->dest);
+		strbuf_reset_from(&sb, ct->dest);
+
+		int err = acpy_copy(ct->src, ct->dest);
+		if (err)
+			die(ERRMAS_COPY_FILE(ct->src, ct->dest));
+
+		list_del(&ct->list);
+		free(ct->dest);
+		free(ct);
+	}
+
+	strbuf_destroy(&sb);
 }
 
 int cmd_copy(int argc, const char **argv)
