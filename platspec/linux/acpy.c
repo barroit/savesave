@@ -21,19 +21,13 @@
 #include "alloc.h"
 #include "list.h"
 
-#define SQ_ENTRIES (1U << 5)
-#define MAX_SUBMIT ((SQ_ENTRIES >> 1) * 2)
-#define MAX_REMAIN ((SQ_ENTRIES >> 1) * 1)
-
-#define BS (1U << 15)
-
 #define URING_MMAP_PROT PROT_READ | PROT_WRITE
 #define URING_MMAP_FLAG MAP_SHARED | MAP_POPULATE
 
 #define ERRMAS_ACPY_LOWMEM \
 	_("machine is running critically low on memory, copy stopped")
 
-#define is_ring_heavy_load (acpy.entries > MAX_SUBMIT)
+#define is_ring_heavy_load (acpy.entries > acpy.msub)
 
 enum acpy_ud_status {
 	ACPY_READ,
@@ -90,6 +84,11 @@ struct acpy {
 
 	struct io_uring_sqe *sqes;	/* submission queue entries */
 	struct io_uring_cqe *cqes;	/* completion queue entries */
+
+	uint sqsz;			/* sq size */
+	uint msub;			/* max submission */
+	uint mrem;			/* max remaining */
+	size_t bs;			/* block size */
 };
 
 static struct acpy acpy;
@@ -122,15 +121,20 @@ retry:
 	return ret;
 }
 
-void acpy_deploy(void)
+void acpy_deploy(uint qs, size_t bs)
 {
 	BUG_ON(acpy.sq.base);
 
 	struct io_uring_params p = {
-		.sq_entries     = SQ_ENTRIES,
-		.cq_entries     = p.sq_entries << 1,
-		.flags          = IORING_SETUP_SQPOLL | IORING_SETUP_CQSIZE,
+		.sq_entries = qs,
+		.cq_entries = p.sq_entries << 1,
+		.flags      = IORING_SETUP_SQPOLL | IORING_SETUP_CQSIZE,
 	};
+
+	acpy.sqsz = qs;
+	acpy.msub = (qs >> 1) * 2;
+	acpy.mrem = (qs >> 1) * 1;
+	acpy.bs = bs;
 
 	/*
 	 * read queue depth from '/sys/block/nvme0n1/queue/nr_requests'?
@@ -432,7 +436,7 @@ again:
 		compcqe();
 	} while (!(err = peekcqe(&cqe)));
 
-	if (acpy.entries >= MAX_REMAIN)
+	if (acpy.entries >= acpy.mrem)
 		goto again;
 
 	return 0;
@@ -526,12 +530,12 @@ static int acpyreg(const char *srcname, const char *destname)
 again:
 	off += len;
 
-	if (remain <= BS) {
+	if (remain <= acpy.bs) {
 		len = remain;
 		remain = 0;
 	} else {
-		len = BS;
-		remain -= BS;
+		len = acpy.bs;
+		remain -= acpy.bs;
 	}
 
 retry:

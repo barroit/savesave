@@ -14,7 +14,7 @@
 
 extern int acpy_disabled;
 
-void acpy_deploy(void);
+void acpy_deploy(uint qs, size_t bs);
 
 int acpy_copy(const char *src, const char *dest);
 
