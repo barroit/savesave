@@ -19,11 +19,13 @@
 #include "fcpy.h"
 #include "acpy.h"
 #include "path.h"
+#include "mcpy.h"
 
 enum cpymode {
 	CPY_DEFAULT,	/* appropriate syscall */
 	CPY_THREADED,	/* multithreaded scheduler */
 	CPY_ASYNCED,	/* asynchronous io */
+	CPY_39SED,	/* 39's ed ;) */
 };
 
 struct cpytsk {
@@ -32,7 +34,11 @@ struct cpytsk {
 	struct list_head list;
 };
 
-static uint thrd_numb = -1;
+uint mt_ts = -1;		/* thread size */
+
+uint aio_qs = 1U << 5;		/* queue size */
+size_t aio_bs = 1U << 15;	/* block size */
+
 static int force_exec;
 static enum cpymode copy_mode;
 
@@ -229,21 +235,27 @@ out:
 	return 0;
 }
 
-static void mt_copy(void)
+static void check_mt_ts(void)
 {
-	struct cpytsk *ct, *tmp;
-	struct strbuf sb = STRBUF_INIT;
 	uint cores = getcpucores();
 
-	if (thrd_numb == 0)
+	if (mt_ts == 0)
 		die(_("thread number can't be zero"));
 
-	if (thrd_numb == -1)
-		thrd_numb = cores;
-	else if (thrd_numb > cores * 2)
+	if (mt_ts == -1)
+		mt_ts = cores;
+	else if (mt_ts > cores * 2)
 		warn(_("too many threads specified"));
+}
 
-	cpsched_deploy(thrd_numb);
+static void mt_copy(void)
+{
+	check_mt_ts();
+
+	struct cpytsk *ct, *tmp;
+	struct strbuf sb = STRBUF_INIT;
+
+	cpsched_deploy(mt_ts);
 	list_for_each_entry_safe(ct, tmp, &tskl, list) {
 		prepare_dest_dir(ct->dest);
 		strbuf_reset_from(&sb, ct->dest);
@@ -260,18 +272,23 @@ static void mt_copy(void)
 	strbuf_destroy(&sb);
 }
 
+static void check_aio_qs(void)
+{
+	if (__builtin_popcount(aio_qs) != 1)
+		die(_("qs is not a power of two"));
+}
+
 static void aio_copy(void)
 {
-	struct cpytsk *ct, *tmp;
-	struct strbuf sb = STRBUF_INIT;
+	check_aio_qs();
 
-	acpy_deploy();
+	acpy_deploy(aio_qs, aio_bs);
 	if (acpy_disabled)
-		die(_("cannot call async copy"));
+		return def_copy();
 
+	struct cpytsk *ct, *tmp;
 	list_for_each_entry_safe(ct, tmp, &tskl, list) {
 		prepare_dest_dir(ct->dest);
-		strbuf_reset_from(&sb, ct->dest);
 
 		int err = acpy_copy(ct->src, ct->dest);
 		if (err)
@@ -282,7 +299,30 @@ static void aio_copy(void)
 		free(ct);
 	}
 
-	strbuf_destroy(&sb);
+}
+
+static void miku_copy(void)
+{
+	check_mt_ts();
+	check_aio_qs();
+
+	struct cpytsk *ct, *tmp;
+
+	mcpy_deploy(aio_qs, aio_bs, mt_ts);
+	if (mcpy_disabled)
+		return def_copy();
+
+	list_for_each_entry_safe(ct, tmp, &tskl, list) {
+		prepare_dest_dir(ct->dest);
+
+		int err = mcpy_copy(ct->src, ct->dest);
+		if (err)
+			die(ERRMAS_COPY_FILE(ct->src, ct->dest));
+
+		list_del(&ct->list);
+		free(ct->dest);
+		free(ct);
+	}
 }
 
 int cmd_copy(int argc, const char **argv)
@@ -297,10 +337,18 @@ CMDDESCRIP("Copy a file")
 			      N_("copy files using multiple threads")),
 		APOPT_CMDMODE(0, "asynced", &copy_mode, CPY_ASYNCED,
 			      N_("copy files using asynchronous io")),
+		APOPT_CMDMODE(0, "mixed", &copy_mode, CPY_39SED,
+			      N_("copy files using mt in combination with aio")),
 
 		APOPT_GROUP("Options for multithreading"),
-		APOPT_UINT('n', "thread", &thrd_numb,
+		APOPT_UINT(0, "thread", &mt_ts,
 			   N_("number of threads to handle copy operations")),
+
+		APOPT_GROUP("Options for asynchronous io"),
+		APOPT_UINT(0, "qs", &aio_qs,
+			   N_("size of aio queue, must be the power of two")),
+		APOPT_UINT(0, "bs", &aio_bs,
+			   N_("max block size of a file in request")),
 
 		APOPT_END(),
 	};
@@ -320,6 +368,7 @@ CMDDESCRIP("Copy a file")
 		[CPY_DEFAULT]  = def_copy,
 		[CPY_THREADED] = mt_copy,
 		[CPY_ASYNCED]  = aio_copy,
+		[CPY_39SED]    = miku_copy,
 	};
 
 	funcmap[copy_mode]();

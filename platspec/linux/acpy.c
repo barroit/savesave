@@ -29,8 +29,6 @@
 #define ERRMAS_ACPY_LOWMEM \
 	_("machine is running critically low on memory, copy stopped")
 
-#define is_ring_heavy_load (acpy.entries > acpy.msub)
-
 enum acpy_ud_status {
 	ACPY_READ,
 	ACPY_WRITE,
@@ -76,21 +74,23 @@ struct acpy_cq {
 };
 
 struct acpy {
-	int ring_fd;			/* file descriptor of uring */
+	int ring_fd;		/* file descriptor of uring */
 
-	struct acpy_sq sq;		/* submission queue */
-	struct acpy_cq cq;		/* completion queue */
+	struct acpy_sq sq;	/* submission queue */
+	struct acpy_cq cq;	/* completion queue */
 
-	u32 entries;			/* number of entries that have been
-					   submitted but not yet processed */
+	u32 ents;		/* number of entries that have been
+				   submitted but not yet processed */
 
-	struct io_uring_sqe *sqes;	/* submission queue entries */
-	struct io_uring_cqe *cqes;	/* completion queue entries */
+	struct io_uring_sqe *sqes;
+				/* submission queue entries */
+	struct io_uring_cqe *cqes;
+				/* completion queue entries */
 
-	uint sqsz;			/* sq size */
-	uint msub;			/* max submission */
-	uint mrem;			/* max remaining */
-	size_t bs;			/* block size */
+	uint sqsz;		/* sq size */
+	uint msub;		/* max submission */
+	uint mrem;		/* max remaining */
+	size_t bs;		/* block size */
 };
 
 static struct acpy acpy;
@@ -121,6 +121,16 @@ retry:
 		goto retry;
 
 	return ret;
+}
+
+static inline int acpy_is_busy(void)
+{
+	return acpy.ents > acpy.msub;
+}
+
+uint acpy_remains(void)
+{
+	return acpy.ents;
 }
 
 static void map_addr(typeof_member(struct io_uring_params, sq_off) *so,
@@ -324,7 +334,7 @@ static void inform_sq(void)
  */
 static int submit_request(int *fd, u32 len, u64 off, u32 *fd_usage)
 {
-	if (is_ring_heavy_load)
+	if (acpy_is_busy())
 		return -EBUSY;
 
 	struct io_uring_sqe *sqe = acquire_sqe();
@@ -354,7 +364,7 @@ static int submit_request(int *fd, u32 len, u64 off, u32 *fd_usage)
 	describe_sqe(sqe, ud);
 
 	push_sqe();
-	acpy.entries++;
+	acpy.ents++;
 
 	inform_sq();
 	return 0;
@@ -374,9 +384,6 @@ static void resubmit_request(struct acpy_ud *ud)
 
 static void drop_user_data(struct acpy_ud *ud)
 {
-	ud->fd_ref[ud->fd_idx]--;
-	acpy.entries--;
-
 	if (unlikely(!ud->fd_ref[0] && !ud->fd_ref[1] && ud->fd_ref[2])) {
 		close(ud->fd[0]);
 		close(ud->fd[1]);
@@ -419,11 +426,13 @@ free_strbuf:
 			warn_errno(_("failed to write to fd `%d'"), fd);
 	}
 
+	ud->fd_ref[ud->fd_idx]--;
+	acpy.ents--;
 	drop_user_data(ud);
 	return -1;
 }
 
-static int process_result(void)
+int acpy_comp_cqe(flag_t flags)
 {
 	int err;
 	struct io_uring_cqe *cqe;
@@ -434,35 +443,37 @@ again:
 		return warn(ERRMAS_ACPY_LOWMEM);
 
 	do {
-		if (unlikely(cqe->res < 0)) {
-			acpy.entries--;
+		if (unlikely(cqe->res < 0))
 			return handle_cqe_error(cqe);
-		}
 
 		struct acpy_ud *ud = (typeof(ud))cqe->user_data;
 
+		ud->fd_ref[ud->fd_idx]--;
 		if (unlikely(cqe->res < ud->len)) {
 			ud->off += cqe->res;
 			ud->len -= cqe->res;
 			resubmit_request(ud);
 		} else if (ud->fd_idx == ACPY_READ) {
-			ud->fd_ref[ud->fd_idx]--;
 			ud->fd_idx = ACPY_WRITE;
 			resubmit_request(ud);
 		} else {
+			acpy.ents--;
 			drop_user_data(ud);
 		}
 
 		compcqe();
 	} while (!(err = peekcqe(&cqe)));
 
-	if (acpy.entries >= acpy.mrem)
+	if (acpy.ents > acpy.mrem)
+		goto again;
+
+	if (unlikely(flags & ACPY_FULLCOMP) && acpy.ents)
 		goto again;
 
 	return 0;
 }
 
-static void drop_entries(void)
+__cold void acpy_drop_entries(void)
 {
 	struct io_uring_cqe *cqe;
 	int err;
@@ -475,15 +486,17 @@ again:
 	do {
 		struct acpy_ud *ud = (typeof(ud))cqe->user_data;
 
+		ud->fd_ref[ud->fd_idx]--;
+		acpy.ents--;
 		drop_user_data(ud);
 	} while (!(err = peekcqe(&cqe)));
 
-	if (acpy.entries)
+	if (acpy.ents)
 		goto again;
 }
 
-static int retrieve_file_info(const char *src,
-			      const char *dest, int *fd, struct stat *st)
+static int acpy_file_info(const char *src,
+			  const char *dest, int *fd, struct stat *st)
 {
 	int in = open(src, O_RDONLY);
 	if (in == -1) {
@@ -515,30 +528,20 @@ err_out:
 	return -1;
 }
 
-static int release_heavy_load(void)
-{
-	int err = process_result();
-	if (!err)
-		return 0;
-
-	drop_entries();
-	return err;
-}
-
-static int acpyreg(const char *srcname, const char *destname)
+int __acpyreg(const char *src, const char *dest)
 {
 	int err;
 
-	if (is_ring_heavy_load) {
-		err = release_heavy_load();
+	if (acpy_is_busy()) {
+		err = acpy_comp_cqe(0);
 		if (err)
-			return err;
+			goto err_proc_res;
 	}
 
 	int fd[2];
 	struct stat st;
 
-	err = retrieve_file_info(srcname, destname, fd, &st);
+	err = acpy_file_info(src, dest, fd, &st);
 	if (err)
 		return err;
 
@@ -561,10 +564,10 @@ again:
 retry:
 	err = submit_request(fd, len, off, fd_usage);
 	if (unlikely(err)) {
-		err = release_heavy_load();
+		err = acpy_comp_cqe(0);
 		if (err) {
 			free(fd_usage);
-			return err;
+			goto err_proc_res;
 		}
 		goto retry;
 	}
@@ -574,6 +577,10 @@ retry:
 
 	fd_usage[2] = 1;
 	return 0;
+
+err_proc_res:
+	acpy_drop_entries();
+	return -1;
 }
 
 static int cp_reg_and_unsuppd(struct iterfile *src, void *data)
@@ -581,7 +588,7 @@ static int cp_reg_and_unsuppd(struct iterfile *src, void *data)
 	struct strbuf *dest = data;
 	strbuf_concatat_base(dest, src->dymname);
 
-	return acpyreg(src->absname, dest->str);
+	return __acpyreg(src->absname, dest->str);
 }
 
 int acpy_copy(const char *src, const char *dest)
@@ -597,8 +604,11 @@ int acpy_copy(const char *src, const char *dest)
 	if (ret)
 		goto err_cpy;
 
-	while (acpy.entries && !ret)
-		ret = process_result();
+	if (acpy.ents) {
+		ret = acpy_comp_cqe(ACPY_FULLCOMP);
+		if (ret)
+			acpy_drop_entries();
+	}
 
 	if (ret) {
 	err_cpy:
