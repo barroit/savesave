@@ -54,9 +54,7 @@ struct argupar {
 	struct list_head cml;	/* cmdmode list */
 };
 
-const char *argupar_cmd_prefix = SAVESAVE_NAME;
-
-static void check_compatibility(struct argupar *ctx)
+static void assert_flags(struct argupar *ctx)
 {
 	BUG_ON(!ctx->usage);
 
@@ -81,6 +79,25 @@ static void check_compatibility(struct argupar *ctx)
 	}
 }
 
+static const char *cmdpath(const char *name)
+{
+	static struct strbuf sb = STRBUF_INIT;
+	static uint cnt;
+
+	if (!name)
+		goto out;
+
+	if (cnt++) {
+		strbuf_concat(&sb, " ");
+		strbuf_concat(&sb, name);
+	} else {
+		strbuf_concat(&sb, "savesave");
+	}
+
+out:
+	return sb.str;
+}
+
 static enum arguret parse_subcommand(struct arguopt *opt, const char *cmd)
 {
 	for_each_option(opt) {
@@ -95,7 +112,7 @@ static enum arguret parse_subcommand(struct arguopt *opt, const char *cmd)
 	}
 
 	return error(_("unknown command `%s', see '%s -h'"),
-		     cmd, argupar_cmd_prefix);
+		     cmd, cmdpath(NULL));
 }
 
 #define OPT_SHRT (1 << 0)
@@ -593,8 +610,9 @@ void __cold argupar_parse(int *argc,
 			  const char **usage,
 			  flag_t flag)
 {
+	int __argc = *argc - 1;
 	struct argupar ctx = {
-		.argc = *argc - 1,
+		.argc = __argc,
 		.argv = *argv + 1,
 		.outv = ctx.argv,
 
@@ -605,8 +623,8 @@ void __cold argupar_parse(int *argc,
 		.cml = LIST_HEAD_INIT(ctx.cml),
 	};
 
-	DEBUGGING()
-		check_compatibility(&ctx);
+	assert_flags(&ctx);
+	cmdpath((*argv)[0]);
 
 	if (!ctx.argc) {
 		if (!(flag & AP_NEED_ARGUMENT))
@@ -640,6 +658,12 @@ parse_done:
 
 	int n = ctx.outc + ctx.argc;
 	if (flag & AP_NEED_ARGUMENT && !n) {
+		/*
+		 * We do have some options, but no argument found
+		 */
+		if (__argc)
+			error(_("command '%s' requires an argument\n"),
+			      cmdpath(NULL));
 help_no_arg:
 		prompt_shrt_help(ctx.usage, ctx.option);
 	}

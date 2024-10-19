@@ -36,7 +36,6 @@ static int cmd_query_path(int argc, const char **argv)
 		NULL,
 	};
 
-	argupar_cmd_prefix = "savesave query";
 	argupar_parse(&argc, &argv, option, usage, AP_NEED_ARGUMENT);
 
 	struct pathinfo info[] = {

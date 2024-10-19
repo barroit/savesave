@@ -71,8 +71,6 @@ typedef typeof(((struct arguopt *)0)->subcmd) argupar_subcommand_t;
 
 __cold NORETURN prompt_shrt_help(const char **usage, struct arguopt *option);
 
-extern const char *argupar_cmd_prefix;
-
 void __cold argupar_parse(int *argc,
 			  const char ***argv,
 			  struct arguopt *option,
