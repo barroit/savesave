@@ -21,6 +21,8 @@
 #include "alloc.h"
 #include "list.h"
 
+#define MAX_ENTRIES INT16_MAX
+
 #define URING_MMAP_PROT PROT_READ | PROT_WRITE
 #define URING_MMAP_FLAG MAP_SHARED | MAP_POPULATE
 
@@ -121,9 +123,44 @@ retry:
 	return ret;
 }
 
+static void map_addr(typeof_member(struct io_uring_params, sq_off) *so,
+		     typeof_member(struct io_uring_params, cq_off) *co)
+{
+	acpy.sq.head = acpy.sq.base + so->head;
+	acpy.sq.tail = acpy.sq.base + so->tail;
+	acpy.sq.mask = *(u32 *)(acpy.sq.base + so->ring_mask);
+	acpy.sq.flags = acpy.sq.base + so->flags;
+
+	acpy.cq.base = acpy.sq.base;
+	acpy.cqes = acpy.cq.base + co->cqes;
+
+	acpy.cq.head = acpy.cq.base + co->head;
+	acpy.cq.tail = acpy.cq.base + co->tail;
+	acpy.cq.mask = *(u32 *)(acpy.cq.base + co->ring_mask);
+}
+
+static void assert_features(typeof_member(struct io_uring_params, features) f)
+{
+	/*
+	 * The minimum kernel version savesave runs on is 5.19. These feature
+	 * should exist.
+	 */
+	BUG_ON(!(f & IORING_FEAT_SINGLE_MMAP));
+	BUG_ON(!(f & IORING_FEAT_NODROP));
+	BUG_ON(!(f & IORING_FEAT_SQPOLL_NONFIXED));
+}
+
 void acpy_deploy(uint qs, size_t bs)
 {
-	BUG_ON(acpy.sq.base);
+	if (qs > INT16_MAX) {
+		warn(_("qs is too large, clamp to %u)"), MAX_ENTRIES);
+		qs = MAX_ENTRIES;
+	}
+
+	if (bs > MAX_ALLOC_SIZE) {
+		warn(_("bs is too large, clamp to %zu)"), MAX_ALLOC_SIZE);
+		bs = MAX_ALLOC_SIZE;
+	}
 
 	struct io_uring_params p = {
 		.sq_entries = qs,
@@ -145,14 +182,7 @@ void acpy_deploy(uint qs, size_t bs)
 		warn_errno(_("failed to setup io uring"));
 		goto err;
 	}
-
-	/*
-	 * The minimum kernel version savesave runs on is 5.19. These feature
-	 * should exist.
-	 */
-	BUG_ON(!(p.features & IORING_FEAT_SINGLE_MMAP));
-	BUG_ON(!(p.features & IORING_FEAT_NODROP));
-	BUG_ON(!(p.features & IORING_FEAT_SQPOLL_NONFIXED));
+	assert_features(p.features);
 
 	size_t size = p.sq_off.array + p.sq_entries * sizeof(*acpy.sq.head);
 	acpy.sq.base = mmap(NULL, size, URING_MMAP_PROT, URING_MMAP_FLAG,
@@ -162,12 +192,6 @@ void acpy_deploy(uint qs, size_t bs)
 		warn_errno(_("failed to allocate submission queue"));
 		goto err;
 	}
-	acpy.cq.base = acpy.sq.base;
-
-	acpy.sq.head = acpy.sq.base + p.sq_off.head;
-	acpy.sq.tail = acpy.sq.base + p.sq_off.tail;
-	acpy.sq.mask = *(u32 *)(acpy.sq.base + p.sq_off.ring_mask);
-	acpy.sq.flags = acpy.sq.base + p.sq_off.flags;
 
 	size_t i;
 	u32 *sqarr = acpy.sq.base + p.sq_off.array;
@@ -182,12 +206,8 @@ void acpy_deploy(uint qs, size_t bs)
 		warn_errno(_("failed to allocate submission queue entries"));
 		goto err;
 	}
-	acpy.cqes = acpy.cq.base + p.cq_off.cqes;
 
-	acpy.cq.head = acpy.cq.base + p.cq_off.head;
-	acpy.cq.tail = acpy.cq.base + p.cq_off.tail;
-	acpy.cq.mask = *(u32 *)(acpy.cq.base + p.cq_off.ring_mask);
-
+	map_addr(&p.sq_off, &p.cq_off);
 	return;
 
 err:
