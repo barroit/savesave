@@ -8,7 +8,7 @@
 #include "proc.h"
 #include "termas.h"
 
-int PLATSPECOF(is_process_alive)(pid_t pid)
+int process_is_alive(pid_t pid)
 {
 	int err;
 

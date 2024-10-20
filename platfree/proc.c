@@ -43,25 +43,29 @@ err_not_pid:
 	    name);
 }
 
-void assert_unique_process(void)
+pid_t check_unique_process(char **name, int abort)
 {
 	pid_t pid;
-	int err;
+	size_t i;
 	struct strbuf path = STRBUF_INIT;
 	const char *piddir[] = DATA_DIR_LIST_INIT;
-	size_t i;
 
 	for_each_idx(i, sizeof_array(piddir)) {
 		if (piddir[i] == NULL)
 			continue;
 
 		strbuf_concat_path(&path, piddir[i], PROCID_NAME);
-		err = readpid(path.str, &pid);
+
+		int err = readpid(path.str, &pid);
 		if (err)
 			goto next;
 
-		if (PLATSPECOF(is_process_alive)(pid))
-			goto err_not_unique;
+		if (process_is_alive(pid)) {
+			if (abort)
+				goto pid_not_unique;
+			*name = path.str;
+			return pid;
+		}
 
 		unlink(path.str);
 next:
@@ -69,9 +73,9 @@ next:
 	}
 
 	strbuf_destroy(&path);
-	return;
+	return max_int_valueof(pid);
 
-err_not_unique:
+pid_not_unique:
 	die(_("there is already a running savesave (PID %d)"), pid);
 }
 
