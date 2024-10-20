@@ -37,7 +37,7 @@ static void prepare_dotsav(void)
 
 int cmd_main(int argc, const char **argv)
 {
-	argupar_subcommand_t runcmd = NULL;
+	subcmd_t runcmd = NULL;
 	struct arguopt option[] = {
 		APOPT_FILENAME(0, "dotsav", &userspec.dotsav_path,
 			       N_("use specified dotsav")),

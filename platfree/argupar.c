@@ -107,7 +107,7 @@ static enum arguret parse_subcommand(struct arguopt *opt, const char *cmd)
 		if (strcmp(opt->longname, cmd))
 			continue;
 
-		*(argupar_subcommand_t *)opt->value = opt->subcmd;
+		*(subcmd_t *)opt->value = opt->subcmd;
 		return AP_DONE;
 	}
 

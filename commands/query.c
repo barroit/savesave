@@ -88,7 +88,7 @@ static int cmd_query_limit(int argc, const char **argv)
 int cmd_query(int argc, const char **argv)
 CMDDESCRIP("Query default information of Savesave")
 {
-	argupar_subcommand_t subcmd = NULL;
+	subcmd_t subcmd = NULL;
 
 	struct arguopt option[] = {
 		APOPT_SUBCOMMAND("path", &subcmd, NULL,
