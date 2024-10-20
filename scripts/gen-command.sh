@@ -69,7 +69,7 @@ EOF
 
 awk -F'†' '
 {
-	printf "\tAPOPT_SUBCOMMAND(\"%s\", (v), N_%s, cmd_%s, ",
+	printf "\tAPOPT_SUBCMD(\"%s\", (v), N_%s, cmd_%s, ",
 	       $1, substr($2, 11), $1
 
 	if ($3)

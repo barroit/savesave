@@ -24,11 +24,11 @@ int cmd_sizeof(int argc, const char **argv);
 int cmd_version(int argc, const char **argv);
 
 #define APOPT_MAINCOMMAND(v) \
-	APOPT_SUBCOMMAND("backup", (v), N_("Start backup task in background"), cmd_backup, CMD_USEDOTSAV), \
-	APOPT_SUBCOMMAND("copy", (v), N_("Copy a file"), cmd_copy, 0), \
-	APOPT_SUBCOMMAND("help", (v), N_("Display help information about Savesave"), cmd_help, 0), \
-	APOPT_SUBCOMMAND("query", (v), N_("Query default information of Savesave"), cmd_query, 0), \
-	APOPT_SUBCOMMAND("sizeof", (v), N_("Calculate file size of given path"), cmd_sizeof, 0), \
-	APOPT_SUBCOMMAND("version", (v), N_("Display version information about Savesave"), cmd_version, 0)
+	APOPT_SUBCMD("backup", (v), N_("Start backup task in background"), cmd_backup, CMD_USEDOTSAV), \
+	APOPT_SUBCMD("copy", (v), N_("Copy a file"), cmd_copy, 0), \
+	APOPT_SUBCMD("help", (v), N_("Display help information about Savesave"), cmd_help, 0), \
+	APOPT_SUBCMD("query", (v), N_("Query default information of Savesave"), cmd_query, 0), \
+	APOPT_SUBCMD("sizeof", (v), N_("Calculate file size of given path"), cmd_sizeof, 0), \
+	APOPT_SUBCMD("version", (v), N_("Display version information about Savesave"), cmd_version, 0)
 
 #endif /* BRTGEN_COMMAND_H */

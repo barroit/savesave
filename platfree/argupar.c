@@ -58,15 +58,16 @@ static void assert_flags(struct argupar *ctx)
 {
 	BUG_ON(!ctx->usage);
 
-	BUG_ON((ctx->flag & AP_STOPAT_NONOPT) &&
-	       (ctx->flag & AP_COMMAND_MODE));
+	if (ctx->flag & AP_COMMAND_MODE)
+		BUG_ON(ctx->flag &
+		       (AP_STOPAT_NONOPT | AP_NO_ARGUMENT));
+
+	BUG_ON(ctx->flag & AP_NO_ARGUMENT && (ctx->flag & AP_NEED_ARGUMENT));
 
 	struct arguopt *opt = ctx->option;
 	for_each_option(opt) {
 		if (opt->type == ARGUOPT_GROUP)
 			continue;
-
-		BUG_ON(!opt->usage && !(opt->flag & ARGUOPT_NOUSAGE));
 
 		if (ctx->flag & AP_COMMAND_MODE)
 			continue;
@@ -446,9 +447,6 @@ static size_t print_option_usage(struct arguopt *option, struct strlist *sl)
 	size_t cnt = 0;
 
 	for_each_option(opt) {
-		if (opt->flag & ARGUOPT_NOUSAGE)
-			continue;
-
 		cnt++;
 		if (opt->type == ARGUOPT_GROUP) {
 			size_t i = cnt - 1;
@@ -604,11 +602,8 @@ static void cleanup_cmdmode_list(struct argupar *ctx)
 	}
 }
 
-void __cold argupar_parse(int *argc,
-			  const char ***argv,
-			  struct arguopt *option,
-			  const char **usage,
-			  flag_t flag)
+void argupar_parse(int *argc, const char ***argv,
+		   struct arguopt *option, const char **usage, flag_t flag)
 {
 	int __argc = *argc - 1;
 	struct argupar ctx = {
@@ -667,6 +662,9 @@ parse_done:
 help_no_arg:
 		prompt_shrt_help(ctx.usage, ctx.option);
 	}
+
+	if (flag & AP_NO_ARGUMENT && n)
+		die(_("command '%s' takes no argument"), cmdpath(NULL));
 
 	ctx.outv[n] = NULL;
 	*argv = ctx.outv;

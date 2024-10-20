@@ -33,7 +33,6 @@ enum arguopt_type {
 #define ARGUOPT_NOARG   (1 << 0) /* no argument */
 #define ARGUOPT_OPTARG  (1 << 1) /* argument is optional */
 #define ARGUOPT_HASNEG  (1 << 2) /* negated version available (no-*) */
-#define ARGUOPT_NOUSAGE (1 << 3) /* no usage print */
 
 struct arguopt {
 	enum arguopt_type type;	/* option type */
@@ -66,16 +65,14 @@ typedef typeof(((struct arguopt *)0)->subcmd) subcmd_t;
 #define AP_STOPAT_NONOPT (1 << 0) /* stop at non-option */
 #define AP_COMMAND_MODE  (1 << 1) /* stop *after* command */
 #define AP_NEED_ARGUMENT (1 << 2) /* need argument (not option!) */
+#define AP_NO_ARGUMENT   (1 << 3) /* takes no argument */
 
 #define for_each_option(opt) for (; opt->type != ARGUOPT_END; opt++)
 
 __cold NORETURN prompt_shrt_help(const char **usage, struct arguopt *option);
 
-void __cold argupar_parse(int *argc,
-			  const char ***argv,
-			  struct arguopt *option,
-			  const char **usage,
-			  flag_t flag);
+void argupar_parse(int *argc, const char ***argv,
+		   struct arguopt *option, const char **usage, flag_t flag);
 
 #define APOPT_END()		\
 {				\
@@ -137,7 +134,7 @@ void __cold argupar_parse(int *argc,
 	.flag     = (f),			\
 }
 
-#define APOPT_SUBCOMMAND(l, v, h, c, f)		\
+#define APOPT_SUBCMD(l, v, h, c, f)		\
 {						\
 	.type     = ARGUOPT_SUBCOMMAND,		\
 	.longname = (l),			\

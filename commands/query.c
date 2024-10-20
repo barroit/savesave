@@ -91,15 +91,15 @@ CMDDESCRIP("Query default information of Savesave")
 	subcmd_t subcmd = NULL;
 
 	struct arguopt option[] = {
-		APOPT_SUBCOMMAND("path", &subcmd, NULL,
-				 cmd_query_path, ARGUOPT_NOUSAGE),
-		APOPT_SUBCOMMAND("limit", &subcmd, NULL,
-				 cmd_query_limit, ARGUOPT_NOUSAGE),
+		APOPT_GROUP("List of subcommands"),
+		APOPT_SUBCMD("path", &subcmd,
+			     _("list default paths"), cmd_query_path, 0),
+		APOPT_SUBCMD("limit", &subcmd,
+			     _("list default limits"), cmd_query_limit, 0),
 		APOPT_END(),
 	};
 	const char *usage[] = {
-		"savesave query path [-h] <name>",
-		"savesave query limit [-h] <name>",
+		"savesave query <command> <name>",
 		NULL,
 	};
 

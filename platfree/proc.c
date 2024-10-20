@@ -43,7 +43,7 @@ err_not_pid:
 	    name);
 }
 
-void check_unique_process(void)
+void assert_unique_process(void)
 {
 	pid_t pid;
 	int err;

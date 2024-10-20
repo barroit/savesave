@@ -8,7 +8,7 @@
 #ifndef PROC_H
 #define PROC_H
 
-void check_unique_process(void);
+void assert_unique_process(void);
 
 int PLATSPECOF(is_process_alive)(pid_t pid);
 
