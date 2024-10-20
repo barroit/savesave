@@ -51,7 +51,7 @@ struct arguopt {
 
 	const char *usage;	/* option usages */
 
-	flag_t flag;		/* option flag */
+	flag_t flags;		/* option flags */
 
 	int (*callback)(const struct arguopt *, const char *);
 				/* function to use for ARGUOPT_CALLBACK */
@@ -69,10 +69,10 @@ typedef typeof(((struct arguopt *)0)->subcmd) subcmd_t;
 
 #define for_each_option(opt) for (; opt->type != ARGUOPT_END; opt++)
 
-__cold NORETURN prompt_shrt_help(const char **usage, struct arguopt *option);
+void __noreturn prompt_shrt_help(const char **usage, struct arguopt *option);
 
 void argupar_parse(int *argc, const char ***argv,
-		   struct arguopt *option, const char **usage, flag_t flag);
+		   struct arguopt *option, const char **usage, flag_t flags);
 
 #define APOPT_END()		\
 {				\
@@ -93,7 +93,7 @@ void argupar_parse(int *argc, const char ***argv,
 	.longname = (l),			\
 	.value    = (v),			\
 	.usage    = (h),			\
-	.flag     = ARGUOPT_NOARG | (f),	\
+	.flags     = ARGUOPT_NOARG | (f),	\
 }
 
 #define APOPT_SWITCH(s, l, v, h) __APOPT_SWITCH(s, l, v, h, 0)
@@ -104,7 +104,7 @@ void argupar_parse(int *argc, const char ***argv,
 	.longname = (l),			\
 	.value    = (v),			\
 	.usage    = (h),			\
-	.flag     = ARGUOPT_NOARG | (f),	\
+	.flags     = ARGUOPT_NOARG | (f),	\
 }
 
 #define APOPT_UINT(s, l, v, h) __APOPT_UINT(s, l, v, h, 0)
@@ -116,7 +116,7 @@ void argupar_parse(int *argc, const char ***argv,
 	.value    = (v),			\
 	.argh     = "n",			\
 	.usage    = (h),			\
-	.flag     = (f),			\
+	.flags     = (f),			\
 }
 
 #define APOPT_FILENAME(s, l, v, h) __APOPT_STRING(s, l, v, "path", h, 0)
@@ -131,7 +131,7 @@ void argupar_parse(int *argc, const char ***argv,
 	.defval   = (intptr_t)(d),		\
 	.argh     = (a),			\
 	.usage    = (h),			\
-	.flag     = (f),			\
+	.flags     = (f),			\
 }
 
 #define APOPT_SUBCMD(l, v, h, c, f)		\
@@ -141,7 +141,7 @@ void argupar_parse(int *argc, const char ***argv,
 	.value    = (v),			\
 	.usage    = (h),			\
 	.subcmd   = (c),			\
-	.flag     = (f),			\
+	.flags     = (f),			\
 }
 
 #define APOPT_MEMBINFO(l, h)			\
@@ -160,7 +160,7 @@ void argupar_parse(int *argc, const char ***argv,
 	.value    = (v),			\
 	.defval   = (d),			\
 	.usage    = (h),			\
-	.flag     = ARGUOPT_NOARG | (f),	\
+	.flags     = ARGUOPT_NOARG | (f),	\
 }
 
 #include "command.h"

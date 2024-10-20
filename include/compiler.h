@@ -16,9 +16,11 @@
 # define BUG_ON(cond) assert(!(cond))
 #endif
 
-#define FORMAT(sta, fir) __attribute__((format(printf, sta, fir)))
+#define __format(start, first) \
+	__attribute__((format(printf, start, first)))
 
-#define NORETURN void __attribute__((noreturn))
+#define __noreturn \
+	__attribute__((noreturn))
 
 #define likely(x)   __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
@@ -57,7 +59,7 @@
 	((type *)(((void *)ptr) - offsetof(type, memb)));		\
 })
 
-#ifdef __linux
+#ifdef __unix__
 # define __PLATSPEC_NAME uni
 #else
 # define __PLATSPEC_NAME win

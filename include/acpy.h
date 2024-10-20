@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef __linux
+#ifndef __linux__
 # error "acpy.h is linux-specific"
 #endif
 

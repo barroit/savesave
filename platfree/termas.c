@@ -19,21 +19,21 @@ do {				\
 	*(buf) += __len;	\
 } while (0)
 
-static void vreport_prefix(char **buf, size_t *avail, const char *lead)
+static void vreport_prefix(char **buf, size_t *avail, const char *prf)
 {
-	size_t n = strlen(lead);
+	size_t n = strlen(prf);
 	if (n > *avail) {
 		fprintf(stderr, "BUG!!! ");
-		fprintf(stderr, _("too long a prefix `%.10s...'\n"),lead);
+		fprintf(stderr, _("too long a prefix `%.10s...'\n"),prf);
 		abort();
 	}
 
-	memcpy(*buf, lead, n);
+	memcpy(*buf, prf, n);
 	UPDATE_BUF(buf, avail, n);
 }
 
-static void vreport_message(char **buf, size_t *avail,
-			    const char *fmt, va_list ap)
+static void vreport_message(char **buf,
+			    size_t *avail, const char *fmt, va_list ap)
 {
 	int nr = vsnprintf(*buf, *avail + 1, /* \0 is unnecessary */ fmt, ap);
 	if (nr < 0) {
@@ -47,16 +47,16 @@ static void vreport_message(char **buf, size_t *avail,
 	UPDATE_BUF(buf, avail, nr);
 }
 
-static void vreport_extra(char **buf, size_t *avail, const char *extr)
+static void vreport_extra(char **buf, size_t *avail, const char *ext)
 {
 	memcpy(*buf, "; ", 2);
 	UPDATE_BUF(buf, avail, 2);
 
-	size_t n = strlen(extr);
+	size_t n = strlen(ext);
 	if (n > *avail)
 		n = *avail;
 
-	memcpy(*buf, extr, n);
+	memcpy(*buf, ext, n);
 	UPDATE_BUF(buf, avail, n);
 }
 
@@ -105,9 +105,8 @@ static void format_cntrl_char_simple(char *str, uint *cntrl, size_t nr)
  * 2.1	- "fun?ctct\\\ion  "
  * 2.2	- "fun\\\ct\\\ion  "
  */
-static void format_cntrl_char_advanced(char *str, size_t lasidx,
-				       size_t off, size_t replen,
-				       uint *cntrl, size_t nr)
+static void format_cntrl_char_advanced(char *str, size_t lasidx, size_t off,
+				       size_t replen, uint *cntrl, size_t nr)
 {
 	size_t baslen;
 	char *base;
@@ -160,20 +159,19 @@ cleanup:
 	free(cntrl.pos);
 }
 
-static void vreportf(FILE *stream, const char *lead,
-		    const char *fmt, va_list ap,
-		    const char *extr)
+static void vreportf(FILE *stream, const char *prf,
+		     const char *fmt, va_list ap, const char *ext)
 {
 	char msg[4096];
 	size_t avail = sizeof(msg) - 1; /* -1 for \n */
 	char *buf = msg;
 
-	vreport_prefix(&buf, &avail, lead);
+	vreport_prefix(&buf, &avail, prf);
 
 	vreport_message(&buf, &avail, fmt, ap);
 
-	if (extr && avail > 2)
-		vreport_extra(&buf, &avail, extr);
+	if (ext && avail > 2)
+		vreport_extra(&buf, &avail, ext);
 
 	vreport_format_cntrl_char(msg, buf - msg, &avail);
 
@@ -185,34 +183,34 @@ static void vreportf(FILE *stream, const char *lead,
 	robwrite(fd, msg, len);
 }
 
-int __warn_routine(const char *pref, const char *extr, const char *fmt, ...)
+int __warn_routine(const char *prf, const char *ext, const char *fmt, ...)
 {
 	va_list ap;
 
 	va_start(ap, fmt);
-	vreportf(stderr, pref, fmt, ap, extr);
+	vreportf(stderr, prf, fmt, ap, ext);
 	va_end(ap);
 
 	return -1;
 }
 
-int __error_routine(const char *pref, const char *extr, const char *fmt, ...)
+int __error_routine(const char *prf, const char *ext, const char *fmt, ...)
 {
 	va_list ap;
 
 	va_start(ap, fmt);
-	vreportf(stderr, pref, fmt, ap, extr);
+	vreportf(stderr, prf, fmt, ap, ext);
 	va_end(ap);
 
 	return -1;
 }
 
-void __die_routine(const char *pref, const char *extr, const char *fmt, ...)
+void __die_routine(const char *prf, const char *ext, const char *fmt, ...)
 {
 	va_list ap;
 
 	va_start(ap, fmt);
-	vreportf(stderr, pref, fmt, ap, extr);
+	vreportf(stderr, prf, fmt, ap, ext);
 
 	exit(128);
 }
@@ -220,12 +218,12 @@ void __die_routine(const char *pref, const char *extr, const char *fmt, ...)
 void bug_routine(const char *file, int line, const char *fmt, ...)
 {
 	va_list ap;
-	char lead[256];
+	char prf[256];
 
 	va_start(ap, fmt);
-	int n = snprintf(lead, sizeof(lead), "BUG: %s:%d: ", file, line);
+	int n = snprintf(prf, sizeof(prf), "BUG: %s:%d: ", file, line);
 	BUG_ON(n < 0);
-	vreportf(stderr, lead, fmt, ap, NULL);
+	vreportf(stderr, prf, fmt, ap, NULL);
 
 	exit(128);
 }

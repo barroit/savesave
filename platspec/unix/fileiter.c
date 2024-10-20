@@ -13,7 +13,7 @@
 
 static int dispatch_lnkfile(struct iterfile *file, struct __fileiter *ctx)
 {
-	if (ctx->flag & FITER_USE_STAT) {
+	if (ctx->flags & FITER_USE_STAT) {
 		int err = lstat(file->absname, &file->st);
 		if (unlikely(err))
 			return warn_errno(ERRMAS_STAT_FILE(file->absname));
@@ -26,14 +26,14 @@ static int dispatch_regfile(struct iterfile *file, struct __fileiter *ctx)
 {
 	int ret;
 
-	if (ctx->flag & FITER_USE_FD) {
+	if (ctx->flags & FITER_USE_FD) {
 		file->fd = open(file->absname, O_RDONLY);
 		if (file->fd == -1)
 			return warn_errno(ERRMAS_OPEN_FILE(file->absname));
 	}
 
-	if (ctx->flag & FITER_USE_STAT) {
-		if (ctx->flag & FITER_USE_FD)
+	if (ctx->flags & FITER_USE_STAT) {
+		if (ctx->flags & FITER_USE_FD)
 			ret = fstat(file->fd, &file->st);
 		else
 			ret = stat(file->absname, &file->st);
@@ -49,7 +49,7 @@ static int dispatch_regfile(struct iterfile *file, struct __fileiter *ctx)
 	}
 
 	ret = ctx->func(file, ctx->data);
-	if (ctx->flag & FITER_USE_FD)
+	if (ctx->flags & FITER_USE_FD)
 		close(file->fd);
 
 	return ret;
@@ -57,11 +57,11 @@ static int dispatch_regfile(struct iterfile *file, struct __fileiter *ctx)
 
 static int dispatch_file(struct __fileiter *ctx, struct dirent *ent)
 {
-	if (__fileiter_is_list_dir_only(ctx->flag) && ent->d_type != DT_DIR)
+	if (__fileiter_is_list_dir_only(ctx->flags) && ent->d_type != DT_DIR)
 		return 0;
-	else if (ctx->flag & FITER_NO_SYMLINK && ent->d_type == DT_LNK)
+	else if (ctx->flags & FITER_NO_SYMLINK && ent->d_type == DT_LNK)
 		return 0;
-	else if (ctx->flag & FITER_NO_REGFILE && ent->d_type == DT_REG)
+	else if (ctx->flags & FITER_NO_REGFILE && ent->d_type == DT_REG)
 		return 0;
 
 	const char *basname = ent->d_name;
@@ -87,7 +87,7 @@ static int dispatch_file(struct __fileiter *ctx, struct dirent *ent)
 	case DT_UNKNOWN:
 		return warn(_("can't determine file type for `%s'"), absname);
 	default:
-		if (!(ctx->flag & FITER_NO_UNSUPPD))
+		if (!(ctx->flags & FITER_NO_UNSUPPD))
 			break;
 		warn(_("`%s' has unsupported file type `%d', skipped"),
 		     absname, ent->d_type);

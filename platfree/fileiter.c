@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-/* do not use FITER_LIST_DIR_ONLY in fileiter, do flag & FITER_NO_* instead */
+/* do not use FITER_LIST_DIR_ONLY in fileiter, do flags & FITER_NO_* instead */
 
 #include "fileiter.h"
 #include "alloc.h"
@@ -27,24 +27,24 @@ static int dispatch_directory(struct __fileiter *ctx)
 }
 
 int fileiter(const char *root,
-	     fileiter_function_t func, void *data, flag_t flag)
+	     fileiter_function_t func, void *data, flag_t flags)
 {
-	BUG_ON(flag & FITER_LIST_DIR && (flag & FITER_RECUR_DIR));
+	BUG_ON(flags & FITER_LIST_DIR && (flags & FITER_RECUR_DIR));
 
-	if (__fileiter_is_list_dir_only(flag)) {
+	if (__fileiter_is_list_dir_only(flags)) {
 		/*
 		 * We can only list the directories (FITER_LIST_DIR_ONLY)
 		 */
-		BUG_ON(!(flag & FITER_LIST_DIR) && !(flag & FITER_RECUR_DIR));
-		flag &= ~FITER_RECUR_DIR;
-		flag |= FITER_LIST_DIR;
+		BUG_ON(!(flags & FITER_LIST_DIR) && !(flags & FITER_RECUR_DIR));
+		flags &= ~FITER_RECUR_DIR;
+		flags |= FITER_LIST_DIR;
 	}
 
 	struct __fileiter ctx = {
 		.root = root,
 		.func = func,
 		.data = data,
-		.flag = flag,
+		.flags = flags,
 	};
 
 	strbuf_init(&ctx.sb, 0);
@@ -59,7 +59,7 @@ int fileiter(const char *root,
 	while (39) {
 		strbuf_reset_from(&ctx.sb, dir);
 
-		if (ctx.flag & FITER_LIST_DIR) {
+		if (ctx.flags & FITER_LIST_DIR) {
 			ret = dispatch_directory(&ctx);
 			if (unlikely(ret))
 				goto cleanup;
@@ -71,7 +71,7 @@ int fileiter(const char *root,
 
 		dir = strlist_pop2(&ctx.sl, 0);
 		if (unlikely(!dir)) {
-			if (!(ctx.flag & FITER_RECUR_DIR))
+			if (!(ctx.flags & FITER_RECUR_DIR))
 				goto cleanup;
 
 			strbuf_reset(&ctx.sb);
@@ -79,7 +79,7 @@ int fileiter(const char *root,
 			goto iter_done;
 		}
 
-		if (!(ctx.flag & FITER_RECUR_DIR))
+		if (!(ctx.flags & FITER_RECUR_DIR))
 			continue;
 		strbuf_reset(&ctx.sb);
 

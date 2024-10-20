@@ -46,7 +46,7 @@ struct argupar {
 	struct arguopt *option;
 	const char **usage;
 
-	flag_t flag;
+	flag_t flags;
 
 	int outc;
 	const char **outv;
@@ -58,25 +58,25 @@ static void assert_flags(struct argupar *ctx)
 {
 	BUG_ON(!ctx->usage);
 
-	if (ctx->flag & AP_COMMAND_MODE)
-		BUG_ON(ctx->flag &
+	if (ctx->flags & AP_COMMAND_MODE)
+		BUG_ON(ctx->flags &
 		       (AP_STOPAT_NONOPT | AP_NO_ARGUMENT));
 
-	BUG_ON(ctx->flag & AP_NO_ARGUMENT && (ctx->flag & AP_NEED_ARGUMENT));
+	BUG_ON(ctx->flags & AP_NO_ARGUMENT && (ctx->flags & AP_NEED_ARGUMENT));
 
 	struct arguopt *opt = ctx->option;
 	for_each_option(opt) {
 		if (opt->type == ARGUOPT_GROUP)
 			continue;
 
-		if (ctx->flag & AP_COMMAND_MODE)
+		if (ctx->flags & AP_COMMAND_MODE)
 			continue;
 
-		BUG_ON((opt->flag & ARGUOPT_NOARG) &&
-		       (opt->flag & ARGUOPT_OPTARG));
+		BUG_ON((opt->flags & ARGUOPT_NOARG) &&
+		       (opt->flags & ARGUOPT_OPTARG));
 
 		BUG_ON(opt->type == ARGUOPT_STRING &&
-		       (opt->flag & ARGUOPT_OPTARG) && !opt->defval);
+		       (opt->flags & ARGUOPT_OPTARG) && !opt->defval);
 	}
 }
 
@@ -277,7 +277,7 @@ static int do_parse_shrtopt(struct argupar *ctx, const char **next)
 			continue;
 
 		*next = str[1] ? &str[1] : NULL;
-		if (opt->flag & ARGUOPT_NOARG) {
+		if (opt->flags & ARGUOPT_NOARG) {
 			arg = NULL;
 		} else if (str[1]) {
 			arg = &str[1];
@@ -285,7 +285,7 @@ static int do_parse_shrtopt(struct argupar *ctx, const char **next)
 		} else if (ctx->argc > 1) {
 			ctx->argc--;
 			arg = *(++ctx->argv);
-		} else if (!(opt->flag & ARGUOPT_OPTARG)) {
+		} else if (!(opt->flags & ARGUOPT_OPTARG)) {
 			goto err_missing_arg;
 		}
 
@@ -351,23 +351,23 @@ static int parse_longopt(struct argupar *ctx)
 
 		int opt_unset = strskip(optname, "no-", &optname) == 0;
 
-		if (arg_unset != opt_unset && !(opt->flag & ARGUOPT_HASNEG))
+		if (arg_unset != opt_unset && !(opt->flags & ARGUOPT_HASNEG))
 			continue;
 
 		if (strskip(argstr, optname, &argval) == 0) {
 prepare_optarg:
 			if (argval[0] == '=') {
-				if (opt->flag & ARGUOPT_NOARG || arg_unset)
+				if (opt->flags & ARGUOPT_NOARG || arg_unset)
 					goto err_extra_value;
 				arg = &argval[1];
 			} else if (*argval) {
 				continue;
-			} else if ((opt->flag & ARGUOPT_NOARG) || arg_unset) {
+			} else if ((opt->flags & ARGUOPT_NOARG) || arg_unset) {
 				arg = NULL;
 			} else if (ctx->argc > 1) {
 				ctx->argc--;
 				arg = *(++ctx->argv);
-			} else if (!(opt->flag & ARGUOPT_OPTARG)) {
+			} else if (!(opt->flags & ARGUOPT_OPTARG)) {
 				goto err_missing_arg;
 			}
 
@@ -379,7 +379,7 @@ prepare_optarg:
 			register_abbrev(opt, arg_unset != opt_unset,
 					&abbrev, &ambiguous);
 
-		if ((opt->flag & ARGUOPT_HASNEG) && straftr("no-", argstr))
+		if ((opt->flags & ARGUOPT_HASNEG) && straftr("no-", argstr))
 			register_abbrev(opt, !opt_unset, &abbrev, &ambiguous);
 	}
 
@@ -483,7 +483,7 @@ static size_t print_option_usage(struct arguopt *option, struct strlist *sl)
 		if (opt->type == ARGUOPT_MEMBINFO)
 			fmt = "%s";
 		else
-			fmt = (opt->flag & ARGUOPT_HASNEG) ? "--[no-]%s" :
+			fmt = (opt->flags & ARGUOPT_HASNEG) ? "--[no-]%s" :
 							     "--%s";
 		nr += printf(fmt, opt->longname);
 
@@ -491,7 +491,7 @@ static size_t print_option_usage(struct arguopt *option, struct strlist *sl)
 			goto print_option_usage;
 
 		int nobrac = strpbrk(opt->argh, "()<>[]|") != NULL;
-		if (opt->flag & ARGUOPT_OPTARG)
+		if (opt->flags & ARGUOPT_OPTARG)
 			fmt = nobrac ? "[=%s]" : "[=<%s>]";
 		else
 			fmt = nobrac ? " %s" : " <%s>";
@@ -523,7 +523,7 @@ next:
 	return cnt;
 }
 
-__cold NORETURN prompt_shrt_help(const char **usage, struct arguopt *option)
+void __cold prompt_shrt_help(const char **usage, struct arguopt *option)
 {
 	struct strlist sl = STRLIST_INIT;
 
@@ -543,9 +543,9 @@ static enum arguret do_parse(struct argupar *ctx)
 
 	/* non option (argument) */
 	if (str[0] != '-') {
-		if (ctx->flag & AP_STOPAT_NONOPT)
+		if (ctx->flags & AP_STOPAT_NONOPT)
 			return AP_DONE;
-		else if (ctx->flag & AP_COMMAND_MODE)
+		else if (ctx->flags & AP_COMMAND_MODE)
 			return parse_subcommand(ctx->option, str);
 
 		ctx->outv[ctx->outc++] = str;
@@ -603,7 +603,7 @@ static void cleanup_cmdmode_list(struct argupar *ctx)
 }
 
 void argupar_parse(int *argc, const char ***argv,
-		   struct arguopt *option, const char **usage, flag_t flag)
+		   struct arguopt *option, const char **usage, flag_t flags)
 {
 	int __argc = *argc - 1;
 	struct argupar ctx = {
@@ -613,7 +613,7 @@ void argupar_parse(int *argc, const char ***argv,
 
 		.option = option,
 		.usage = usage,
-		.flag = flag,
+		.flags = flags,
 
 		.cml = LIST_HEAD_INIT(ctx.cml),
 	};
@@ -622,7 +622,7 @@ void argupar_parse(int *argc, const char ***argv,
 	cmdpath((*argv)[0]);
 
 	if (!ctx.argc) {
-		if (!(flag & AP_NEED_ARGUMENT))
+		if (!(flags & AP_NEED_ARGUMENT))
 			return;
 		goto help_no_arg;
 	}
@@ -652,7 +652,7 @@ parse_done:
 			st_mult(sizeof(*ctx.argv), ctx.argc));
 
 	int n = ctx.outc + ctx.argc;
-	if (flag & AP_NEED_ARGUMENT && !n) {
+	if (flags & AP_NEED_ARGUMENT && !n) {
 		/*
 		 * We do have some options, but no argument found
 		 */
@@ -663,7 +663,7 @@ help_no_arg:
 		prompt_shrt_help(ctx.usage, ctx.option);
 	}
 
-	if (flag & AP_NO_ARGUMENT && n)
+	if (flags & AP_NO_ARGUMENT && n)
 		die(_("command '%s' takes no argument"), cmdpath(NULL));
 
 	ctx.outv[n] = NULL;

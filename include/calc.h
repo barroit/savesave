@@ -24,7 +24,9 @@
 #define uint_add_overflows(a, b) \
     ((b) > max_uint_valueof(a) - (a))
 
-extern NORETURN __die_routine(const char *, const char *, const char *, ...);
+extern void __noreturn __die_routine(const char *prf,
+				     const char *ext,
+				     const char *fmt, ...) __format(3, 4);
 
 #define st_mult(a, b)							\
 ({									\

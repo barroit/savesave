@@ -31,7 +31,7 @@ int cntopen3(const char *file, int oflag, mode_t mode);
 int cntclose(int fd);
 #define close cntclose
 
-#ifdef __linux__
+#ifdef __unix__
 
 DIR *cntopendir(const char *name);
 #define opendir cntopendir
@@ -39,7 +39,7 @@ DIR *cntopendir(const char *name);
 int cntclosedir(DIR *dirp);
 #define closedir cntclosedir
 
-#endif /* __linux__ */
+#endif /* __unix__ */
 
 int cntdup(int oldfd);
 #define dup cntdup

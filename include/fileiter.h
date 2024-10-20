@@ -26,7 +26,7 @@ struct __fileiter {
 	fileiter_function_t func;
 	void *data;
 
-	flag_t flag;
+	flag_t flags;
 
 	struct strbuf sb;
 	struct strlist sl;
@@ -58,7 +58,7 @@ static inline int __fileiter_is_list_dir_only(flag_t flags)
 }
 
 int fileiter(const char *root,
-	     fileiter_function_t func, void *data, flag_t flag);
+	     fileiter_function_t func, void *data, flag_t flags);
 int PLATSPECOF(fileiter_loop_dir)(struct __fileiter *ctx);
 
 #endif /* FILEITER_H */

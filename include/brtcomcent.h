@@ -110,7 +110,7 @@ char *basename(char *path);
 
 int setenv(const char *name, const char *value, int overwrite);
 
-NORETURN winexit(int code);
+void __noreturn winexit(int code);
 
 #define read   _read
 #define write  _write

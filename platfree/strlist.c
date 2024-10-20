@@ -50,12 +50,12 @@ static void strlist_grow1(struct strlist *sl)
 
 static void strlist_init_strbuf(struct strlist *sl, struct strbuf *sb)
 {
-	flag_t flag = 0;
+	flag_t flags = 0;
 
 	if (sl->use_ref)
-		flag |= STRBUF_CONSTANT;
+		flags |= STRBUF_CONSTANT;
 
-	strbuf_init(sb, flag);
+	strbuf_init(sb, flags);
 }
 
 size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc)

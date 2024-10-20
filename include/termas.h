@@ -8,17 +8,21 @@
 #ifndef TERMAS_H
 #define TERMAS_H
 
-int __warn_routine(const char *pref, const char *extr,
-		   const char *fmt, ...) FORMAT(3, 4);
+int __warn_routine(const char *prf,
+		   const char *ext,
+		   const char *fmt, ...) __format(3, 4);
 
-int __error_routine(const char *pref, const char *extr,
-		    const char *fmt, ...) FORMAT(3, 4);
+int __error_routine(const char *prf,
+		    const char *ext,
+		    const char *fmt, ...) __format(3, 4);
 
-NORETURN __die_routine(const char *pref, const char *extr,
-		       const char *fmt, ...) FORMAT(3, 4);
+void __noreturn __die_routine(const char *prf,
+			      const char *ext,
+			      const char *fmt, ...) __format(3, 4);
 
-NORETURN bug_routine(const char *file, int line,
-		     const char *fmt, ...) FORMAT(3, 4);
+void __noreturn bug_routine(const char *file,
+			    int line,
+			    const char *fmt, ...) __format(3, 4);
 
 #define warn(...) \
 	__warn_routine(_("warning: "), 0, __VA_ARGS__)

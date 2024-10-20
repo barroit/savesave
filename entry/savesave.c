@@ -64,7 +64,7 @@ int cmd_main(int argc, const char **argv)
 		if (runcmd != cmd->subcmd)
 			continue;
 
-		if (cmd->flag & CMD_USEDOTSAV)
+		if (cmd->flags & CMD_USEDOTSAV)
 			prepare_dotsav();
 
 		break;
