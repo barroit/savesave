@@ -11,5 +11,5 @@ int cmd_help(int argc, const char **argv)
 CMDDESCRIP("Display help information about Savesave")
 {
 	puts("cmd_help");
-	return 0;
+	exit(0);
 }

@@ -5,33 +5,9 @@
  * Contact: barroit@linux.com
  */
 
-#include "i18n.h"
 #include "maincmd.h"
-#include "termas.h"
-#include "proc.h"
-#include "atexit.h"
-
-static void __prepare_longrunning(void)
-{
-	detach_process();
-
-	setup_lr_logging();
-	atexit_enque(teardown_lr_logging);
-
-	push_process_id();
-	atexit_enque(pop_process_id);
-
-	atexit_apply();
-}
 
 int main(int argc, const char **argv)
 {
-	prepare_longrunning = __prepare_longrunning;
-	int ret = cmd_main(argc, argv);
-
-	if (!is_longrunning)
-		exit(ret);
-
-	while (39)
-		pause();
+	return cmd_main(argc, argv);
 }

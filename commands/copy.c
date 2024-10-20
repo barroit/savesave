@@ -276,5 +276,5 @@ CMDDESCRIP("Copy a file")
 	};
 
 	funcmap[copy_mode]();
-	return 0;
+	exit(0);
 }

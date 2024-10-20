@@ -9,9 +9,7 @@
 #include "dotsav.h"
 #include "maincmd.h"
 
-LONGRUNNING
 USEDOTSAV
-UNIQUEPROC
 int cmd_backup(int argc, const char **argv)
 CMDDESCRIP("Start backup task in background")
 {

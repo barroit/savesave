@@ -18,13 +18,6 @@ struct userspec_argument userspec;
 static struct savesave *savarr;
 static size_t savnl;
 
-int is_longrunning;
-void (*prepare_longrunning)(void);
-
-#ifdef CONFIG_NO_LONGRUNNING_DAEMON
-# define prepare_longrunning() do {} while (0)
-#endif
-
 static void prepare_dotsav(void)
 {
 	if (!userspec.dotsav_path)
@@ -71,20 +64,12 @@ int cmd_main(int argc, const char **argv)
 		if (runcmd != cmd->subcmd)
 			continue;
 
-		if (cmd->flag & CMD_UNIQUEPROC)
-			check_unique_process();
-
 		if (cmd->flag & CMD_USEDOTSAV)
 			prepare_dotsav();
-
-		if (cmd->flag & CMD_LONGRUNNING)
-			is_longrunning = 1;
 
 		break;
 	}
 
-	if (is_longrunning && prepare_longrunning)
-		prepare_longrunning();
 	return runcmd(argc, argv);
 }
 

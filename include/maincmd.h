@@ -10,9 +10,6 @@
 
 int cmd_main(int argc, const char **argv);
 
-extern int is_longrunning;
-extern void (*prepare_longrunning)(void);
-
 struct savesave;
 size_t retrieve_dotsav(struct savesave **sav);
 

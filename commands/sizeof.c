@@ -149,6 +149,5 @@ CMDDESCRIP("Calculate file size of given path")
 		}
 	}
 
-	strlist_destroy(&sl);
-	return 0;
+	exit(0);
 }

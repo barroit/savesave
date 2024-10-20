@@ -76,14 +76,13 @@ static int cmd_query_path(int argc, const char **argv)
 next:
 	}
 
-	NOLEAK(sb);
-	return 0;
+	exit(0);
 }
 
 static int cmd_query_limit(int argc, const char **argv)
 {
 	puts("limit");
-	return 0;
+	exit(0);
 }
 
 int cmd_query(int argc, const char **argv)

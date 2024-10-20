@@ -16,17 +16,6 @@
 #include "atexit.h"
 #include "proc.h"
 
-static void __prepare_longrunning(void)
-{
-	setup_lr_logging();
-	atexit_enque(teardown_lr_logging);
-
-	push_process_id();
-	atexit_enque(pop_process_id);
-
-	atexit_apply();
-}
-
 int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int __)
 {
 	setup_program();
@@ -40,11 +29,7 @@ int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int __)
 	if (*cmdline)
 		argc = getargv(&argv);
 
-	prepare_longrunning = __prepare_longrunning;
 	cmd_main(argc, argv);
-
-	if (!is_longrunning)
-		exit(39);
 
 	HWND window = create_main_window(app);
 

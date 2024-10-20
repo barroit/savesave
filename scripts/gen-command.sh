@@ -50,13 +50,9 @@ cat <<EOF > $dest
 #ifndef BRTGEN_COMMAND_H
 #define BRTGEN_COMMAND_H
 
-#define UNIQUEPROC  /* can only be one process at a time */
 #define USEDOTSAV   /* use dotsav */
-#define LONGRUNNING /* long-running command */
 
-#define CMD_UNIQUEPROC  (1 << 0)
 #define CMD_USEDOTSAV   (1 << 1)
-#define CMD_LONGRUNNING (1 << 2)
 
 #define CMDDESCRIP(usage)
 

@@ -21,5 +21,5 @@ CMDDESCRIP("Display version information about Savesave")
 	printf("   gettext-%s\n", GETTEXT_VERSION);
 #endif
 
-	return 0;
+	exit(0);
 }

@@ -10,13 +10,9 @@
 #ifndef BRTGEN_COMMAND_H
 #define BRTGEN_COMMAND_H
 
-#define UNIQUEPROC  /* can only be one process at a time */
 #define USEDOTSAV   /* use dotsav */
-#define LONGRUNNING /* long-running command */
 
-#define CMD_UNIQUEPROC  (1 << 0)
 #define CMD_USEDOTSAV   (1 << 1)
-#define CMD_LONGRUNNING (1 << 2)
 
 #define CMDDESCRIP(usage)
 
@@ -28,7 +24,7 @@ int cmd_sizeof(int argc, const char **argv);
 int cmd_version(int argc, const char **argv);
 
 #define APOPT_MAINCOMMAND(v) \
-	APOPT_SUBCOMMAND("backup", (v), N_("Start backup task in background"), cmd_backup, CMD_LONGRUNNING | CMD_USEDOTSAV | CMD_UNIQUEPROC), \
+	APOPT_SUBCOMMAND("backup", (v), N_("Start backup task in background"), cmd_backup, CMD_USEDOTSAV), \
 	APOPT_SUBCOMMAND("copy", (v), N_("Copy a file"), cmd_copy, 0), \
 	APOPT_SUBCOMMAND("help", (v), N_("Display help information about Savesave"), cmd_help, 0), \
 	APOPT_SUBCOMMAND("query", (v), N_("Query default information of Savesave"), cmd_query, 0), \
