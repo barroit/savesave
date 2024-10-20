@@ -12,7 +12,6 @@
 #include "list.h"
 #include "proc.h"
 #include "path.h"
-#include "cpsched.h"
 
 struct userspec_argument userspec;
 

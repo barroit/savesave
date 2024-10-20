@@ -15,17 +15,13 @@
 #include "dotsav.h"
 #include "noleak.h"
 #include "list.h"
-#include "cpsched.h"
 #include "fcpy.h"
 #include "acpy.h"
 #include "path.h"
-#include "mcpy.h"
 
 enum cpymode {
 	CPY_DEFAULT,	/* appropriate syscall */
-	CPY_THREADED,	/* multithreaded scheduler */
 	CPY_ASYNCED,	/* asynchronous io */
-	CPY_39SED,	/* 39's ed ;) */
 };
 
 struct cpytsk {
@@ -204,83 +200,10 @@ static void def_copy(void)
 	strbuf_destroy(&sb);
 }
 
-static int __mt_cpy_reg(struct iterfile *src, void *data)
-{
-	struct strbuf *dest = &((struct strbuf *)data)[0];
-	strbuf_concatat_base(dest, src->dymname);
-
-	int ret = cpsched_schedule(src->absname, dest->str);
-	if (ret != SCHED_BUSY)
-		return ret;
-
-	return copy_regfile(src->absname, dest->str);
-}
-
-int mt_copy_routine(const char *src, struct strbuf *sb)
-{
-	int iter_err;
-	int thrd_err = 0;
-
-	iter_err = fileiter(src, __fiter_cpy_nonreg, sb, __FITER_CPY_NONREG);
-	if (iter_err)
-		goto out;
-
-	iter_err = fileiter(src, __mt_cpy_reg, sb, FITER_NO_SYMLINK);
-	cpsched_join(&thrd_err);
-
-out:
-	if (iter_err || thrd_err)
-		return error(ERRMAS_COPY_FILE(src, sb->str));
-
-	return 0;
-}
-
-static void check_mt_ts(void)
-{
-	uint cores = getcpucores();
-
-	if (mt_ts == 0)
-		die(_("thread number can't be zero"));
-
-	if (mt_ts == -1)
-		mt_ts = cores;
-	else if (mt_ts > cores * 2)
-		warn(_("too many threads specified"));
-}
-
-static void mt_copy(void)
-{
-	check_mt_ts();
-
-	struct cpytsk *ct, *tmp;
-	struct strbuf sb = STRBUF_INIT;
-
-	cpsched_deploy(mt_ts);
-	list_for_each_entry_safe(ct, tmp, &tskl, list) {
-		prepare_dest_dir(ct->dest);
-		strbuf_reset_from(&sb, ct->dest);
-
-		int err = mt_copy_routine(ct->src, &sb);
-		if (err)
-			die(ERRMAS_COPY_FILE(ct->src, ct->dest));
-
-		list_del(&ct->list);
-		free(ct->dest);
-		free(ct);
-	}
-
-	strbuf_destroy(&sb);
-}
-
-static void check_aio_qs(void)
+static void aio_copy(void)
 {
 	if (__builtin_popcount(aio_qs) != 1)
 		die(_("qs is not a power of two"));
-}
-
-static void aio_copy(void)
-{
-	check_aio_qs();
 
 	acpy_deploy(aio_qs, aio_bs);
 	if (acpy_disabled)
@@ -301,30 +224,6 @@ static void aio_copy(void)
 
 }
 
-static void miku_copy(void)
-{
-	check_mt_ts();
-	check_aio_qs();
-
-	struct cpytsk *ct, *tmp;
-
-	mcpy_deploy(aio_qs, aio_bs, mt_ts);
-	if (mcpy_disabled)
-		return def_copy();
-
-	list_for_each_entry_safe(ct, tmp, &tskl, list) {
-		prepare_dest_dir(ct->dest);
-
-		int err = mcpy_copy(ct->src, ct->dest);
-		if (err)
-			die(ERRMAS_COPY_FILE(ct->src, ct->dest));
-
-		list_del(&ct->list);
-		free(ct->dest);
-		free(ct);
-	}
-}
-
 int cmd_copy(int argc, const char **argv)
 CMDDESCRIP("Copy a file")
 {
@@ -332,17 +231,8 @@ CMDDESCRIP("Copy a file")
 		APOPT_COUNTUP('f', "force", &force_exec,
 			      N_("overwrite existing one")),
 
-		APOPT_GROUP("List of file copying methods"),
-		APOPT_CMDMODE(0, "threaded", &copy_mode, CPY_THREADED,
-			      N_("copy files using multiple threads")),
 		APOPT_CMDMODE(0, "asynced", &copy_mode, CPY_ASYNCED,
 			      N_("copy files using asynchronous io")),
-		APOPT_CMDMODE(0, "mixed", &copy_mode, CPY_39SED,
-			      N_("copy files using mt in combination with aio")),
-
-		APOPT_GROUP("Options for multithreading"),
-		APOPT_UINT(0, "thread", &mt_ts,
-			   N_("number of threads to handle copy operations")),
 
 		APOPT_GROUP("Options for asynchronous io"),
 		APOPT_UINT(0, "qs", &aio_qs,
@@ -366,9 +256,7 @@ CMDDESCRIP("Copy a file")
 
 	typeof(def_copy) *funcmap[] = {
 		[CPY_DEFAULT]  = def_copy,
-		[CPY_THREADED] = mt_copy,
 		[CPY_ASYNCED]  = aio_copy,
-		[CPY_39SED]    = miku_copy,
 	};
 
 	funcmap[copy_mode]();
