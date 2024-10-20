@@ -8,7 +8,7 @@
 #ifndef MKDIR_H
 #define MKDIR_H
 
-int mkdirp2(char *name, size_t start);
+int mkdirp2(char *name, size_t start, int dcheck);
 
 /**
  * mkdirp - make directory as well as parent
@@ -17,15 +17,24 @@ int mkdirp2(char *name, size_t start);
  */
 static inline int mkdirp(char *name)
 {
-	return mkdirp2(name, 0);
+	return mkdirp2(name, 0, 0);
 }
 
 int mkfdirp2(char *name, size_t start);
 
+/*
+ * Make file directory as well as parent
+ */
 static inline int mkfdirp(char *name)
 {
 	return mkfdirp2(name, 0);
 }
+
+/*
+ * Make file directory as well as parent. Take care of existing files make sure
+ * they are directories.
+ */
+int mkfdirp3(char *name);
 
 /**
  * rmdirr - remove directory as well as subdirectory

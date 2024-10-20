@@ -10,7 +10,18 @@
 #include "fileiter.h"
 #include "termas.h"
 
-int mkdirp2(char *name, size_t start)
+static int mkdirp_check_dir(const char *name)
+{
+	struct stat st;
+	int err = stat(name, &st);
+	BUG_ON(err);
+
+	if (S_ISDIR(st.st_mode))
+		return 0;
+	return -1;
+}
+
+int mkdirp2(char *name, size_t start, int dcheck)
 {
 	int err;
 	char *next = &name[start];
@@ -27,8 +38,16 @@ int mkdirp2(char *name, size_t start)
 			*next = 0;
 
 		err = MKDIR(name);
-		if (err && errno != EEXIST)
-			return err;
+		if (err) {
+			if (dcheck && errno == EEXIST) {
+				int err2 = mkdirp_check_dir(name);
+				if (err2)
+					errno = ENOTDIR;
+			}
+
+			if (errno != EEXIST)
+				return err;
+		}
 
 		if (!next)
 			break;
@@ -45,13 +64,27 @@ int mkfdirp2(char *name, size_t start)
 	char *p = strrchr(name, '/');
 
 	*p = 0;
-	int err = mkdirp2(name, start);
+	int err = mkdirp2(name, start, 0);
 	if (err)
 		return err;
 
 	*p = '/';
 	return 0;
 }
+
+int mkfdirp3(char *name)
+{
+	char *p = strrchr(name, '/');
+
+	*p = 0;
+	int err = mkdirp2(name, 0, 1);
+	if (err)
+		return err;
+
+	*p = '/';
+	return 0;
+}
+
 
 static int do_rmdirr(struct iterfile *file, void *data)
 {

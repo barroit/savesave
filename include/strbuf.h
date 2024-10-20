@@ -155,7 +155,7 @@ size_t strbuf_concat_basename(struct strbuf *sb, const char *name);
 size_t strbuf_concat_path(struct strbuf *sb,
 			  const char *prefix, const char *name);
 
-extern int mkdirp2(char *name, size_t start);
+extern int mkdirp2(char *name, size_t start, int dcheck);
 
 /**
  * strbuf_mkdirp - make directory as well as its parent directories, starting
@@ -163,7 +163,7 @@ extern int mkdirp2(char *name, size_t start);
  */
 static inline int strbuf_mkdirp(struct strbuf *sb)
 {
-	return mkdirp2(sb->str, sb->baslen);
+	return mkdirp2(sb->str, sb->baslen, 0);
 }
 
 /**

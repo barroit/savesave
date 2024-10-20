@@ -20,8 +20,6 @@ void acpy_deploy(uint qs, size_t bs);
 
 int acpy_copy(const char *src, const char *dest);
 
-int __acpyreg(const char *src, const char *dest);
-
 int acpy_comp_cqe(flag_t flags);
 
 uint acpy_remains(void);

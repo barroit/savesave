@@ -8,6 +8,3 @@ make strbuf/strlist handle multibyte string
 
 ----
 handle empty file in copy routine
-
-----
-add newline between "error: command 'X' requires..." and "usage: ..."

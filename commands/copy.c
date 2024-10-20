@@ -27,10 +27,11 @@ enum cpymode {
 struct cpytsk {
 	const char *src;
 	char *dest;
+
+	mode_t mode;
+
 	struct list_head list;
 };
-
-uint mt_ts = -1;		/* thread size */
 
 uint aio_qs = 1U << 5;		/* queue size */
 size_t aio_bs = 1U << 15;	/* block size */
@@ -96,20 +97,30 @@ err:
 
 static void argv2task(int argc, const char **argv)
 {
-	size_t i;
-	struct strbuf sb = strbuf_from2(argv[argc - 1], 0, PATH_MAX);
-
 	argc -= 1;
+
+	size_t i;
+	struct strbuf sb = strbuf_from2(argv[argc], 0, PATH_MAX);
+	struct stat st;
+
 	for_each_idx(i, argc) {
 		assert_file_not_same(sb.str, argv[i]);
 
+		int err = stat(argv[i], &st);
+		if (err) {
+			warn_errno(ERRMAS_STAT_FILE(argv[i]));
+			continue;
+		}
+
 		struct cpytsk *tsk = xmalloc(sizeof(*tsk));
 		tsk->src = argv[i];
+		tsk->mode = st.st_mode;
 
 		char *tmp = xstrdup(tsk->src);
 		const char *name = basename(tmp);
 
-		strbuf_concat_basename(&sb, name);
+		if (argc > 1)
+			strbuf_concat_basename(&sb, name);
 		tsk->dest = xstrdup(sb.str);
 
 		struct cpytsk *ct;
@@ -133,7 +144,7 @@ static void argv2task(int argc, const char **argv)
 static void prepare_dest_dir(const char *name)
 {
 	int err;
-	char *dir;
+	char *cp;
 
 	err = access(name, F_OK);
 	if (err)
@@ -147,12 +158,11 @@ static void prepare_dest_dir(const char *name)
 		die(_("cannot remove dest `%s'"), name);
 
 mkdir:
-	dir = xstrdup(name);
-	err = mkfdirp(dir);
-	free(dir);
-
+	cp = xstrdup(name);
+	err = mkfdirp3(cp);
 	if (err)
-		die_errno(ERRMAS_CREAT_DIR(name));
+		die_errno(ERRMAS_CREAT_DIR(cp));
+	free(cp);
 }
 
 static inline int __mkdir(const char *name)
@@ -187,10 +197,16 @@ static void def_copy(void)
 		prepare_dest_dir(ct->dest);
 		strbuf_reset_from(&sb, ct->dest);
 
-		int err = fileiter(ct->src, def_copy_routine,
-				   &sb, FITER_LIST_DIR);
-		if (err)
-			die(ERRMAS_COPY_FILE(ct->src, ct->dest));
+		int err;
+		if (!S_ISDIR(ct->mode))
+			err = copy_regfile(ct->src, ct->dest);
+		else
+			err = fileiter(ct->src,
+				       def_copy_routine, &sb, FITER_LIST_DIR);
+		if (err) {
+			error(ERRMAS_COPY_FILE(ct->src, ct->dest));
+			continue;
+		}
 
 		list_del(&ct->list);
 		free(ct->dest);

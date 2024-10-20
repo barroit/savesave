@@ -528,7 +528,7 @@ err_out:
 	return -1;
 }
 
-int __acpyreg(const char *src, const char *dest)
+static int acpyreg(const char *src, const char *dest)
 {
 	int err;
 
@@ -544,6 +544,12 @@ int __acpyreg(const char *src, const char *dest)
 	err = acpy_file_info(src, dest, fd, &st);
 	if (err)
 		return err;
+
+	if (!st.st_size) {
+		close(fd[0]);
+		close(fd[1]);
+		return 0;
+	}
 
 	u32 len = 0;
 	u64 off = 0;
@@ -588,7 +594,7 @@ static int cp_reg_and_unsuppd(struct iterfile *src, void *data)
 	struct strbuf *dest = data;
 	strbuf_concatat_base(dest, src->dymname);
 
-	return __acpyreg(src->absname, dest->str);
+	return acpyreg(src->absname, dest->str);
 }
 
 int acpy_copy(const char *src, const char *dest)

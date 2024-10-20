@@ -27,6 +27,9 @@ int copy_regfile(const char *srcname, const char *destname)
 	if (dest == -1)
 		goto err_creat_dest;
 
+	if (!st.st_size)
+		goto done;
+
 	ret = PLATSPECOF(fd2fd_copy)(src, dest, st.st_size);
 	if (ret)
 		goto err_copy_file;
@@ -49,6 +52,7 @@ int copy_regfile(const char *srcname, const char *destname)
 		dest = -1;
 	}
 
+done:
 	if (src != -1)
 		close(src);
 	if (dest != -1)

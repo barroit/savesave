@@ -9,6 +9,8 @@
 
 int PLATSPECOF(fd2fd_copy)(int src, int dest, off_t len)
 {
+	BUG_ON(!len);
+
 	ssize_t copied;
 	do {
 		copied = copy_file_range(src, NULL, dest, NULL, len, 0);
