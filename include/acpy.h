@@ -22,8 +22,6 @@ int acpy_copy(const char *src, const char *dest);
 
 int acpy_comp_cqe(flag_t flags);
 
-uint acpy_remains(void);
-
 void acpy_drop_entries(void);
 
 #endif /* ACPY_H */

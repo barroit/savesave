@@ -7,8 +7,8 @@
  * Implementation based on the example provided by liburing and
  * https://man7.org/linux/man-pages/man7/io_uring.7.html
  *
- * Unfortunately, this io_uring does not speed up file copying. It even slows
- * the speed down compared to file_copy_range(2).
+ * IMPORTANT: See kernel source file io_uring/io_uring.c for the required
+ * barriers and atomic semantics between operations.
  */
 
 #include "acpy.h"
@@ -20,6 +20,7 @@
 #include "path.h"
 #include "alloc.h"
 #include "list.h"
+#include "barrier.h"
 
 #define MAX_ENTRIES INT16_MAX
 
@@ -123,16 +124,6 @@ retry:
 	return ret;
 }
 
-static inline int acpy_is_busy(void)
-{
-	return acpy.ents > acpy.msub;
-}
-
-uint acpy_remains(void)
-{
-	return acpy.ents;
-}
-
 static void map_addr(typeof_member(struct io_uring_params, sq_off) *so,
 		     typeof_member(struct io_uring_params, cq_off) *co)
 {
@@ -183,9 +174,6 @@ void acpy_deploy(uint qs, size_t bs)
 	acpy.mrem = (qs >> 1) * 1;
 	acpy.bs = bs;
 
-	/*
-	 * read queue depth from '/sys/block/nvme0n1/queue/nr_requests'?
-	 */
 	acpy.ring_fd = io_uring_setup(p.sq_entries, &p);
 	if (acpy.ring_fd < 0) {
 		errno = -acpy.ring_fd;
@@ -194,7 +182,9 @@ void acpy_deploy(uint qs, size_t bs)
 	}
 	assert_features(p.features);
 
-	size_t size = p.sq_off.array + p.sq_entries * sizeof(*acpy.sq.head);
+	size_t sqsz = p.sq_off.array + p.sq_entries * sizeof(*acpy.sq.head);
+	size_t cqsz = p.cq_off.cqes + p.cq_entries * sizeof(*acpy.cqes);
+	size_t size = max(sqsz, cqsz);
 	acpy.sq.base = mmap(NULL, size, URING_MMAP_PROT, URING_MMAP_FLAG,
 			    acpy.ring_fd, IORING_OFF_SQ_RING);
 
@@ -229,9 +219,9 @@ err:
  * Peek a CQE from CQ
  * Return -EAGAIN if CQ is empty.
  */
-static int peekcqe(struct io_uring_cqe **cqe)
+static int peek_cqe(struct io_uring_cqe **cqe)
 {
-	u32 tail = __atomic_load_n(acpy.cq.tail, __ATOMIC_ACQUIRE);
+	u32 tail = smp_load_acquire(acpy.cq.tail);
 	u32 head = *acpy.cq.head;
 
 	if (tail == head)
@@ -245,12 +235,13 @@ static int peekcqe(struct io_uring_cqe **cqe)
  * Wait a CQE to complete.
  * On error, -EBADR is returned. In this case, the program should terminate.
  */
-static int waitcqe(struct io_uring_cqe **cqe)
+static int wait_cqe(struct io_uring_cqe **cqe)
 {
-	int err = peekcqe(cqe);
+	int err = peek_cqe(cqe);
 	if (!err)
 		return 0;
 
+	BUG_ON(!acpy.ents);
 	/*
 	 * Impossible return value in this path (until 6.11)
 	 *	EAGAIN	EBADF	EBADFD		EEXIST		EINVAL
@@ -263,38 +254,23 @@ static int waitcqe(struct io_uring_cqe **cqe)
 	if (err)
 		return err;
 
-	err = peekcqe(cqe);
+	err = peek_cqe(cqe);
 	BUG_ON(err);
 
 	return 0;
 }
 
-static void compcqe(void)
-{
-	u32 head = *acpy.cq.head;
-	head += 1;
-	__atomic_store_n(acpy.cq.head, head, __ATOMIC_RELEASE);
-}
-
 static struct io_uring_sqe *acquire_sqe(void)
 {
-	u32 head = __atomic_load_n(acpy.sq.head, __ATOMIC_ACQUIRE);
+	u32 head = smp_load_acquire(acpy.sq.head);
 	u32 tail = *acpy.sq.tail;
-	u32 new = tail & acpy.sq.mask;
 
 	if (tail + 1 == head)
 		return NULL;
 
-	return &acpy.sqes[new];
+	return &acpy.sqes[tail & acpy.sq.mask];
 }
 
-static void push_sqe(void)
-{
-	u32 tail = *acpy.sq.tail;
-
-	tail += 1;
-	__atomic_store_n(acpy.sq.tail, tail, __ATOMIC_RELEASE);
-}
 
 static void describe_sqe(struct io_uring_sqe *sqe, struct acpy_ud *ud)
 {
@@ -312,29 +288,13 @@ static void describe_sqe(struct io_uring_sqe *sqe, struct acpy_ud *ud)
 	sqe->user_data = (typeof(sqe->user_data))ud;
 }
 
-static void inform_sq(void)
-{
-	/*
-	 * We need a full memory barrier before checking for
-	 * IORING_SQ_NEED_WAKEUP after updating the sq tail
-	 */
-	__atomic_thread_fence(__ATOMIC_SEQ_CST);
-
-	u32 flags = __atomic_load_n(acpy.sq.flags, __ATOMIC_RELAXED);
-	if (flags & IORING_SQ_NEED_WAKEUP)
-		/*
-		 * No error in this path
-		 */
-		io_uring_enter(acpy.ring_fd, 0, 0, IORING_ENTER_SQ_WAKEUP);
-}
-
 /*
  * Submit a asynchronous io request.
  * Return -EBUSY if there's no room to make this request.
  */
 static int submit_request(int *fd, u32 len, u64 off, u32 *fd_usage)
 {
-	if (acpy_is_busy())
+	if (acpy.ents > acpy.msub)
 		return -EBUSY;
 
 	struct io_uring_sqe *sqe = acquire_sqe();
@@ -363,10 +323,14 @@ static int submit_request(int *fd, u32 len, u64 off, u32 *fd_usage)
 
 	describe_sqe(sqe, ud);
 
-	push_sqe();
+	WRITE_ONCE(acpy.sq.tail, *acpy.sq.tail + 1);
 	acpy.ents++;
 
-	inform_sq();
+	smp_mb();
+
+	u32 flags = READ_ONCE(acpy.sq.flags);
+	if (flags & IORING_SQ_NEED_WAKEUP)
+		io_uring_enter(acpy.ring_fd, 0, 0, IORING_ENTER_SQ_WAKEUP);
 	return 0;
 }
 
@@ -378,8 +342,13 @@ static void resubmit_request(struct acpy_ud *ud)
 	describe_sqe(sqe, ud);
 	ud->fd_ref[ud->fd_idx]++;
 
-	push_sqe();
-	inform_sq();
+	WRITE_ONCE(acpy.sq.tail, *acpy.sq.tail + 1);
+
+	smp_mb();
+
+	u32 flags = READ_ONCE(acpy.sq.flags);
+	if (flags & IORING_SQ_NEED_WAKEUP)
+		io_uring_enter(acpy.ring_fd, 0, 0, IORING_ENTER_SQ_WAKEUP);
 }
 
 static void drop_user_data(struct acpy_ud *ud)
@@ -438,7 +407,7 @@ int acpy_comp_cqe(flag_t flags)
 	struct io_uring_cqe *cqe;
 
 again:
-	err = waitcqe(&cqe);
+	err = wait_cqe(&cqe);
 	if (err)
 		return warn(ERRMAS_ACPY_LOWMEM);
 
@@ -461,8 +430,8 @@ again:
 			drop_user_data(ud);
 		}
 
-		compcqe();
-	} while (!(err = peekcqe(&cqe)));
+		smp_store_release(acpy.cq.head, *acpy.cq.head + 1);
+	} while (!(err = peek_cqe(&cqe)));
 
 	if (acpy.ents > acpy.mrem)
 		goto again;
@@ -479,7 +448,7 @@ __cold void acpy_drop_entries(void)
 	int err;
 
 again:
-	err = waitcqe(&cqe);
+	err = wait_cqe(&cqe);
 	if (err)
 		die(ERRMAS_ACPY_LOWMEM);
 
@@ -489,7 +458,7 @@ again:
 		ud->fd_ref[ud->fd_idx]--;
 		acpy.ents--;
 		drop_user_data(ud);
-	} while (!(err = peekcqe(&cqe)));
+	} while (!(err = peek_cqe(&cqe)));
 
 	if (acpy.ents)
 		goto again;
@@ -532,7 +501,7 @@ static int acpyreg(const char *src, const char *dest)
 {
 	int err;
 
-	if (acpy_is_busy()) {
+	if (acpy.ents > acpy.msub) {
 		err = acpy_comp_cqe(0);
 		if (err)
 			goto err_proc_res;

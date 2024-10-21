@@ -48,4 +48,10 @@ extern void __noreturn __die_routine(const char *prf,
 	((a) + (b));							\
 })
 
+/*
+ * Do not perform operations that produce side effects
+ */
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
+
 #endif /* CALC_H */
