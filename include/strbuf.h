@@ -105,7 +105,7 @@ static inline size_t strbuf_concatat_base(struct strbuf *sb, const char *str)
 /**
  * strbuf_printf - produce output to strbuf according to format
  */
-size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...);
+size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...) __nonnull(2);
 
 /**
  * strbuf_trunc - truncate strbuf

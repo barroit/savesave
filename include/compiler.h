@@ -22,6 +22,16 @@
 #define __noreturn \
 	__attribute__((noreturn))
 
+/*
+ * I'm fucking using __, no matter what!
+ */
+#ifdef __nonnull
+# undef __nonnull
+#endif
+
+#define __nonnull(...) \
+	__attribute__((nonnull(__VA_ARGS__)))
+
 #define likely(x)   __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
 
