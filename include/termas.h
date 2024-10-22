@@ -99,8 +99,4 @@ const char *strwinerror(void);
 #define ERRMAS_REMOVE_FILE(name) \
 	_("failed to remove file `%s'"), name
 
-void setup_lr_logging(void);
-
-void teardown_lr_logging(void);
-
 #endif /* TERMAS_H */

@@ -9,8 +9,6 @@
 #include "robio.h"
 #include "list.h"
 #include "alloc.h"
-#include "strbuf.h"
-#include "path.h"
 
 #define UPDATE_BUF(buf, n, len)	\
 do {				\
@@ -226,42 +224,4 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 	vreportf(stderr, prf, fmt, ap, NULL);
 
 	exit(128);
-}
-
-void setup_lr_logging(void)
-{
-	const char *name = log_path();
-	int fd = flexcreat(name);
-
-	setbuf(stdout, NULL);
-	setbuf(stderr, NULL);
-
-	if (fd == -1)
-		warn_errno(_("failed to create log file `%s' for long-running task"),
-			   name);
-	else if (dup2(fd, STDOUT_FILENO) == -1)
-		warn_errno(_("failed to redirect stdout to `%s' for long-running task"),
-			   name);
-	else if (dup2(fd, STDERR_FILENO) == -1)
-		warn_errno(_("failed to redirect stderr to `%s' for long-running task"),
-			   name);
-
-	close(fd);
-}
-
-void teardown_lr_logging(void)
-{
-	const char *name = log_path();
-
-	struct stat st;
-	int err;
-
-	err = stat(name, &st);
-	if (err)
-		return;
-
-	if (st.st_size != 0)
-		return;
-
-	unlink(name);
 }
