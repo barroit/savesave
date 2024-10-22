@@ -10,7 +10,7 @@
 
 #ifdef NDEBUG
 # define DEBUGGING() if (0)
-# define BUG_ON(cond) do {} while (0)
+# define BUG_ON(cond) do { if (cond); } while (0)
 #else
 # define DEBUGGING() if (1)
 # define BUG_ON(cond) assert(!(cond))

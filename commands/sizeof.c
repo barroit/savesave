@@ -22,7 +22,7 @@ struct dirinfo {
 	uint dirs;
 };
 
-int accumsize(struct iterfile *file, void *data)
+static int accumsize(struct iterfile *file, void *data)
 {
 	struct dirinfo *info = data;
 

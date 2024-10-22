@@ -270,7 +270,7 @@ static int do_parse_shrtopt(struct argupar *ctx, const char **next)
 {
 	struct arguopt *opt = ctx->option;
 	const char *str = *next;
-	const char *arg;
+	const char *arg = ACCESS_POISON;
 
 	for_each_option(opt) {
 		if (opt->shrtname != *str)
@@ -332,7 +332,7 @@ static void register_abbrev(struct arguopt *opt, int unset,
 
 static int parse_longopt(struct argupar *ctx)
 {
-	const char *arg;
+	const char *arg = ACCESS_POISON;
 	const char *argstr = *ctx->argv;
 	const char *argsep = strchrnul(argstr, '=');
 	const char *argval;

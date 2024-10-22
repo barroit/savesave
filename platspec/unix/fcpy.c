@@ -11,7 +11,7 @@
 
 int copy_regfile(const char *srcname, const char *destname)
 {
-	int ret;
+	int ret = -1;
 	int src = open(srcname, O_RDONLY);
 	int dest = -1;
 	struct stat st;

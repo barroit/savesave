@@ -126,7 +126,7 @@ static void format_cntrl_char_advanced(char *str, size_t lasidx, size_t off,
 	}
 }
 
-void vreport_format_cntrl_char(char *str, size_t len, size_t *avail)
+static void vreport_format_cntrl_char(char *str, size_t len, size_t *avail)
 {
 	struct cntrl_char cntrl = { 0 };
 
