@@ -165,13 +165,12 @@ void acpy_deploy(uint qs, size_t bs)
 
 	struct io_uring_params p = {
 		.sq_entries = qs,
-		.cq_entries = p.sq_entries << 1,
-		.flags      = IORING_SETUP_SQPOLL | IORING_SETUP_CQSIZE,
+		.flags      = IORING_SETUP_SQPOLL,
 	};
 
 	acpy.sqsz = qs;
-	acpy.msub = (qs >> 1) * 2;
-	acpy.mrem = (qs >> 1) * 1;
+	acpy.msub = qs - 1;
+	acpy.mrem = qs >> 1;
 	acpy.bs = bs;
 
 	acpy.ring_fd = io_uring_setup(p.sq_entries, &p);
@@ -213,51 +212,6 @@ void acpy_deploy(uint qs, size_t bs)
 err:
 	acpy_disabled = 1;
 	warn(_("asynchronous io is disabled"));
-}
-
-/*
- * Peek a CQE from CQ
- * Return -EAGAIN if CQ is empty.
- */
-static int peek_cqe(struct io_uring_cqe **cqe)
-{
-	u32 tail = smp_load_acquire(acpy.cq.tail);
-	u32 head = *acpy.cq.head;
-
-	if (tail == head)
-		return -EAGAIN;
-
-	*cqe = &acpy.cqes[head & acpy.cq.mask];
-	return 0;
-}
-
-/*
- * Wait a CQE to complete.
- * On error, -EBADR is returned. In this case, the program should terminate.
- */
-static int wait_cqe(struct io_uring_cqe **cqe)
-{
-	int err = peek_cqe(cqe);
-	if (!err)
-		return 0;
-
-	BUG_ON(!acpy.ents);
-	/*
-	 * Impossible return value in this path (until 6.11)
-	 *	EAGAIN	EBADF	EBADFD		EEXIST		EINVAL
-	 *	EFAULT	ENXIO	EOPNOTSUPP	EINTR (handled)
-	 *
-	 * EBADR - call exit(3)
-	 * EBUSY - not seen in source
-	 */
-	err = io_uring_enter(acpy.ring_fd, 0, 1, IORING_ENTER_GETEVENTS);
-	if (err)
-		return err;
-
-	err = peek_cqe(cqe);
-	BUG_ON(err);
-
-	return 0;
 }
 
 static struct io_uring_sqe *acquire_sqe(void)
@@ -401,20 +355,63 @@ free_strbuf:
 	return -1;
 }
 
-int acpy_comp_cqe(flag_t flags)
+/*
+ * Peek a CQE from CQ
+ * Return -EAGAIN if CQ is empty.
+ */
+static struct io_uring_cqe *peek_cqe(void)
 {
-	int err;
+	u32 tail = smp_load_acquire(acpy.cq.tail);
+	u32 head = *acpy.cq.head;
+
+	if (tail == head)
+		return NULL;
+
+	return &acpy.cqes[head & acpy.cq.mask];
+}
+
+/*
+ * Wait a CQE to complete.
+ * On error, -EBADR is returned. In this case, the program should terminate.
+ */
+static struct io_uring_cqe *wait_cqe(void)
+{
+	struct io_uring_cqe *cqe = peek_cqe();
+	if (cqe)
+		return cqe;
+
+	BUG_ON(!acpy.ents);
+	/*
+	 * Impossible return value in this path (until 6.11)
+	 *	EAGAIN	EBADF	EBADFD		EEXIST		EINVAL
+	 *	EFAULT	ENXIO	EOPNOTSUPP	EINTR (handled)
+	 *
+	 * EBADR - call exit(3)
+	 * EBUSY - not seen in source
+	 */
+	int err = io_uring_enter(acpy.ring_fd, 0, 1, IORING_ENTER_GETEVENTS);
+	if (err)
+		return NULL;
+
+	cqe = peek_cqe();
+	BUG_ON(!cqe);
+	return cqe;
+}
+
+static int acpy_comp_cqe(flag_t flags)
+{
 	struct io_uring_cqe *cqe;
 
 again:
-	err = wait_cqe(&cqe);
-	if (err)
+	cqe = wait_cqe();
+	if (!cqe)
 		return warn(ERRMAS_ACPY_LOWMEM);
 
-	do {
+	while (39) {
 		if (unlikely(cqe->res < 0))
 			return handle_cqe_error(cqe);
 
+		READ_ONCE(acpy.cq.head);
 		struct acpy_ud *ud = (typeof(ud))cqe->user_data;
 
 		ud->fd_ref[ud->fd_idx]--;
@@ -431,7 +428,11 @@ again:
 		}
 
 		smp_store_release(acpy.cq.head, *acpy.cq.head + 1);
-	} while (!(err = peek_cqe(&cqe)));
+
+		cqe = peek_cqe();
+		if (!cqe)
+			break;
+	}
 
 	if (acpy.ents > acpy.mrem)
 		goto again;
@@ -442,14 +443,13 @@ again:
 	return 0;
 }
 
-__cold void acpy_drop_entries(void)
+static __cold void acpy_drop_entries(void)
 {
 	struct io_uring_cqe *cqe;
-	int err;
 
 again:
-	err = wait_cqe(&cqe);
-	if (err)
+	cqe = wait_cqe();
+	if (!cqe)
 		die(ERRMAS_ACPY_LOWMEM);
 
 	do {
@@ -458,7 +458,7 @@ again:
 		ud->fd_ref[ud->fd_idx]--;
 		acpy.ents--;
 		drop_user_data(ud);
-	} while (!(err = peek_cqe(&cqe)));
+	} while ((cqe = peek_cqe()) != NULL);
 
 	if (acpy.ents)
 		goto again;
