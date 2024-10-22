@@ -67,14 +67,6 @@ struct savesave {
 	u32 period;		/* backup period (in seconds) */
 	u8 stack;		/* maximum number of backups
 				   exist at the same time */
-
-	/*
-	 * task_* is used by baksched
-	 */
-	uint task_idx;		/* index of task array */
-	ullong task_pos;	/* position of a task array element */
-
-	struct list_head head;
 };
 
 enum {

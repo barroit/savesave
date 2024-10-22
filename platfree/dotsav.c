@@ -159,9 +159,6 @@ static void append_savesave(struct dotsav *ctx)
 	struct savesave *new = &ctx->savarr[ctx->savnl];
 	memset(new, 0, sizeof(*ctx->savarr));
 
-	new->task_idx = ctx->savnl / sizeof(ullong);
-	new->task_pos = 1 << (ctx->savnl % sizeof(ullong));
-
 	ctx->savnl++;
 }
 
