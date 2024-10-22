@@ -5,10 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#ifdef CONFIG_CC_IS_CLANG
-# pragma GCC diagnostic ignored "-Wsometimes-uninitialized"
-#endif
-
 #include "robio.h"
 
 rlim_t cntio_fdcnt;

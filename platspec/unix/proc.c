@@ -21,6 +21,7 @@ int process_is_alive(pid_t pid)
 	die_errno(_("failed to determine existence of process `%d'"), pid);
 }
 
+#ifndef detach_process
 void detach_process(void)
 {
 	int err = daemon(1, 1);
@@ -29,3 +30,4 @@ void detach_process(void)
 
 	warn_errno(_("failed to detach process from controlling terminal"));
 }
+#endif

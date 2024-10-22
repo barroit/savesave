@@ -16,7 +16,11 @@ void push_process_id(void);
 
 void pop_process_id(void);
 
+#ifdef CONFIG_NO_LONGRUNNING_DAEMON
+# define detach_process() do {} while (0)
+#else
 void detach_process(void);
+#endif
 
 void kill_process(pid_t pid, int signal);
 
