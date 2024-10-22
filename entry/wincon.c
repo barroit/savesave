@@ -10,7 +10,6 @@
 #include "maincmd.h"
 #include "proc.h"
 #include "termas.h"
-#include "atexit.h"
 
 int main(int argc, const char **argv)
 {

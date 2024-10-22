@@ -13,7 +13,6 @@
 #include "notifyicon.h"
 #include "maincmd.h"
 #include "termas.h"
-#include "atexit.h"
 #include "proc.h"
 
 int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int __)
