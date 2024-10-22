@@ -9,6 +9,7 @@
 #include "list.h"
 #include "strbuf.h"
 #include "maincmd.h"
+#include "termas.h"
 
 static const char *find_data_dirname(void)
 {
@@ -40,7 +41,7 @@ static const char *find_data_dirname(void)
 	 * Even the executable directory is not available !?
 	 * And, make compiler happy :(
 	 */
-	return (char *)(*((int **)0xdeadbeef) = NULL);
+	bug("???");
 }
 
 const char *data_dir(void)

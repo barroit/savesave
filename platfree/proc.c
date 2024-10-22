@@ -12,14 +12,14 @@
 #include "list.h"
 #include "termas.h"
 
-static int readpid(const char *name, pid_t *pid)
+static pid_t read_pid(const char *name)
 {
 	int fd;
 	char pidstr[STRPID_MAX];
 
 	fd = open(name, O_RDONLY);
 	if (fd == -1)
-		return -1;
+		return max_int_valueof(pid_t);
 
 	int nr = robread(fd, pidstr, sizeof(pidstr));
 	if (nr == sizeof(pidstr)) /* truncated? */
@@ -28,25 +28,25 @@ static int readpid(const char *name, pid_t *pid)
 		goto err_not_pid;
 
 	pidstr[nr] = 0;
-	llong __pid;
-	int ret = str2llong(pidstr, -1, &__pid, 0, max_int_valueof(*pid));
+	llong pid;
+	int ret = str2llong(pidstr, -1, &pid, 0, max_int_valueof(pid_t));
 	if (ret)
 		goto err_not_pid;
 
-	*pid = __pid;
 	close(fd);
-	return ret;
+	return pid;
 
 err_not_pid:
 	/* this error message is so fucking long :( */
-	die(_("PID found in file `%s' is malformed; ensure savesave is completely terminated and manually remove this file."),
+	die(_("pid found in file `%s' is malformed; ensure savesave "
+	    "is completely terminated and manually remove this file."),
 	    name);
 }
 
-pid_t check_unique_process(char **name, int abort)
+pid_t savesave_pid(void)
 {
-	pid_t pid;
 	size_t i;
+	pid_t pid = max_int_valueof(pid);
 	struct strbuf path = STRBUF_INIT;
 	const char *piddir[] = DATA_DIR_LIST_INIT;
 
@@ -56,30 +56,38 @@ pid_t check_unique_process(char **name, int abort)
 
 		strbuf_concat_path(&path, piddir[i], PROCID_NAME);
 
-		int err = readpid(path.str, &pid);
-		if (err)
+		pid = read_pid(path.str);
+		if (pid == max_int_valueof(pid))
 			goto next;
 
-		if (process_is_alive(pid)) {
-			if (abort)
-				goto pid_not_unique;
-			*name = path.str;
+		if (proc_is_alive(pid))
 			return pid;
-		}
 
+		/*
+		 * We have pid file, but the process associated with
+		 * that pid is dead.
+		 */
 		unlink(path.str);
+
 next:
 		strbuf_reset(&path);
 	}
 
 	strbuf_destroy(&path);
-	return max_int_valueof(pid);
-
-pid_not_unique:
-	die(_("there is already a running savesave (PID %d)"), pid);
+	return pid;
 }
 
-void push_process_id(void)
+void assert_unic_proc(void)
+{
+	pid_t pid = savesave_pid();
+
+	if (pid == max_int_valueof(pid))
+		return;
+
+	die(_("only one process allowed (running process `%d')"), pid);
+}
+
+void pid_dump(void)
 {
 	const char *name = pid_path();
 	pid_t pid = getpid();
@@ -105,7 +113,7 @@ err_init_pidfile:
 	warn(_("ensure only one savesave process runs at a time, behavior otherwise is undefined"));
 }
 
-void pop_process_id(void)
+void pid_erase(void)
 {
 	const char *name = pid_path();
 	unlink(name);

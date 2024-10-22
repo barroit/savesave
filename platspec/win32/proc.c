@@ -8,7 +8,7 @@
 #include "proc.h"
 #include "termas.h"
 
-int process_is_alive(pid_t pid)
+int proc_is_alive(pid_t pid)
 {
 	HANDLE proc = OpenProcess(SYNCHRONIZE, FALSE, pid);
 	if (proc) {
