@@ -71,16 +71,16 @@ if(CONFIG_USE_MSAN AND (CONFIG_USE_ASAN OR
 	  "incompatible with all other sanitizers.")
 endif()
 
-test_add_complie_options(CONFIG_USE_ASAN -fsanitize=address)
+test_add_compile_options(CONFIG_USE_ASAN -fsanitize=address)
 test_add_link_options(CONFIG_USE_ASAN -fsanitize=address)
 
-test_add_complie_options(CONFIG_USE_UBSAN -fsanitize=undefined)
+test_add_compile_options(CONFIG_USE_UBSAN -fsanitize=undefined)
 test_add_link_options(CONFIG_USE_UBSAN -fsanitize=undefined)
 
-test_add_complie_options(CONFIG_USE_TSAN -fsanitize=thread)
+test_add_compile_options(CONFIG_USE_TSAN -fsanitize=thread)
 test_add_link_options(CONFIG_USE_TSAN -fsanitize=thread)
 
-test_add_complie_options(CONFIG_USE_MSAN -fsanitize=memory)
+test_add_compile_options(CONFIG_USE_MSAN -fsanitize=memory)
 test_add_link_options(CONFIG_USE_MSAN -fsanitize=memory)
 
 # --------------------------------- Compiler ----------------------------------
@@ -90,15 +90,37 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_EXTENSIONS true)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-test_add_complie_options(CONFIG_COMPILER_WARNING_ALL -Wall)
+test_add_compile_options(CONFIG_COMPILER_WARNING_ALL -Wall)
 
-test_add_complie_options(CONFIG_COMPILER_WARNING_EXTRA -Wextra)
+test_add_compile_options(CONFIG_COMPILER_WARNING_EXTRA -Wextra)
 
 kselect(CONFIG_COMPILER_DEBUG)
 add_compile_options(-g${CONFIG_COMPILER_DEBUG})
 
 kselect(CONFIG_COMPILER_OPTIMIZE)
 add_compile_options(-O${CONFIG_COMPILER_OPTIMIZE})
+
+test_add_compile_options(CONFIG_ENABLE_DEBUGGING -fno-omit-frame-pointer)
+
+test_add_compile_options(CONFIG_USE_POISON -fno-strict-aliasing)
+
+add_compile_options(-Wbad-function-cast
+		    -Wformat-security
+		    -Wformat-y2k
+		    -Winit-self
+		    -Wmissing-declarations
+		    -Wmissing-prototypes
+		    -Wnested-externs
+		    -Wno-system-headers
+		    -Wold-style-definition
+		    -Wpacked
+		    -Wstrict-prototypes
+		    -Wswitch-enum
+		    -Wshadow)
+
+add_compile_options(-fshort-wchar
+		    -funsigned-char
+		    -fno-common)
 
 # ---------------------------------- Profile ----------------------------------
 set(SAVESAVE_NAME savesave)
@@ -194,7 +216,7 @@ target_link_libraries(savesave platfree platspec)
 # ------------------------------------ Dll ------------------------------------
 if(WIN32)
   target_link_libraries(savesave ws2_32 comctl32 shlwapi)
-  if(NOT CONFIG_SOURCE_NDEBUG)
+  if(CONFIG_ENABLE_DEBUGGING)
     target_link_libraries(savesave dbghelp)
   endif()
 endif()
@@ -202,7 +224,9 @@ endif()
 # -------------------------------- Definition ---------------------------------
 add_compile_definitions(_GNU_SOURCE)
 
-test_add_compile_definitions(CONFIG_SOURCE_NDEBUG NDEBUG)
+if(NOT CONFIG_ENABLE_DEBUGGING)
+  add_compile_definitions(NDEBUG)
+endif()
 
 test_add_compile_definitions(WIN32
 			     NTDDI_WIN7

@@ -3,6 +3,15 @@ mainmenu "Savesave/$(BUILD)-$(ARCH) $(SAVESAVE_VERSION) Configuration"
 
 menu "Debugging"
 
+config ENABLE_DEBUGGING
+	bool "enable debugging"
+	imply USE_ASAN
+	imply USE_UBSAN
+	imply NO_LONGRUNNING_DAEMON
+	imply SUPPRESS_ANNOTATED_LEAKS
+	imply USE_POISON
+	default y if "$(UNIX)"
+
 menu "Sanitizers"
 	depends on "$(UNIX)"
 
@@ -26,8 +35,8 @@ config NO_LONGRUNNING_DAEMON
 config SUPPRESS_ANNOTATED_LEAKS
 	bool "suppress annotated leaks"
 
-config SOURCE_NDEBUG
-	bool "define NDEBUG"
+config USE_POISON
+	bool "use poison value"
 
 if "$(WIN32)"
 config DEBUG_INTLDLL

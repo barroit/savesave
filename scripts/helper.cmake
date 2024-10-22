@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
-function(test_add_complie_options cond)
+function(test_add_compile_options cond)
   if(${cond})
     list(POP_FRONT ARGV)
     add_compile_options(${ARGV})
