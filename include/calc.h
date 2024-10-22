@@ -35,7 +35,7 @@ extern void __noreturn __die_routine(const char *prf,
 			      "%" PRIuMAX " * %" PRIuMAX ""),		\
 			      (uintmax_t)(a), (uintmax_t)(b));		\
 	}								\
-	((a) * (b));							\
+	(a) * (b);							\
 })
 
 #define st_add(a, b)							\
@@ -45,7 +45,7 @@ extern void __noreturn __die_routine(const char *prf,
 			      "%" PRIuMAX " + %" PRIuMAX ""),		\
 			      (uintmax_t)(a), (uintmax_t)(b));		\
 	}								\
-	((a) + (b));							\
+	(a) + (b);							\
 })
 
 /*
@@ -53,5 +53,9 @@ extern void __noreturn __die_routine(const char *prf,
  */
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))
+
+#define sec_to_millisec(x) st_mult(x, 1000)
+#define sec_to_microsec(x) st_mult(sec_to_millisec(x), 1000)
+#define sec_to_nanosec(x)  st_mult(sec_to_microsec(x), 1000)
 
 #endif /* CALC_H */

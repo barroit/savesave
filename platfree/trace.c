@@ -18,14 +18,14 @@ void trace_start_timer(void)
 {
 	BUG_ON(timer.start);
 
-	timer.start = gettimestamp();
+	timer.start = timestamp();
 }
 
 void trace_stop_timer(void)
 {
 	BUG_ON(!timer.start);
 
-	timer.end = gettimestamp();
+	timer.end = timestamp();
 }
 
 void __trace_print_timer(const char *name)

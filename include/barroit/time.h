@@ -10,6 +10,6 @@
 
 typedef uint64_t timestamp_t;
 
-timestamp_t gettimestamp(void);
+timestamp_t timestamp(void);
 
 #endif /* BRT_TIME_H */

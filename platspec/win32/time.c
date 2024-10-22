@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-timestamp_t gettimestamp(void)
+timestamp_t timestamp(void)
 {
 	int err;
 	static uint64_t hns, lns;

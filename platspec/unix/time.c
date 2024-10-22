@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-timestamp_t gettimestamp(void)
+timestamp_t timestamp(void)
 {
 	struct timespec ts;
 
