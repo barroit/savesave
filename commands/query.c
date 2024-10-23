@@ -39,9 +39,9 @@ static int cmd_query_path(int argc, const char **argv)
 	argupar_parse(&argc, &argv, option, usage, AP_NEED_ARGUMENT);
 
 	struct pathinfo info[] = {
-		{ "log",      log_path },
+		{ "output",   __output_path },
 		{ "home",     home_dir },
-		{ "dotsav",   dotsav_path },
+		{ "dotsav",   __dotsav_path },
 		{ "proc-id",  pid_path },
 		{ "data-dir", data_dir },
 		{ "tmp-dir",  tmp_dir },

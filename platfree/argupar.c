@@ -420,7 +420,7 @@ static void print_command_usage(const char *const *usage, struct strlist *sl)
 		int namlen = mas - str;
 		int preflen = strlen("usage: ");
 
-		strlist_split_word(sl, mas, 80 - preflen);
+		strlist_split_word(sl, mas, 80 - (preflen + namlen));
 
 		printf("%*s%.*s", preflen, pref, namlen, str);
 		puts(sl->list[0].str);

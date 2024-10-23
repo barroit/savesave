@@ -63,13 +63,18 @@ awk -F'†' '{
 }' <<< $declare >> $dest
 
 cat <<EOF >> $dest
-
 int cmd_main(int argc, const char **argv);
 
-size_t retrieve_dotsav(struct savesave **sav);
-
+/*
+ * Do not use these cm_*_path variables directly. Instead, use corresponding
+ * *_path() wrapper functions declared in path.h.
+ */
 extern const char *cm_dotsav_path;
 extern const char *cm_output_path;
+
+extern int cm_has_output;
+
+size_t retrieve_dotsav(struct savesave **sav);
 
 #define APOPT_MAINCOMMAND(v) \\
 EOF

@@ -68,9 +68,10 @@ static void sav2argv(const char *name, int *argc, const char ***argv)
 		if (strcmp(sav->name, name) == 0)
 			break;
 
-	if (sav_is_last(sav))
-		die(_("no matching sav `%s' found in `%s'"),
-		    name, cm_dotsav_path);
+	if (sav_is_last(sav)) {
+		const char *path = dotsav_path();
+		die(_("no matching sav `%s' found in `%s'"), name, path);
+	}
 
 	/*
 	 * -1 for removing the trailing dot

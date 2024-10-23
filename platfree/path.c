@@ -10,6 +10,7 @@
 #include "list.h"
 #include "strbuf.h"
 #include "termas.h"
+#include "noleak.h"
 
 static const char *find_data_dirname(void)
 {
@@ -93,12 +94,9 @@ const char *locale_dir(void)
 	return path;
 }
 
-const char *dotsav_path(void)
+const char *__dotsav_path(void)
 {
 	static const char *path;
-
-	if (!path)
-		path = getenv("SAVESAVE");
 
 	if (!path) {
 		struct strbuf sb = STRBUF_INIT;
@@ -111,15 +109,44 @@ const char *dotsav_path(void)
 	return path;
 }
 
-const char *log_path(void)
+const char *dotsav_path(void)
 {
 	static const char *path;
 
 	if (!path)
-		path = cm_output_path;
+		path = cm_dotsav_path;
+
+	if (!path)
+		path = getenv("SAVESAVE");
+
+	if (!path)
+		path = __dotsav_path();
+
+	return path;
+}
+
+const char *__output_path(void)
+{
+	static const char *path;
+
 	if (!path)
 		path = filename_at_datadir(SAVLOG_NAME);
-	BUG_ON(!path);
+
+	return path;
+}
+
+const char *output_path(void)
+{
+	if (!cm_has_output)
+		return "none";
+
+	static const char *path;
+
+	if (!path)
+		path = cm_output_path;
+
+	if (!path)
+		path = __output_path();
 
 	return path;
 }

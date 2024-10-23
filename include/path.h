@@ -36,9 +36,25 @@ const char *pid_path(void);
 
 const char *locale_dir(void);
 
+/*
+ * Return default (built-in) path of dotsav.
+ */
+const char *__dotsav_path(void);
+
+/*
+ * Similar to __dotsav_path(), but return value is affected by cm_dotsav_path.
+ */
 const char *dotsav_path(void);
 
-const char *log_path(void);
+/*
+ * Return default (built-in) path of log file.
+ */
+const char *__output_path(void);
+
+/*
+ * Similar to __output_path(), but return value is affected by cm_output_path.
+ */
+const char *output_path(void);
 
 /*
  * Same as readlink(2) but no truncation happens (target is intact)
