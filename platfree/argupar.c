@@ -623,7 +623,7 @@ void argupar_parse(int *argc, const char ***argv,
 
 	if (!ctx.argc) {
 		if (!(flags & AP_NEED_ARGUMENT))
-			return;
+			goto parse_done;
 		goto help_no_arg;
 	}
 
