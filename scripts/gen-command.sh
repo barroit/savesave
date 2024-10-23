@@ -64,6 +64,13 @@ awk -F'†' '{
 
 cat <<EOF >> $dest
 
+int cmd_main(int argc, const char **argv);
+
+size_t retrieve_dotsav(struct savesave **sav);
+
+extern const char *cm_dotsav_path;
+extern const char *cm_output_path;
+
 #define APOPT_MAINCOMMAND(v) \\
 EOF
 

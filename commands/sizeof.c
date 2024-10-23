@@ -11,7 +11,6 @@
 #include "argupar.h"
 #include "termas.h"
 #include "list.h"
-#include "maincmd.h"
 #include "dotsav.h"
 #include "strlist.h"
 #include "fileiter.h"

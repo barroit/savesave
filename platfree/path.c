@@ -5,10 +5,10 @@
  * Contact: barroit@linux.com
  */
 
+#include "command.h"
 #include "path.h"
 #include "list.h"
 #include "strbuf.h"
-#include "maincmd.h"
 #include "termas.h"
 
 static const char *find_data_dirname(void)
@@ -116,7 +116,7 @@ const char *log_path(void)
 	static const char *path;
 
 	if (!path)
-		path = userspec.lr_log_path;
+		path = cm_output_path;
 	if (!path)
 		path = filename_at_datadir(SAVLOG_NAME);
 	BUG_ON(!path);

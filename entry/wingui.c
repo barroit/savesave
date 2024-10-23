@@ -5,13 +5,13 @@
  * Contact: barroit@linux.com
  */
 
+#include "command.h"
 #include "i18n.h"
 #include "atenter.h"
 #include "console.h"
 #include "getargv.h"
 #include "window.h"
 #include "notifyicon.h"
-#include "maincmd.h"
 #include "termas.h"
 #include "proc.h"
 

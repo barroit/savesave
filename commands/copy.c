@@ -11,7 +11,6 @@
 #include "mkdir.h"
 #include "strbuf.h"
 #include "alloc.h"
-#include "maincmd.h"
 #include "dotsav.h"
 #include "noleak.h"
 #include "list.h"
@@ -71,7 +70,7 @@ static void sav2argv(const char *name, int *argc, const char ***argv)
 
 	if (sav_is_last(sav))
 		die(_("no matching sav `%s' found in `%s'"),
-		    name, userspec.dotsav_path);
+		    name, cm_dotsav_path);
 
 	/*
 	 * -1 for removing the trailing dot

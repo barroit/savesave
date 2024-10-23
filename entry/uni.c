@@ -5,7 +5,7 @@
  * Contact: barroit@linux.com
  */
 
-#include "maincmd.h"
+#include "command.h"
 
 int main(int argc, const char **argv)
 {

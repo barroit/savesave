@@ -16,15 +16,20 @@
 
 #define CMDDESCRIP(usage)
 
-int cmd_backup(int argc, const char **argv);
 int cmd_copy(int argc, const char **argv);
 int cmd_help(int argc, const char **argv);
 int cmd_query(int argc, const char **argv);
 int cmd_sizeof(int argc, const char **argv);
 int cmd_version(int argc, const char **argv);
 
+int cmd_main(int argc, const char **argv);
+
+size_t retrieve_dotsav(struct savesave **sav);
+
+extern const char *cm_dotsav_path;
+extern const char *cm_output_path;
+
 #define APOPT_MAINCOMMAND(v) \
-	APOPT_SUBCMD("backup", (v), N_("Start backup task in background"), cmd_backup, CMD_USEDOTSAV), \
 	APOPT_SUBCMD("copy", (v), N_("Copy a file"), cmd_copy, 0), \
 	APOPT_SUBCMD("help", (v), N_("Display help information about Savesave"), cmd_help, 0), \
 	APOPT_SUBCMD("query", (v), N_("Query default information of Savesave"), cmd_query, 0), \

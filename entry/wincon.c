@@ -5,9 +5,9 @@
  * Contact: barroit@linux.com
  */
 
+#include "command.h"
 #include "i18n.h"
 #include "atenter.h"
-#include "maincmd.h"
 #include "proc.h"
 #include "termas.h"
 
