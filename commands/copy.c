@@ -18,6 +18,7 @@
 #include "fcpy.h"
 #include "acpy.h"
 #include "path.h"
+#include "cls.h"
 
 enum cpymode {
 	CPY_DEFAULT,	/* appropriate syscall */
@@ -28,7 +29,7 @@ struct cpytsk {
 	const char *src;
 	char *dest;
 
-	mode_t mode;
+	mode_t mode;	/* st_mode */
 
 	struct list_head list;
 };
@@ -40,6 +41,24 @@ static int force_exec;
 static enum cpymode copy_mode;
 
 static LIST_HEAD(tskl);
+
+static void cleanup_cpytsk(void)
+{
+	if (list_is_empty(&tskl))
+		return;
+
+	struct cpytsk *ct, *tmp;
+	list_for_each_entry_safe(ct, tmp, &tskl, list) {
+		if (S_ISDIR(ct->mode))
+			rmdirr(ct->dest);
+		else
+			unlink(ct->dest);
+
+		list_del(&ct->list);
+		free(ct->dest);
+		free(ct);
+	}
+}
 
 static void sav2argv(const char *name, int *argc, const char ***argv)
 {
@@ -247,6 +266,7 @@ CMDDESCRIP("Copy a file")
 		APOPT_COUNTUP('f', "force", &force_exec,
 			      N_("overwrite existing one")),
 
+		APOPT_GROUP("List of file copying methods"),
 		APOPT_CMDMODE(0, "asynced", &copy_mode, CPY_ASYNCED,
 			      N_("copy files using asynchronous io")),
 
@@ -274,6 +294,9 @@ CMDDESCRIP("Copy a file")
 		[CPY_DEFAULT]  = def_copy,
 		[CPY_ASYNCED]  = aio_copy,
 	};
+
+	cls_push(cleanup_cpytsk);
+	cls_apply();
 
 	funcmap[copy_mode]();
 	exit(0);
