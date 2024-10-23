@@ -21,13 +21,15 @@
  */
 # define CONSTRUCTOR(name) void name(void)
 
-CONSTRUCTOR(init_u8tstr_table);
+CONSTRUCTOR(setup_atexit);
 CONSTRUCTOR(check_libzstd_compat);
+CONSTRUCTOR(check_kernel_version);
 CONSTRUCTOR(check_os_version);
 CONSTRUCTOR(setup_crt_report_hook);
 
 #define CONSTRUCTOR_LIST_INIT { \
-	init_u8tstr_table, \
+	setup_atexit, \
+	check_kernel_version, \
 	setup_crt_report_hook, \
 }
 
@@ -36,7 +38,7 @@ CONSTRUCTOR(setup_crt_report_hook);
 	check_os_version, \
 }
 
-typedef typeof(&init_u8tstr_table) constructor_t;
+typedef typeof(&setup_atexit) constructor_t;
 #endif
 
 #endif /* BRTGEN_CONSTRUCTOR_H */

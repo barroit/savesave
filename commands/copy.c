@@ -295,9 +295,7 @@ CMDDESCRIP("Copy a file")
 		[CPY_ASYNCED]  = aio_copy,
 	};
 
-	cls_push(cleanup_cpytsk);
-	cls_apply();
-
+	cls_add(cleanup_cpytsk);
 	funcmap[copy_mode]();
 	exit(0);
 }

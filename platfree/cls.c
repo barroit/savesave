@@ -8,6 +8,7 @@
 #include "cls.h"
 #include "list.h"
 #include "alloc.h"
+#include "constructor.h"
 
 static LIST_HEAD(clsl);
 
@@ -16,7 +17,7 @@ struct cls {
 	struct list_head list;
 };
 
-void cls_push(cls_callback_t cb)
+void cls_add(cls_callback_t cb)
 {
 	struct cls *c = xmalloc(sizeof(*c));
 
@@ -24,7 +25,7 @@ void cls_push(cls_callback_t cb)
 	list_add_tail(&c->list, &clsl);
 }
 
-cls_callback_t cls_pop(void)
+cls_callback_t cls_rm(void)
 {
 	if (list_is_empty(&clsl))
 		return NULL;
@@ -37,12 +38,14 @@ cls_callback_t cls_pop(void)
 	return cb;
 }
 
-void cls_apply(void)
+static void cls_apply(void)
 {
-	while (39) {
-		cls_callback_t cb = cls_pop();
-		if (!cb)
-			break;
-		atexit(cb);
-	}
+	cls_callback_t cb;
+	while ((cb = cls_rm()) != NULL)
+		cb();
+}
+
+CONSTRUCTOR(setup_atexit)
+{
+	atexit(cls_apply);
 }
