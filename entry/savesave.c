@@ -15,33 +15,14 @@
 #define SAVESAVE_USAGE \
 "savesave [--dotsav=<path>] [--output=<path> | --no-output] <command> [<args>]"
 
-static struct savesave *savarr;
-static size_t savnl;
-
 const char *cm_dotsav_path;
 const char *cm_output_path = (void *)-39;
 
 int cm_has_output = 1;
 
-static void prepare_dotsav(void)
-{
-	const char *name = dotsav_path();
-
-	if (access(name, F_OK | R_OK) != 0)
-		die(_("no dotsav (.savesave) was provided"));
-
-	char *savstr = read_dotsav(name);
-
-	savnl = dotsav_parse(savstr, &savarr);
-	free(savstr);
-
-	if (!savnl)
-		die(_("no configuration found in dotsav `%s'"), name);
-}
-
 int cmd_main(int argc, const char **argv)
 {
-	subcmd_t runcmd = NULL;
+	subcmd_t runcmd;
 	struct arguopt option[] = {
 		APOPT_FILENAME(0, "dotsav", &cm_dotsav_path,
 			       N_("dotsav file")),
@@ -67,25 +48,5 @@ int cmd_main(int argc, const char **argv)
 	else if (cm_output_path == NULL)
 		cm_has_output = 0;
 
-	struct arguopt *cmd = option;
-	for_each_option(cmd) {
-		if (runcmd != cmd->subcmd)
-			continue;
-
-		if (cmd->flags & CMD_USEDOTSAV)
-			prepare_dotsav();
-
-		break;
-	}
-
 	return runcmd(argc, argv);
-}
-
-size_t retrieve_dotsav(struct savesave **sav)
-{
-	if (!savarr)
-		prepare_dotsav();
-
-	*sav = savarr;
-	return savnl;
 }

@@ -50,10 +50,6 @@ cat <<EOF > $dest
 #ifndef BRTGEN_COMMAND_H
 #define BRTGEN_COMMAND_H
 
-#define USEDOTSAV   /* use dotsav */
-
-#define CMD_USEDOTSAV   (1 << 1)
-
 #define CMDDESCRIP(usage)
 
 EOF
@@ -73,8 +69,6 @@ extern const char *cm_dotsav_path;
 extern const char *cm_output_path;
 
 extern int cm_has_output;
-
-size_t retrieve_dotsav(struct savesave **sav);
 
 #define APOPT_MAINCOMMAND(v) \\
 EOF

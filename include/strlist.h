@@ -61,9 +61,9 @@ void __strlist_join_member(struct strlist *sl, void *arr,
  *
  * note: Member must be of type const char * or char *
  */
-#define strlist_join_member(sl, arr, nl, memb) \
-	__strlist_join_member(sl, arr, sizeof(*arr), nl, \
-			      offsetof(typeof(*savarr), memb))
+#define strlist_join_member(sl, arr, nl, memb)			\
+	__strlist_join_member(sl, arr, sizeof(*arr), nl,	\
+			      offsetof(typeof(*arr), memb))
 
 /**
  * strlist_pop2 - Remove an element from sl, and return the value of element

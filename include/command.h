@@ -10,10 +10,6 @@
 #ifndef BRTGEN_COMMAND_H
 #define BRTGEN_COMMAND_H
 
-#define USEDOTSAV   /* use dotsav */
-
-#define CMD_USEDOTSAV   (1 << 1)
-
 #define CMDDESCRIP(usage)
 
 int cmd_backup(int argc, const char **argv);
@@ -33,10 +29,8 @@ extern const char *cm_output_path;
 
 extern int cm_has_output;
 
-size_t retrieve_dotsav(struct savesave **sav);
-
 #define APOPT_MAINCOMMAND(v) \
-	APOPT_SUBCMD("backup", (v), N_("Start backup task in background"), cmd_backup, CMD_USEDOTSAV), \
+	APOPT_SUBCMD("backup", (v), N_("Start backup task in background"), cmd_backup, 0), \
 	APOPT_SUBCMD("copy", (v), N_("Copy a file"), cmd_copy, 0), \
 	APOPT_SUBCMD("help", (v), N_("Display help information about Savesave"), cmd_help, 0), \
 	APOPT_SUBCMD("query", (v), N_("Query default information of Savesave"), cmd_query, 0), \

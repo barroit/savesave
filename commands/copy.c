@@ -61,8 +61,9 @@ static void cleanup_cpytsk(void)
 
 static void sav2argv(const char *name, int *argc, const char ***argv)
 {
-	struct savesave *sav;
-	retrieve_dotsav(&sav);
+	dotsav_prepare();
+
+	struct savesave *sav = dotsav_array;
 
 	for_each_sav(sav)
 		if (strcmp(sav->name, name) == 0)

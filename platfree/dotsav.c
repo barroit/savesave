@@ -63,7 +63,7 @@ struct dotsav {
 	size_t savcap;
 };
 
-char *read_dotsav(const char *name)
+static char *read_dotsav(const char *name)
 {
 	int fd = open(name, O_RDONLY);
 	if (fd == -1)
@@ -356,3 +356,22 @@ void dotsav_print(struct savesave *sav)
 		putchar('\n');
 	}
 }
+
+size_t dotsav_size;
+struct savesave *dotsav_array;
+
+void dotsav_prepare(void)
+{
+	const char *name = dotsav_path();
+
+	if (access(name, F_OK | R_OK) != 0)
+		die(_("no dotsav (.savesave) was provided"));
+
+	char *savstr = read_dotsav(name);
+	dotsav_size = dotsav_parse(savstr, &dotsav_array);
+	free(savstr);
+
+	if (!dotsav_size)
+		die(_("no configuration found in dotsav `%s'"), name);
+}
+

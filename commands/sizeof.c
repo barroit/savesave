@@ -57,14 +57,10 @@ CMDDESCRIP("Calculate file size of given path")
 		NULL,
 	};
 
-	argupar_parse(&argc, &argv, option, usage,
-		      AP_NEED_ARGUMENT | AP_STOPAT_NONOPT);
-
-	struct savesave *savarr;
-	size_t savnl = 0;
+	argupar_parse(&argc, &argv, option, usage, AP_STOPAT_NONOPT);
 
 	if (from_dotsav)
-		savnl = retrieve_dotsav(&savarr);
+		dotsav_prepare();
 	else if (!argc)
 		die(_("sizeof requires pathspec"));
 
@@ -73,8 +69,9 @@ CMDDESCRIP("Calculate file size of given path")
 	struct strlist sl;
 
 	strlist_init(&sl, STRLIST_USEREF);
-	if (savnl)
-		strlist_join_member(&sl, savarr, savnl, save_prefix);
+	if (dotsav_size)
+		strlist_join_member(&sl, dotsav_array,
+				    dotsav_size, save_prefix);
 	strlist_join_argv(&sl, argv);
 
 	for_each_idx(i, sl.nl) {

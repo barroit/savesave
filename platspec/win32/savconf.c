@@ -9,7 +9,7 @@
 #include "fileiter.h"
 #include "list.h"
 
-void format_dotsav(struct savesave *dotsav, size_t n)
+void dotsav_format(struct savesave *dotsav, size_t n)
 {
 	size_t i;
 	for_each_idx(i, n) {
