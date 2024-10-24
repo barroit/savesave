@@ -2,9 +2,3 @@
 
 ----
 make strbuf/strlist handle multibyte string
-
-----
---silent
-
-----
-handle empty file in copy routine

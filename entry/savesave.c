@@ -7,9 +7,6 @@
 
 #include "argupar.h"
 #include "termas.h"
-#include "dotsav.h"
-#include "list.h"
-#include "proc.h"
 #include "path.h"
 
 #define SAVESAVE_USAGE \
@@ -19,6 +16,30 @@ const char *cm_dotsav_path;
 const char *cm_output_path = (void *)-39;
 
 int cm_has_output = 1;
+
+static void redirect_output(void)
+{
+	const char *name = output_path();
+
+	int fd = flexcreat(name);
+	if (fd == -1) {
+		warn_errno(ERRMAS_OPEN_FILE(name));
+		return;
+	}
+
+	if (dup2(fd, STDOUT_FILENO) == -1) {
+		warn_errno(_("failed to redirect stdout to %s"), name);
+		goto err_out;
+	}
+
+	if (dup2(fd, STDERR_FILENO) == -1) {
+		warn_errno(_("failed to redirect stderr to %s"), name);
+		goto err_out;
+	}
+
+err_out:
+	close(fd);
+}
 
 int cmd_main(int argc, const char **argv)
 {
@@ -47,6 +68,9 @@ int cmd_main(int argc, const char **argv)
 		cm_output_path = NULL;
 	else if (cm_output_path == NULL)
 		cm_has_output = 0;
+
+	if (!cm_has_output || cm_output_path)
+		redirect_output();
 
 	return runcmd(argc, argv);
 }

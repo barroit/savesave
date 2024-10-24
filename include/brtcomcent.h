@@ -101,6 +101,8 @@
 
 #define MKDIR(path) mkdir(path, 0775)
 
+#define NULL_DEVICE "/dev/null"
+
 #elif defined(_WIN32)
 
 char *strchrnul(const char *s, int c);
@@ -149,6 +151,8 @@ void __noreturn winexit(int code);
 
 #define STDOUT_FILENO ({ fileno(stdout); })
 #define STDERR_FILENO ({ fileno(stderr); })
+
+#define NULL_DEVICE "NUL"
 #endif
 
 #include "cntio.h"

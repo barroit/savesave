@@ -138,7 +138,7 @@ const char *__output_path(void)
 const char *output_path(void)
 {
 	if (!cm_has_output)
-		return "none";
+		return NULL_DEVICE;
 
 	static const char *path;
 
