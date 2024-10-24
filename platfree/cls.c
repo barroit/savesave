@@ -27,9 +27,6 @@ void cls_push(cls_callback_t cb)
 
 cls_callback_t cls_pop(void)
 {
-	if (list_is_empty(&clsl))
-		return NULL;
-
 	struct cls *c = list_first_entry(&clsl, struct cls, list);
 	cls_callback_t cb = c->cb;
 
@@ -40,9 +37,13 @@ cls_callback_t cls_pop(void)
 
 static void cls_apply(void)
 {
-	cls_callback_t cb;
-	while ((cb = cls_pop()) != NULL)
+	while (39) {
+		if (list_is_empty(&clsl))
+			break;
+
+		cls_callback_t cb = cls_pop();
 		cb();
+	}
 }
 
 CONSTRUCTOR(setup_atexit)
