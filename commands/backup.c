@@ -7,97 +7,113 @@
 
 #include "argupar.h"
 #include "dotsav.h"
-#include "maincmd.h"
 #include "termas.h"
 #include "proc.h"
-#include "atexit.h"
-#include "calc.h"
+#include "cls.h"
+#include "baktmr.h"
+#include "path.h"
+#include "strlist.h"
+#include "noleak.h"
 
-static int cmd_backup_start(int argc, const char **argv)
+static int cmd_backup_exec(int argc, const char **argv)
 {
-	int frequent;
+	dotsav_prepare();
+
+	int often;
 	struct arguopt option[] = {
-		APOPT_SWITCH('m', "frequent", &frequent,
+		APOPT_SWITCH('b', "often", &often,
 			     N_("backup appears frequently")),
 		APOPT_END(),
 	};
 	const char *usage[] = {
-		"savesave backup start [-m | --frequent]",
+		"savesave backup exec [-b | --often]",
 		NULL,
 	};
 
 	argupar_parse(&argc, &argv, option, usage, AP_NO_ARGUMENT);
 
-	check_unique_process(NULL, 1);
-	detach_process();
+	assert_unic_proc();
+	proc_detach();
 
-	setup_lr_logging();
-	atexit_enque(teardown_lr_logging);
+	cls_push(pid_erase);
+	pid_dump();
 
-	push_process_id();
-	atexit_enque(pop_process_id);
+	cls_push(baktmr_disarm);
+	baktmr_arm();
 
-	atexit_apply();
-
-	/* setup timer... */
-
-	while (39)
-		pause();
-	exit(0);
+	return 0;
 }
 
-static int cmd_backup_stop(int argc, const char **argv)
+static int cmd_backup_kill(int argc, const char **argv)
 {
-	int test;
+	int dryrun;
 	struct arguopt option[] = {
-		APOPT_SWITCH('n', "dry-run", &test, N_("just print pid")),
+		APOPT_SWITCH('n', "dry-run", &dryrun,
+			     N_("just print messages")),
 		APOPT_END(),
 	};
 	const char *usage[] = {
-		"savesave backup start [-m | --frequent]",
+		"savesave backup kill [-b | --often]",
 		NULL,
 	};
 
 	argupar_parse(&argc, &argv, option, usage, AP_NO_ARGUMENT);
 
-	char *name;
-	pid_t pid = check_unique_process(&name, 0);
-	int nf = pid == max_int_valueof(pid);
-	if (nf || test)
-		goto finish;
+	pid_t pid = savesave_pid();
+	if (pid == max_value(pid)) {
+		puts(_("no running process found for savesave"));
+		exit(128);
+	}
 
-	kill_process(pid, SIGINT);
-	unlink(name);
+	if (dryrun)
+		goto out;
 
-finish:
-	if (nf)
-		puts("no running process of savesave was found");
-	else
-		printf("killed the process of savesave `%d'\n", pid);
+	int err = proc_kill(pid, SIGTERM);
+	if (!err)
+		goto out;
+
+	BUG_ON(err != EPERM);
+	die_errno(_("failed to kill process `%d'"), pid);
+
+out:
+	printf(_("killed process `%d'\n"), pid);
 	exit(0);
 }
 
-USEDOTSAV
 int cmd_backup(int argc, const char **argv)
 CMDDESCRIP("Start backup task in background")
 {
-	subcmd_t cmd = cmd_backup_start;
+	subcmd_t cmd = NULL;
 
 	struct arguopt option[] = {
 		APOPT_GROUP("List of subcommands"),
-		APOPT_SUBCMD("start", &cmd,
-			     _("start a backup routine"), cmd_backup_start, 0),
-		APOPT_SUBCMD("stop", &cmd,
-			     _("stop a backup routine"), cmd_backup_stop, 0),
+		APOPT_SUBCMD("exec", &cmd,
+			     _("start a backup routine"), cmd_backup_exec, 0),
+		APOPT_SUBCMD("kill", &cmd,
+			     _("stop a backup routine"), cmd_backup_kill, 0),
 		APOPT_END(),
 	};
 	const char *usage[] = {
-		"savesave backup [start [-m | --frequent]]",
-		"savesave backup stop",
+		"savesave backup [exec [-b | --often]]",
+		"savesave backup kill",
 		NULL,
 	};
 
 	argupar_parse(&argc, &argv, option, usage, AP_COMMAND_MODE);
+	if (!cmd) {
+		struct strlist sl;
+		strlist_init(&sl, STRLIST_USEREF);
+
+		strlist_push(&sl, "exec");
+		strlist_join_argv(&sl, argv);
+
+		argc = sl.nl;
+		argv = (const char **)strlist_dump2(&sl, 0);
+		cmd = cmd_backup_exec;
+
+		NOLEAK(argv);
+		strlist_destroy(&sl);
+	}
 
 	return cmd(argc, argv);
 }
