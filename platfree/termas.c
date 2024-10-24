@@ -226,10 +226,14 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 	exit(128);
 }
 
-void __cold __die_ucalc_overflow(uintmax_t a, uintmax_t b, int op)
+void __cold ___die_ucalc_overflow(const char *file, int line,
+				  uintmax_t a, uintmax_t b, int op, uint size)
 {
+	const char *mas;
 	if (op == '*')
-		die(_("size overflow: %" PRIuMAX " * %" PRIuMAX ""), a, b);
+		mas = N_("%s:%d:overflow (%u-bit): %" PRIuMAX " * %" PRIuMAX);
 	else
-		die(_("size overflow: %" PRIuMAX " + %" PRIuMAX ""), a, b);
+		mas = N_("%s:%d:overflow (%u-bit): %" PRIuMAX " + %" PRIuMAX);
+
+	die(_(mas), file, line, size, a, b);
 }

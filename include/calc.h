@@ -23,7 +23,12 @@
 
 #define uadd_is_overflow(a, b) ((b) > (max_value(a) - (a)))
 
-void __die_ucalc_overflow(uintmax_t a, uintmax_t b, int op);
+void __noreturn ___die_ucalc_overflow(const char *file, int line,
+				      uintmax_t a, uintmax_t b,
+				      int op, uint size);
+
+#define __die_ucalc_overflow(a, b, op) \
+	___die_ucalc_overflow(__FILE__, __LINE__, a, b, op, sizeof(a));
 
 #define st_umult(a, b)					\
 ({							\
