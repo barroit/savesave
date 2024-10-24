@@ -61,7 +61,7 @@ pid_t savesave_pid(void)
 			goto next;
 
 		if (proc_is_alive(pid))
-			return pid;
+			goto out;
 
 		/*
 		 * We have pid file, but the process associated with
@@ -73,6 +73,7 @@ next:
 		strbuf_reset(&path);
 	}
 
+out:
 	strbuf_destroy(&path);
 	return pid;
 }
