@@ -17,15 +17,15 @@ struct cls {
 	struct list_head list;
 };
 
-void cls_add(cls_callback_t cb)
+void cls_push(cls_callback_t cb)
 {
 	struct cls *c = xmalloc(sizeof(*c));
 
 	c->cb = cb;
-	list_add_tail(&c->list, &clsl);
+	list_add(&c->list, &clsl);
 }
 
-cls_callback_t cls_rm(void)
+cls_callback_t cls_pop(void)
 {
 	if (list_is_empty(&clsl))
 		return NULL;
@@ -41,7 +41,7 @@ cls_callback_t cls_rm(void)
 static void cls_apply(void)
 {
 	cls_callback_t cb;
-	while ((cb = cls_rm()) != NULL)
+	while ((cb = cls_pop()) != NULL)
 		cb();
 }
 
