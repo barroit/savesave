@@ -153,4 +153,6 @@ void __noreturn winexit(int code);
 
 #include "cntio.h"
 
+#include "calc.h"
+
 #endif /* BRTCOMCENT_H */

@@ -225,3 +225,11 @@ void bug_routine(const char *file, int line, const char *fmt, ...)
 
 	exit(128);
 }
+
+void __cold __die_ucalc_overflow(uintmax_t a, uintmax_t b, int op)
+{
+	if (op == '*')
+		die(_("size overflow: %" PRIuMAX " * %" PRIuMAX ""), a, b);
+	else
+		die(_("size overflow: %" PRIuMAX " + %" PRIuMAX ""), a, b);
+}

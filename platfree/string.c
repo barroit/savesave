@@ -6,7 +6,6 @@
  */
 
 #include "termas.h"
-#include "calc.h"
 
 void strrepl(char *str, int c, int r)
 {
@@ -159,7 +158,7 @@ int str2timespan(const char *str, u32 *value)
 	if (err)
 		return err;
 
-	*value = st_mult(val, mult);
+	*value = st_umult(val, mult);
 	return 0;
 
 err_unknown_unit:

@@ -46,7 +46,7 @@ void *xmalloc(size_t size)
 
 void *xcalloc(size_t nmemb, size_t size)
 {
-	size_t tot = st_mult(nmemb, size);
+	size_t tot = st_umult(nmemb, size);
 	alloc_limit_check(tot);
 
 	void *ptr = calloc(nmemb, size);
@@ -57,7 +57,7 @@ void *xcalloc(size_t nmemb, size_t size)
 
 void *xreallocarray(void *ptr, size_t nmemb, size_t size)
 {
-	size_t tot = st_mult(nmemb, size);
+	size_t tot = st_umult(nmemb, size);
 	alloc_limit_check(tot);
 
 	ptr = xrealloc(ptr, tot);

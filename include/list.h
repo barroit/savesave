@@ -8,8 +8,6 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include "calc.h"
-
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
 
 #define LIST_HEAD(name) \
@@ -92,9 +90,9 @@ static inline int list_is_empty(struct list_head *head)
 #define for_each_idx(i, n) for (i = 0; i < n; i++)
 
 /*
- * handle index up to max_uint_valueof(i) - 1
+ * handle index up to max_value(i) - 1
  */
-#define for_each_idx_back(i, n) for (i = n; i != max_uint_valueof(i); i--)
+#define for_each_idx_back(i, n) for (i = n; i != max_value(i); i--)
 
 #define for_each_idx_from(i, n) for (; i < n; i++)
 

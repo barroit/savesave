@@ -649,7 +649,7 @@ parse_done:
 
 	if (ctx.argc)
 		memmove(&ctx.outv[ctx.outc], ctx.argv,
-			st_mult(sizeof(*ctx.argv), ctx.argc));
+			st_umult(sizeof(*ctx.argv), ctx.argc));
 
 	int n = ctx.outc + ctx.argc;
 	if (flags & AP_NEED_ARGUMENT && !n) {

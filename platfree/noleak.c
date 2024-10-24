@@ -18,7 +18,7 @@ static LIST_HEAD(refs);
 
 void __noleak(void *ptr, size_t size)
 {
-	size_t n = st_add(sizeof(struct leakref), size);
+	size_t n = st_uadd(sizeof(struct leakref), size);
 	alloc_limit_check(n);
 
 	struct leakref *ref = xmalloc(n);

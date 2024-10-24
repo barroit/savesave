@@ -8,8 +8,6 @@
 #ifndef ALLOC_H
 #define ALLOC_H
 
-#include "calc.h"
-
 void alloc_limit_check(size_t n);
 
 void alloced_or_die(void *ptr, size_t size);
@@ -24,7 +22,7 @@ void *xreallocarray(void *ptr, size_t nmemb, size_t size);
 
 char *xstrdup(const char *src);
 
-#define REALLOC_ARRAY(p, n) xrealloc(p, st_mult(sizeof(*(p)), n))
+#define REALLOC_ARRAY(p, n) xrealloc(p, st_umult(sizeof(*(p)), n))
 
 /**
  * CAP_ALLOC - increase buf size

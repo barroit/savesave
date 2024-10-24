@@ -19,7 +19,7 @@ static pid_t read_pid(const char *name)
 
 	fd = open(name, O_RDONLY);
 	if (fd == -1)
-		return max_int_valueof(pid_t);
+		return max_value(pid_t);
 
 	int nr = robread(fd, pidstr, sizeof(pidstr));
 	if (nr == sizeof(pidstr)) /* truncated? */
@@ -29,7 +29,7 @@ static pid_t read_pid(const char *name)
 
 	pidstr[nr] = 0;
 	llong pid;
-	int ret = str2llong(pidstr, -1, &pid, 0, max_int_valueof(pid_t));
+	int ret = str2llong(pidstr, -1, &pid, 0, max_value(pid_t));
 	if (ret)
 		goto err_not_pid;
 
@@ -46,7 +46,7 @@ err_not_pid:
 pid_t savesave_pid(void)
 {
 	size_t i;
-	pid_t pid = max_int_valueof(pid);
+	pid_t pid = max_value(pid);
 	struct strbuf path = STRBUF_INIT;
 	const char *piddir[] = DATA_DIR_LIST_INIT;
 
@@ -57,7 +57,7 @@ pid_t savesave_pid(void)
 		strbuf_concat_path(&path, piddir[i], PROCID_NAME);
 
 		pid = read_pid(path.str);
-		if (pid == max_int_valueof(pid))
+		if (pid == max_value(pid))
 			goto next;
 
 		if (proc_is_alive(pid))
@@ -81,7 +81,7 @@ void assert_unic_proc(void)
 {
 	pid_t pid = savesave_pid();
 
-	if (pid == max_int_valueof(pid))
+	if (pid == max_value(pid))
 		return;
 
 	die(_("only one process allowed (running process `%d')"), pid);

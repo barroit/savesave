@@ -10,42 +10,33 @@
 
 #define fix_grow(x) (((x) + 16) * 3 / 2)
 
-#define bitsizeof(x) (CHAR_BIT * sizeof(x))
+#define bit_sizeof(x) (CHAR_BIT * sizeof(x))
 
-#define max_uint_valueof(x) \
-	(UINTMAX_MAX >> (bitsizeof(uintmax_t) - bitsizeof(x)))
+#define value_is_signed(x) ((typeof(x))-1 < 0)
 
-#define max_int_valueof(x) \
-	(INTMAX_MAX >> (bitsizeof(intmax_t) - bitsizeof(x)))
+#define offsetof_intmax(x) (bit_sizeof(uintmax_t) - bit_sizeof(x))
 
-#define uint_mult_overflows(a, b) \
-	((a) && ((b) > (max_uint_valueof(a) / (a))))
+#define max_value(x) \
+	((UINTMAX_MAX >> value_is_signed(x)) >> offsetof_intmax(x))
 
-#define uint_add_overflows(a, b) \
-    ((b) > max_uint_valueof(a) - (a))
+#define umult_is_overflow(a, b) ((a) && (b) > (max_value(a) / (a)))
 
-extern void __noreturn __die_routine(const char *prf,
-				     const char *ext,
-				     const char *fmt, ...) __format(3, 4);
+#define uadd_is_overflow(a, b) ((b) > (max_value(a) - (a)))
 
-#define st_mult(a, b)							\
-({									\
-	if (unlikely(uint_mult_overflows(a, b))) {			\
-		__die_routine(_("fatal: "), NULL, _("size overflow: "	\
-			      "%" PRIuMAX " * %" PRIuMAX ""),		\
-			      (uintmax_t)(a), (uintmax_t)(b));		\
-	}								\
-	(a) * (b);							\
+void __die_ucalc_overflow(uintmax_t a, uintmax_t b, int op);
+
+#define st_umult(a, b)					\
+({							\
+	if (unlikely(umult_is_overflow(a, b)))		\
+		__die_ucalc_overflow(a, b, '*');	\
+	(a) * (b);					\
 })
 
-#define st_add(a, b)							\
-({									\
-	if (unlikely(uint_add_overflows(a, b))) {			\
-		__die_routine(_("fatal: "), NULL, _("size overflow: "	\
-			      "%" PRIuMAX " + %" PRIuMAX ""),		\
-			      (uintmax_t)(a), (uintmax_t)(b));		\
-	}								\
-	(a) + (b);							\
+#define st_uadd(a, b)					\
+({							\
+	if (unlikely(uadd_is_overflow(a, b)))		\
+		__die_ucalc_overflow(a, b, '+');	\
+	(a) + (b);					\
 })
 
 /*
@@ -54,8 +45,8 @@ extern void __noreturn __die_routine(const char *prf,
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
-#define sec_to_millisec(x) st_mult(x, 1000)
-#define sec_to_microsec(x) st_mult(sec_to_millisec(x), 1000)
-#define sec_to_nanosec(x)  st_mult(sec_to_microsec(x), 1000)
+#define sec_to_millisec(x) st_umult(x, 1000)
+#define sec_to_microsec(x) st_umult(sec_to_millisec(x), 1000)
+#define sec_to_nanosec(x)  st_umult(sec_to_microsec(x), 1000)
 
 #endif /* CALC_H */

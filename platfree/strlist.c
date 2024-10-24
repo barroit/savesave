@@ -92,7 +92,8 @@ void __strlist_join_member(struct strlist *sl, void *arr,
 			   size_t nmemb, size_t size, size_t offset)
 {
 	intptr_t addr = (intptr_t)arr;
-	intptr_t end = st_add(addr, st_mult(nmemb, size));
+	size_t sum = st_umult(nmemb, size);
+	intptr_t end = st_uadd(addr, sum);
 
 	for (; addr != end; addr += nmemb)
 		strlist_push(sl, *(const char **)(addr + offset));
