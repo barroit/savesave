@@ -59,6 +59,6 @@ static inline int __fileiter_is_list_dir_only(flag_t flags)
 
 int fileiter(const char *root,
 	     fileiter_function_t func, void *data, flag_t flags);
-int PLATSPECOF(fileiter_loop_dir)(struct __fileiter *ctx);
+int FEATSPEC(fileiter_loop_dir)(struct __fileiter *ctx);
 
 #endif /* FILEITER_H */

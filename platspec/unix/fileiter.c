@@ -110,7 +110,7 @@ static int dispatch_file(struct __fileiter *ctx, struct dirent *ent)
 	return dispatch_regfile(&file, ctx);
 }
 
-int PLATSPECOF(fileiter_loop_dir)(struct __fileiter *ctx)
+int FEATSPEC(fileiter_loop_dir)(struct __fileiter *ctx)
 {
 	DIR *dir = opendir(ctx->sb.str);
 	if (!dir)

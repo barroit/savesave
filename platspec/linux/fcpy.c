@@ -7,7 +7,7 @@
 
 #include "fcpy.h"
 
-int PLATSPECOF(fd2fd_copy)(int src, int dest, off_t len)
+int FEATSPEC(fd2fd_copy)(int src, int dest, off_t len)
 {
 	BUG_ON(!len);
 

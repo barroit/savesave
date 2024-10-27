@@ -30,7 +30,7 @@ int copy_regfile(const char *srcname, const char *destname)
 	if (!st.st_size)
 		goto done;
 
-	ret = PLATSPECOF(fd2fd_copy)(src, dest, st.st_size);
+	ret = FEATSPEC(fd2fd_copy)(src, dest, st.st_size);
 	if (ret)
 		goto err_copy_file;
 

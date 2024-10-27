@@ -67,16 +67,6 @@
 	((type *)(((void *)ptr) - offsetof(type, memb)));		\
 })
 
-#ifdef __unix__
-# define __PLATSPEC_NAME uni
-#else
-# define __PLATSPEC_NAME win
-#endif
-
-#define PLATSPECOF(name)	 __PLATSPECOF(__PLATSPEC_NAME, name)
-#define __PLATSPECOF(suf, name)  ___PLATSPECOF(suf, name)
-#define ___PLATSPECOF(suf, name) __platspec_##suf##_##name
-
 /*
  * Returns the number of arguments (up to 6) passed to this macro. Useful for
  * implementing flexible function calls.
@@ -121,7 +111,7 @@
 
 #ifdef __unix__
 # define __FEATSPEC_NAME uni
-#elif _WIN32
+#elif defined(_WIN32)
 # define __FEATSPEC_NAME win
 #endif
 

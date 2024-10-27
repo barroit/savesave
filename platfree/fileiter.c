@@ -65,7 +65,7 @@ int fileiter(const char *root,
 				goto cleanup;
 		}
 
-		ret = PLATSPECOF(fileiter_loop_dir)(&ctx);
+		ret = FEATSPEC(fileiter_loop_dir)(&ctx);
 		if (unlikely(ret))
 			goto cleanup;
 

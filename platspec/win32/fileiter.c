@@ -91,7 +91,7 @@ static int dispatch_file(struct __fileiter *ctx, WIN32_FIND_DATA *ent)
 	return 0;
 }
 
-int PLATSPECOF(fileiter_loop_dir)(struct __fileiter *ctx)
+int FEATSPEC(fileiter_loop_dir)(struct __fileiter *ctx)
 {
 	strbuf_concat(&ctx->sb, "/*");
 
