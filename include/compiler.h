@@ -119,4 +119,14 @@
 
 #define __cold __attribute__((__cold__))
 
+#ifdef __unix__
+# define __FEATSPEC_NAME uni
+#elif _WIN32
+# define __FEATSPEC_NAME win
+#endif
+
+#define FEATSPEC(x)       __FEATSPEC(__FEATSPEC_NAME, x)
+#define __FEATSPEC(p, x)  ___FEATSPEC(p, x)
+#define ___FEATSPEC(p, x) __feat_##p##_##x
+
 #endif /* COMPILER_H */
