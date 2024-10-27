@@ -125,8 +125,6 @@ static char *pretty_optname(struct arguopt *opt, flag_t flags)
 {
 	struct strbuf sb = STRBUF_INIT;
 
-	strbuf_require_cap(&sb, 8);
-
 	/*
 	 * Short options never have a negated version.
 	 */

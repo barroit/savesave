@@ -54,7 +54,7 @@ pid_t savesave_pid(void)
 		if (piddir[i] == NULL)
 			continue;
 
-		strbuf_concat_path(&path, piddir[i], PROCID_NAME);
+		strbuf_concat_pathname(&path, piddir[i], PROCID_NAME);
 
 		pid = read_pid(path.str);
 		if (pid == max_value(pid))

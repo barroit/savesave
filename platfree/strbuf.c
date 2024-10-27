@@ -10,111 +10,82 @@
 #include "list.h"
 #include "mkdir.h"
 
-void strbuf_init(struct strbuf *sb, flag_t flags)
+void strbuf_init2(struct strbuf *sb, const char *base, flag_t flags)
 {
+	BUG_ON(flags);
+
 	memset(sb, 0, sizeof(*sb));
+	if (!base)
+		return;
 
-	if (flags & STRBUF_CONSTANT)
-		sb->is_const = 1;
-}
-
-struct strbuf strbuf_from2(const char *base, flag_t flags, size_t extalloc)
-{
-	BUG_ON(flags & STRBUF_CONSTANT);
-
-	struct strbuf sb = STRBUF_INIT;
-
-	sb.baslen = strbuf_concat2(&sb, base, extalloc);
-	return sb;
+	sb->base = strbuf_concat(sb, base);
 }
 
 void strbuf_destroy(struct strbuf *sb)
 {
 	free(sb->str);
 	sb->str = STRBUF_POISON;
-	sb->cap = 0;
 }
 
 void strbuf_reset_from(struct strbuf *sb, const char *base)
 {
 	sb->len = 0;
-	sb->baslen = strbuf_concat(sb, base);
-}
-
-void strbuf_require_cap(struct strbuf *sb, size_t n)
-{
-	CAP_ALLOC(&sb->str, n, &sb->cap);
+	sb->base = strbuf_concat(sb, base);
 }
 
 /*
- * Grow capacity by n (exclude null terminator) if the available space is less
- * than space required
+ * Grow capacity by n (exclude null terminator) if the available space
+ * is less than space required.
  */
-static void strbuf_growlen(struct strbuf *sb, size_t n)
+static void strbuf_nalloc(struct strbuf *sb, size_t n)
 {
 	CAP_ALLOC(&sb->str, sb->len + n + 1, &sb->cap);
 }
 
-size_t strbuf_move(struct strbuf *sb, const char *str)
+uint strbuf_oconcat(struct strbuf *sb, uint offset, const char *str)
 {
-	BUG_ON(!sb->is_const);
+	uint len = strlen(str);
+	uint overlap = sb->len - offset;
 
-	size_t len = strlen(str);
+	if (len > overlap)
+		strbuf_nalloc(sb, len - overlap);
 
-	sb->str = (char *)str;
-	sb->len = len;
-	sb->cap = len;
+	memcpy(&sb->str[offset], str, len + 1);
+	if (len > overlap)
+		sb->len += len - overlap;
+	else
+		sb->len -= overlap - len;
 
 	return len;
 }
 
-size_t strbuf_concat2(struct strbuf *sb, const char *str, size_t extalloc)
+uint strbuf_oprintf(struct strbuf *sb,
+		    uint offset, const char *format, ...)
 {
-	size_t nl = strlen(str);
+	va_list ap[2];
+	va_start(ap[0], format);
+	va_copy(ap[1], ap[0]);
 
-	strbuf_growlen(sb, nl + extalloc);
-	memcpy(sb->str + sb->len, str, nl + 1);
-	sb->len += nl;
+	strbuf_nalloc(sb, 32);
 
-	return nl;
-}
+	int nr;
+	uint avail;
+	uint i = 0;
 
-size_t strbuf_concatat(struct strbuf *sb, size_t idx, const char *str)
-{
-	BUG_ON(idx > sb->len);
-	if (idx == sb->len)
-		return strbuf_concat(sb, str);
+retry:
+	avail = strbuf_avail(sb);
+	nr = vsnprintf(&sb->str[offset], avail + 1, format, ap[i]);
 
-	size_t nl = strlen(str);
-	size_t alloc = 0;
-	size_t overlap = sb->len - (idx + 1);
-
-	if (nl > overlap) {
-		alloc = nl - overlap;
-		strbuf_growlen(sb, alloc);
+	BUG_ON(nr < 0);
+	if (nr > avail) {
+		strbuf_nalloc(sb, nr);
+		i += 1;
+		goto retry;
 	}
 
-	memcpy(&sb->str[idx], str, nl + 1);
-	sb->len += alloc;
-	return nl;
-}
+	va_end(ap[0]);
+	va_end(ap[1]);
 
-size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...)
-{
-	va_list ap, cp;
-	va_start(ap, fmt);
-	va_copy(cp, ap);
-
-	int nr = vsnprintf(NULL, 0, fmt, cp);
-	BUG_ON(nr < 0);
-
-	va_end(cp);
-	strbuf_growlen(sb, nr);
-
-	nr = vsnprintf(sb->str + sb->len, nr + 1, fmt, ap);
-	BUG_ON(nr < 0);
-
-	va_end(ap);
 	sb->len += nr;
 	return nr;
 }
@@ -143,18 +114,15 @@ void strbuf_trim(struct strbuf *sb)
 	sb->str[sb->len] = 0;
 }
 
-size_t strbuf_cntchr(struct strbuf *sb, int c)
+uint strbuf_count_char(struct strbuf *sb, int c)
 {
-	BUG_ON(!sb->str);
+	uint n = 0;
+	const char *str = sb->str;
 
-	size_t cnt = 0;
-	const char *p = sb->str;
-
-	while (*p)
-		if (*p++ == c)
-			cnt++;
-
-	return cnt;
+	while (*str)
+		if (*str++ == c)
+			n++;
+	return n;
 }
 
 void strbuf_normalize_path(struct strbuf *sb)
@@ -166,15 +134,15 @@ void strbuf_normalize_path(struct strbuf *sb)
 
 	char *sep = strbuf_strrsep(sb);
 	if (sep && sep[1] == 0) {
-		int need_sync = sb->baslen == sb->len;
+		int need_sync = sb->base == sb->len;
 
 		strbuf_trunc(sb, 1);
 		if (need_sync)
-			sb->baslen = sb->len;
+			sb->base = sb->len;
 	}
 }
 
-void strbuf_to_dirname(struct strbuf *sb)
+void strbuf_dirname(struct strbuf *sb)
 {
 	char *dirsep = strbuf_strrsep(sb);
 	size_t dirlen = dirsep - sb->str;
@@ -182,38 +150,36 @@ void strbuf_to_dirname(struct strbuf *sb)
 	strbuf_trunc(sb, sb->len - dirlen);
 }
 
-size_t strbuf_concat_basename(struct strbuf *sb, const char *name)
+uint strbuf_concat_basename(struct strbuf *sb, const char *name)
 {
-	size_t namlen = strlen(name);
-	size_t totlen = namlen + 1;
+	uint nsz = strlen(name);
+	uint n = nsz + 1;
 
-	strbuf_growlen(sb, totlen);
+	strbuf_nalloc(sb, n);
 
 	sb->str[sb->len] = '/';
 	sb->len += 1;
 
-	memcpy(&sb->str[sb->len], name, namlen + 1);
-	sb->len += namlen;
-
-	return totlen;
+	memcpy(&sb->str[sb->len], name, n);
+	sb->len += nsz;
+	return n;
 }
 
-size_t strbuf_concat_path(struct strbuf *sb,
-			  const char *prefix, const char *name)
+uint strbuf_concat_pathname(struct strbuf *sb,
+			    const char *prefix, const char *name)
 {
-	size_t dirlen = strlen(prefix);
-	size_t namlen = strlen(name);
-	size_t totlen = dirlen + namlen + 1;
+	uint dsz = strlen(prefix);
+	uint nsz = strlen(name);
+	uint n = dsz + nsz + 1;
 
-	strbuf_growlen(sb, totlen);
-	memcpy(&sb->str[sb->len], prefix, dirlen);
-	sb->len += dirlen;
+	strbuf_nalloc(sb, n);
+	memcpy(&sb->str[sb->len], prefix, dsz);
+	sb->len += dsz;
 
 	sb->str[sb->len] = '/';
 	sb->len += 1;
 
-	memcpy(&sb->str[sb->len], name, namlen + 1);
-	sb->len += namlen;
-
-	return totlen;
+	memcpy(&sb->str[sb->len], name, nsz + 1);
+	sb->len += nsz;
+	return n;
 }

@@ -253,7 +253,7 @@ static void check_valid_savent(struct savesave *sav)
 	if (!sb.cap)
 		return;
 
-	size_t lines = strbuf_cntchr(&sb, '\n');
+	size_t lines = strbuf_count_char(&sb, '\n');
 	die(lines > 1 ?
 	    _("savent `%s' missing the following fields\n\n%s") :
 	    _("savent `%s' missing the following field\n\n%s"),
@@ -264,7 +264,7 @@ static void update_backup_prefix(struct savesave *sav)
 {
 	struct strbuf sb = STRBUF_INIT;
 
-	strbuf_concat_path(&sb, sav->backup_prefix, sav->name);
+	strbuf_concat_pathname(&sb, sav->backup_prefix, sav->name);
 	if (sav->use_compress)
 		strbuf_printf(&sb, ".%s.", CONFIG_ARCHIVE_EXTENTION);
 	else

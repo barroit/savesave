@@ -38,18 +38,12 @@ struct list_head {
 };
 
 struct strbuf {
-	char *str;
-	size_t len;
-	size_t cap;
-	size_t baslen;
+	char *str;	/* buffer */
 
-	int is_const;
-	// char *str;	/* buffer */
-
-	// uint len;	/* strlen(3) on buffer */
-	// uint cap;	/* allocated size */
-	// uint base;	/* position at which new concat made
-	// 		   by strbuf_b* begins to fill data */
+	uint len;	/* strlen(3) on buffer */
+	uint cap;	/* allocated size */
+	uint base;	/* position at which new concat made
+			   by strbuf_b* begins to fill data */
 };
 
 struct strlist {

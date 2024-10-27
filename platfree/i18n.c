@@ -39,7 +39,9 @@ static char *get_preferred_locale(void)
 			return xstrdup(language);
 	}
 
-	struct strbuf locale = strbuf_from(CONFIG_TARGET_LOCALE, 0);
+	struct strbuf locale;
+
+	strbuf_init2(&locale, CONFIG_TARGET_LOCALE, 0);
 	if (*locale.str == 0)
 		return locale.str;
 

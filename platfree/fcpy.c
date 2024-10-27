@@ -13,7 +13,7 @@
 int __fiter_cpy_nonreg(struct iterfile *src, void *data)
 {
 	struct strbuf *dest = &(((struct strbuf *)data)[0]);
-	strbuf_concatat_base(dest, src->dymname);
+	strbuf_boconcat(dest, src->dymname);
 
 	if (S_ISLNK(src->st.st_mode))
 		return copy_symlink(src->absname, dest->str);

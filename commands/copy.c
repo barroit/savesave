@@ -120,9 +120,10 @@ static void argv2task(int argc, const char **argv)
 	argc -= 1;
 
 	size_t i;
-	struct strbuf sb = strbuf_from2(argv[argc], 0, PATH_MAX);
+	struct strbuf sb;
 	struct stat st;
 
+	strbuf_init2(&sb, argv[argc], 0);
 	for_each_idx(i, argc) {
 		assert_file_not_same(sb.str, argv[i]);
 
@@ -198,7 +199,7 @@ static inline int __mkdir(const char *name)
 static int def_copy_routine(struct iterfile *src, void *data)
 {
 	struct strbuf *dest = data;
-	strbuf_concatat_base(dest, src->dymname);
+	strbuf_boconcat(dest, src->dymname);
 
 	if (likely(S_ISREG(src->st.st_mode)))
 		return copy_regfile(src->absname, dest->str);

@@ -561,7 +561,7 @@ err_proc_res:
 static int cp_reg_and_unsuppd(struct iterfile *src, void *data)
 {
 	struct strbuf *dest = data;
-	strbuf_concatat_base(dest, src->dymname);
+	strbuf_boconcat(dest, src->dymname);
 
 	return acpyreg(src->absname, dest->str);
 }
@@ -569,8 +569,9 @@ static int cp_reg_and_unsuppd(struct iterfile *src, void *data)
 int acpy_copy(const char *src, const char *dest)
 {
 	int ret;
-	struct strbuf data = strbuf_from2(dest, 0, PATH_MAX);
+	struct strbuf data;
 
+	strbuf_init2(&data, dest, 0);
 	ret = fileiter(src, __fiter_cpy_nonreg, &data, __FITER_CPY_NONREG);
 	if (ret)
 		goto err_cpy;

@@ -60,7 +60,7 @@ static char *filename_at_datadir(const char *name)
 	const char *prefix = data_dir();
 	struct strbuf sb = STRBUF_INIT;
 
-	strbuf_concat_path(&sb, prefix, name);
+	strbuf_concat_pathname(&sb, prefix, name);
 	return sb.str;
 }
 
@@ -82,7 +82,7 @@ const char *locale_dir(void)
 		const char *dir = exec_dir();
 		struct strbuf sb = STRBUF_INIT;
 
-		strbuf_concat_path(&sb, dir, "locale");
+		strbuf_concat_pathname(&sb, dir, "locale");
 
 		/*
 		 * gettext expect separator is shash
@@ -102,7 +102,7 @@ const char *__dotsav_path(void)
 		struct strbuf sb = STRBUF_INIT;
 		const char *home = home_dir();
 
-		strbuf_concat_path(&sb, home, ".savesave");
+		strbuf_concat_pathname(&sb, home, ".savesave");
 		path = sb.str;
 	}
 

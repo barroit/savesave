@@ -10,51 +10,34 @@
 
 #define STRBUF_INIT { 0 }
 
-#define STRBUF_CONSTANT 1 << 0
-
-/**
- * strbuf_init - initialize strbuf with flags
+/*
+ * Same as strbuf_init, except it also setup base.
  */
-void strbuf_init(struct strbuf *sb, flag_t flags);
+void strbuf_init2(struct strbuf *sb, const char *base, flag_t flags);
 
-/**
- * strbuf_from - initialize strbuf with initial string base, as well as a
- * 		 pre-allocate area
- *
- * extalloc - the extra bytes to be allocated, excluding null-terminating byte
+/*
+ * Initialize strbuf with flags.
  */
-struct strbuf strbuf_from2(const char *base, flag_t flags, size_t extalloc);
-
-/**
- * strbuf_from - initialize strbuf with initial string base
- */
-static inline struct strbuf strbuf_from(const char *base, flag_t flags)
+static inline void strbuf_init(struct strbuf *sb, flag_t flags)
 {
-	return strbuf_from2(base, flags, 0);
+	strbuf_init2(sb, NULL, flags);
 }
 
-/**
- * strbuf_require_cap - make strbuf has at least n capacity
- */
-void strbuf_require_cap(struct strbuf *sb, size_t n);
-
-/**
- * strbuf_destroy - destroy strbuf
- *
- * note: a destroyed strbuf object can be re-initialized using strbuf_init()
+/*
+ * Destroy strbuf.
  */
 void strbuf_destroy(struct strbuf *sb);
 
-/**
- * strbuf_reset_length - reset length of strbuf to its initializing status
+/*
+ * Reset length to its initializing status.
  */
 static inline void strbuf_reset_length(struct strbuf *sb)
 {
-	sb->len = sb->baslen;
+	sb->len = sb->base;
 }
 
-/**
- * strbuf_reset - reset strbuf object to its initializing status
+/*
+ * Reset strbuf to its initializing status.
  */
 static inline void strbuf_reset(struct strbuf *sb)
 {
@@ -62,114 +45,119 @@ static inline void strbuf_reset(struct strbuf *sb)
 	sb->str[sb->len] = 0;
 }
 
-/**
- * strbuf_reset_from - reset strbuf and its initial string to base
+/*
+ * Full-cleanup strbuf, and setup base.
  */
 void strbuf_reset_from(struct strbuf *sb, const char *base);
 
-/**
- * strbuf_move - store str reference instead of copy it
- * 
- * note: strbuf must initialized with STRBUF_CONSTANT
+/*
+ * Return space available for storing characters (excluding null terminator).
+ * NB: Don't call this function on an empty strbuf (cap is zero).
  */
-size_t strbuf_move(struct strbuf *sb, const char *str);
-
-/**
- * strbuf_concat2 - concat str to strbuf, with pre-allocate area
- *
- * extalloc - the extra bytes to be allocated, excluding null-terminating byte
- */
-size_t strbuf_concat2(struct strbuf *sb, const char *str, size_t extalloc);
-
-/**
- * strbuf_concat2 - concat str to strbuf
- */
-static inline size_t strbuf_concat(struct strbuf *sb, const char *str)
+static inline uint strbuf_avail(struct strbuf *sb)
 {
-	return strbuf_concat2(sb, str, 0);
+	return sb->cap - sb->len - 1;
 }
 
-/**
- * strbuf_concatat - concat str at specific index
+/*
+ * Similar to strbuf_concat(), except it includes a position argument that
+ * specifies the buffer position where string is appended.
+ * NB: Don't pass offset that exceeds the length of strbuf.
  */
-size_t strbuf_concatat(struct strbuf *sb, size_t idx, const char *str);
+uint strbuf_oconcat(struct strbuf *sb, uint offset, const char *str);
 
-/**
- * strbuf_concatat_base - concat str to the initial string
+/*
+ * Append str to the tail of strbuf.
  */
-static inline size_t strbuf_concatat_base(struct strbuf *sb, const char *str)
+static inline uint strbuf_concat(struct strbuf *sb, const char *str)
 {
-	return strbuf_concatat(sb, sb->baslen, str);
+	return strbuf_oconcat(sb, sb->len, str);
 }
 
-/**
- * strbuf_printf - produce output to strbuf according to format
+/*
+ * Append str to the base of strbuf.
  */
-size_t strbuf_printf(struct strbuf *sb, const char *fmt, ...) __nonnull(2);
-
-/**
- * strbuf_trunc - truncate strbuf
- */
-static inline void strbuf_trunc(struct strbuf *sb, size_t n)
+static inline uint strbuf_boconcat(struct strbuf *sb, const char *str)
 {
-	sb->len -= n;
+	return strbuf_oconcat(sb, sb->base, str);
+}
+
+/*
+ * Append /name to strbuf.
+ */
+uint strbuf_concat_basename(struct strbuf *sb, const char *name);
+
+/*
+ * Concat prefix/name to strbuf.
+ */
+uint strbuf_concat_pathname(struct strbuf *sb,
+			    const char *prefix, const char *name);
+
+/*
+ * Produce output to strbuf according to format.
+ */
+#define strbuf_printf(__sb, ...) \
+	strbuf_oprintf(__sb, (__sb)->len, __VA_ARGS__)
+
+/*
+ * Similar to strbuf_printf(), except it takes a position argument that
+ * specifies the buffer position at which printf starts to fill data.
+ */
+uint strbuf_oprintf(struct strbuf *sb,
+		    uint offset, const char *format, ...) __nonnull(3);
+
+/*
+ * Truncate the length of strbuf.
+ */
+static inline void strbuf_trunc(struct strbuf *sb, uint size)
+{
+	sb->len -= size;
 	sb->str[sb->len] = 0;
 }
 
-/**
- * strbuf_trim - remove space character from both ends of strbuf
+/*
+ * Remove space character from both ends of strbuf.
  */
 void strbuf_trim(struct strbuf *sb);
 
-/**
- * strbuf_cntchr - count occurrences of c in strbuf
+/*
+ * Count occurrences of c in strbuf.
  */
-size_t strbuf_cntchr(struct strbuf *sb, int c);
-// uint strbuf_occur(struct strbuf *sb, int c);
+uint strbuf_count_char(struct strbuf *sb, int c);
 
-/**
- * strbuf_normalize_path - unify path separator into slash
- */
-void strbuf_normalize_path(struct strbuf *sb);
-
-/**
- * strbuf_strrsep - get the pointer points to the last path separator
+/*
+ * Return the pointer points to the last path separator.
  */
 static inline char *strbuf_strrsep(struct strbuf *sb)
 {
-#ifdef __unix__
-	return strrchr(sb->str, '/');
-#else
+#ifdef _WIN32
 	char *sep = strrchr(sb->str, '/');
 	return sep ? : strrchr(sb->str, '\\');
+#else
+	return strrchr(sb->str, '/');
 #endif
 }
 
-/**
- * strbuf_concat_path - concat '/name' to strbuf
+/*
+ * Truncates the length of pathname stored in strbuf to the length of
+ * its dirname.
  */
-size_t strbuf_concat_basename(struct strbuf *sb, const char *name);
+void strbuf_dirname(struct strbuf *sb);
 
-/**
- * strbuf_concat_path - concat 'prefix/name' to strbuf
+/*
+ * Unify path separator into slash.
  */
-size_t strbuf_concat_path(struct strbuf *sb,
-			  const char *prefix, const char *name);
+void strbuf_normalize_path(struct strbuf *sb);
 
 extern int mkdirp2(char *name, size_t start, int dcheck);
 
-/**
- * strbuf_mkdirp - make directory as well as its parent directories, starting
- * 		   from initial string
+/*
+ * Make directory as well as its parent directories, starting from
+ * initial string.
  */
 static inline int strbuf_mkdirp(struct strbuf *sb)
 {
-	return mkdirp2(sb->str, sb->baslen, 0);
+	return mkdirp2(sb->str, sb->base, 0);
 }
-
-/**
- * strbuf_to_dirname - make strbuf become its parent name
- */
-void strbuf_to_dirname(struct strbuf *sb);
 
 #endif /* STRBUF_H */

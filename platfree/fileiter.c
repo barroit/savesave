@@ -109,7 +109,7 @@ iter_done:
 			if (unlikely(ctx.sb.len == rootlen))
 				goto cleanup;
 
-			strbuf_to_dirname(&ctx.sb);
+			strbuf_dirname(&ctx.sb);
 			if (ctx.sb.len == ndrlen && dir)
 				break;
 		}

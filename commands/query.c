@@ -52,7 +52,6 @@ static int cmd_query_path(int argc, const char **argv)
 	int i;
 	struct strbuf sb = STRBUF_INIT;
 
-	strbuf_require_cap(&sb, PATH_MAX);
 	for_each_idx(i, argc) {
 		size_t j;
 		const char *name = argv[i];
@@ -65,7 +64,7 @@ static int cmd_query_path(int argc, const char **argv)
 
 			const char *path = q->func();
 
-			strbuf_concatat_base(&sb, path);
+			strbuf_boconcat(&sb, path);
 			strbuf_normalize_path(&sb);
 			printf("%-10s %s\n", name, sb.str);
 
