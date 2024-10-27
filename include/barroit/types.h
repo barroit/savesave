@@ -44,15 +44,27 @@ struct strbuf {
 	size_t baslen;
 
 	int is_const;
+	// char *str;	/* buffer */
+
+	// uint len;	/* strlen(3) on buffer */
+	// uint cap;	/* allocated size */
+	// uint base;	/* position at which new concat made
+	// 		   by strbuf_b* begins to fill data */
 };
 
 struct strlist {
-	struct strbuf *list;
-	size_t uninit;
-	size_t nl;
-	size_t cap;
+	union {
+		struct strbuf *__sb;
+				/* buffer is strbuf */
+		const char **__cs;
+				/* buffer is const char * */
+	};
 
-	int use_ref;
+	uint alnext;		/* next allocated but uninitialized strbuf */
+	uint size;		/* number of elements */
+	uint cap;		/* allocated size */
+
+	flag_t flags;	/* flags */
 };
 
 struct savesave {

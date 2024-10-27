@@ -80,7 +80,7 @@ static int dispatch_file(struct __fileiter *ctx, struct dirent *ent)
 	case DT_REG:
 		break;
 	case DT_DIR:
-		strlist_push2(&ctx->sl, absname, 32);
+		strlist_push(&ctx->sl, absname);
 		return 0;
 	case DT_LNK:
 		break;

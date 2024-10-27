@@ -98,6 +98,20 @@ CMDDESCRIP("Start backup task in background")
 	};
 
 	argupar_parse(&argc, &argv, option, usage, AP_COMMAND_MODE);
+	if (!cmd) {
+		struct strlist sl;
+		strlist_init(&sl, STRLIST_STORE_REF);
+
+		strlist_push(&sl, "exec");
+		strlist_join_argv(&sl, argv);
+
+		argc = sl.size;
+		argv = (const char **)strlist_dump2(&sl, 0);
+		cmd = cmd_backup_exec;
+
+		NOLEAK(argv);
+		strlist_destroy(&sl);
+	}
 
 	return cmd(argc, argv);
 }

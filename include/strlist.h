@@ -8,97 +8,89 @@
 #ifndef STRLIST_H
 #define STRLIST_H
 
-#include "strbuf.h"
-
 #define STRLIST_INIT { 0 }
 
-#define STRLIST_USEREF 1 << 0
+#define STRLIST_STORE_REF (1 << 0)	/* store reference instead of
+					   allocating new strbuf */
+#define STRLIST_CALC_STRLEN (1 << 1)	/* calculate string length, only work
+					   when buffer is __cs */
 
-/**
- * strlist_init - Initialize strlist with flags
+/*
+ * Initialize strlist with flags.
  */
 void strlist_init(struct strlist *sl, flag_t flags);
 
-/**
- * strlist_destroy - Destroy strlist
- *
- * note: A destroyed strlist object can be re-initialized using strlist_init()
+/*
+ * Destroy a strlist instance.
+ * NB: Destroyed strlist object can be re-initialized.
  */
 void strlist_destroy(struct strlist *sl);
 
-/**
- * strlist_reset - Make strlist factory new without releasing allocated memory
+/*
+ * Make strlist factory new without releasing allocated memory.
  */
-void strlist_reset(struct strlist *sl);
+void strlist_cleanup(struct strlist *sl);
 
-/**
- * strlist_push2 - Append str to sl, with pre-allocate area
- * 
- * note: The pre-allocate area is applied to the element of internal
- *	 array (strbuf) not the internal array itself
+/*
+ * Append str to strlist.
  */
-size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc);
+uint strlist_push(struct strlist *sl, const char *str);
 
-/**
- * strlist_push - Append str to sl
- */
-static inline size_t strlist_push(struct strlist *sl, const char *str)
-{
-	return strlist_push2(sl, str, 0);
-}
-
-/**
- * strlist_join_argv - Append entire argv to sl (not including terminated NULL)
+/*
+ * Append argv to strlist (excluding terminated NULL)
  */
 void strlist_join_argv(struct strlist *sl, const char **argv);
 
 void __strlist_join_member(struct strlist *sl, void *arr,
-			   size_t nmemb, size_t size, size_t offset);
+			   uint nmemb, uint size, uint offset);
 
-/**
- * strlist_join_member - Append the specified member of each element in an
- *			 array to sl
- *
- * note: Member must be of type const char * or char *
+/*
+ * Append the specified member (offset) of each element in an array to
+ * strlist.
+ * NB: The member must be of type const char * or char *.
  */
-#define strlist_join_member(sl, arr, nl, memb)			\
-	__strlist_join_member(sl, arr, sizeof(*arr), nl,	\
+#define strlist_join_member(sl, arr, size, memb)		\
+	__strlist_join_member(sl, arr, sizeof(*arr), size,	\
 			      offsetof(typeof(*arr), memb))
 
-/**
- * strlist_pop2 - Remove an element from sl, and return the value of element
- *
- * dup: If this value is zero, the return value is simply a pointer points to
- *	the last element, the value is guarantee to be available until the next
- *	calls to strlist_push() or strlist_push2(). Otherwise, the return value
- *	is a copy of that element
- *
- * note: strlist_pop2 does not release the memory allocated for element
+/*
+ * Similar to strlist_pop(), except it takes an additional argument. If
+ * that argument is set to a non-zero value, the return value is a copy
+ * of the last element. Otherwise, the return value is simply a pointer
+ * pointing to the last element.
  */
 char *strlist_pop2(struct strlist *sl, int dup);
 
-
-/**
- * strlist_pop - remove an element from sl, and return a copy of that element
- *
- * note: strlist_pop does not release the memory allocated for element
+/*
+ * Remove an element from sl, and return a copy of that element.
  */
 static inline char *strlist_pop(struct strlist *sl)
 {
 	return strlist_pop2(sl, 1);
 }
 
-/**
- * strlist_dump2 - dump elements into array
+/*
+ * Get string at specified position.
+ */
+static inline char *strlist_at(struct strlist *sl, uint index)
+{
+	if (!(sl->flags & STRLIST_STORE_REF))
+		return sl->__sb[index].str;
+	else
+		return (char *)sl->__cs[index];
+}
+
+/*
+ * Same as strlist_dump().
  *
- * copy: if this value is 0, the elements are not copied and the dumped array
- *	 stores the pointer points to the elements. Otherwise, each element is
- *	 copied.
+ * I'm sick of this shit, explaining dup or copy again and again. You
+ * know what it does! You just make sure the string's lifecycle is not
+ * over during use.
  */
 char **strlist_dump2(struct strlist *sl, int copy);
 
-/**
- * strlist_dump2 - dump elements into array
+/*
+ * Dump elements of strlist into array.
  */
 static inline char **strlist_dump(struct strlist *sl)
 {
@@ -106,8 +98,8 @@ static inline char **strlist_dump(struct strlist *sl)
 }
 
 /*
- * strlist_split_word - split string, make sure the words don't get broken
- *			into pieces
+ * Splits string into strlist, ensuring that words remain intact and
+ * are not broken into pieces.
  */
 void strlist_split_word(struct strlist *sl, const char *str, uint bound);
 

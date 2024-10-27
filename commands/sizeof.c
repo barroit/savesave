@@ -68,20 +68,22 @@ CMDDESCRIP("Calculate file size of given path")
 	const char *unit_map[] = { "B", "KiB", "MiB", "GiB", "TiB" };
 	struct strlist sl;
 
-	strlist_init(&sl, STRLIST_USEREF);
+	strlist_init(&sl, STRLIST_STORE_REF);
 	if (dotsav_size)
 		strlist_join_member(&sl, dotsav_array,
 				    dotsav_size, save_prefix);
 	strlist_join_argv(&sl, argv);
 
-	for_each_idx(i, sl.nl) {
+	for_each_idx(i, sl.size) {
 		int err;
-		const char *path = sl.list[i].str;
-
+		const char *path = strlist_at(&sl, i);
 		struct stat st;
+
 		err = stat(path, &st);
-		if (err)
-			goto err_stat_file;
+		if (err) {
+			error_errno(ERRMAS_STAT_FILE(path));
+			continue;
+		}
 
 		struct dirinfo info = {
 			.size  = st.st_size,
@@ -91,10 +93,14 @@ CMDDESCRIP("Calculate file size of given path")
 		if (S_ISDIR(st.st_mode)) {
 			err = fileiter(path, accumsize, &info,
 				       FITER_LIST_DIR | FITER_USE_STAT);
-			if (err)
-				goto err_calc_dir;
+			if (err) {
+				error(_("cannot calculate size for directory `%s'"),
+				      path);
+				continue;
+			}
 		} else if (!info.size) {
-			goto err_lacks_size;
+			error(_("file `%s' lacks a size information"), path);
+			continue;
 		}
 
 		uint uidx = 0;
@@ -130,19 +136,6 @@ CMDDESCRIP("Calculate file size of given path")
 		}
 
 		printf("%*s%s\n", indent - width, "", path);
-		continue;
-
-		if (0) {
-		err_stat_file:
-			error_errno(ERRMAS_STAT_FILE(path));
-		} else if (0) {
-		err_calc_dir:
-			error(_("cannot calculate size for directory `%s'"),
-			      path);
-		} else if (0) {
-		err_lacks_size:
-			error(_("file `%s' lacks a size information"), path);
-		}
 	}
 
 	exit(0);

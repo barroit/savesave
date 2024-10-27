@@ -6,80 +6,87 @@
  */
 
 #include "strlist.h"
+#include "strbuf.h"
 #include "alloc.h"
 #include "list.h"
 
 void strlist_init(struct strlist *sl, flag_t flags)
 {
-	memset(sl, 0, sizeof(*sl));
+	BUG_ON(!(sl->flags & STRLIST_STORE_REF) &&
+	       (sl->flags & STRLIST_CALC_STRLEN));
 
-	if (flags & STRLIST_USEREF)
-		sl->use_ref = 1;
+	memset(sl, 0, sizeof(*sl));
+	sl->flags = flags;
 }
 
 void strlist_destroy(struct strlist *sl)
 {
-	if (!sl->use_ref) {
-		size_t i;
-		for_each_idx(i, sl->cap) {
-			struct strbuf *sb = &sl->list[i];
-			if (sb->cap)
-				strbuf_destroy(sb);
-		}
-	}
+	if (sl->flags & STRLIST_STORE_REF)
+		goto out;
 
-	free(sl->list);
-	sl->list = STRLIST_POISON;
-	sl->cap = 0;
+	struct strbuf *sb = sl->__sb;
+	while (sb->cap)
+		strbuf_destroy(sb++);
+
+out:
+	free(sl->__sb);
+	sl->__sb = STRLIST_POISON;
 }
 
-void strlist_reset(struct strlist *sl)
+void strlist_cleanup(struct strlist *sl)
 {
-	BUG_ON(sl->use_ref);
 	while (strlist_pop2(sl, 0));
 }
 
-static void strlist_grow1(struct strlist *sl)
+static void strlist_nalloc(struct strlist *sl, uint size)
 {
-	CAP_ALLOC(&sl->list, sl->nl + 1, &sl->cap);
+	if (!(sl->flags & STRLIST_STORE_REF)) {
+		CAP_ALLOC(&sl->__sb, sl->size + size, &sl->cap);
 
-	size_t i = sl->uninit;
-	for_each_idx_from(i, sl->cap)
-		sl->list[i].cap = 0; /* cap as a marker */
+		uint i = sl->alnext;
+		for_each_idx_from(i, sl->cap)
+			sl->__sb[i].cap = 0; /* cap as a marker */
+	} else {
+		CAP_ALLOC(&sl->__cs, sl->size + size, &sl->cap);
+	}
 }
 
-static void strlist_init_strbuf(struct strlist *sl, struct strbuf *sb)
+static uint strlist_push_cs(struct strlist *sl, const char *str)
 {
-	flag_t flags = 0;
+	sl->__cs[sl->size++] = str;
 
-	if (sl->use_ref)
-		flags |= STRBUF_CONSTANT;
+	if (likely(!(sl->flags & STRLIST_CALC_STRLEN)))
+		return 0;
 
-	strbuf_init(sb, flags);
+	return strlen(str);
 }
 
-size_t strlist_push2(struct strlist *sl, const char *str, size_t extalloc)
+static uint strlist_push_sb(struct strlist *sl, const char *str)
 {
-	BUG_ON(sl->use_ref && extalloc);
+	struct strbuf *sb = &sl->__sb[sl->size++];
 
-	if (sl->nl == sl->cap)
-		strlist_grow1(sl);
-
-	struct strbuf *sb = &sl->list[sl->nl++];
 	if (!sb->cap)
-		strlist_init_strbuf(sl, sb);
+		strbuf_init(sb, 0);
 
 	/*
-	 * keep track uninitialized strbuf position to avoid unexpacted
-	 * zore-cap in strlist_grow1()
+	 * keep track uninitialized strbuf position to avoid
+	 * unexpacted zore-out strbuf cap in strlist_nalloc()
 	 */
-	if (sl->uninit <= sl->nl)
-		sl->uninit = sl->nl;
+	if (sl->alnext <= sl->size)
+		sl->alnext = sl->size;
 
-	if (sl->use_ref)
-		return strbuf_move(sb, str);
+	return strbuf_concat(sb, str);
+}
+
+uint strlist_push(struct strlist *sl, const char *str)
+{
+	if (sl->size == sl->cap)
+		strlist_nalloc(sl, 1);
+
+	if (!(sl->flags & STRLIST_STORE_REF))
+		return strlist_push_sb(sl, str);
 	else
-		return strbuf_concat2(sb, str, extalloc);
+		return strlist_push_cs(sl, str);
 }
 
 void strlist_join_argv(struct strlist *sl, const char **argv)
@@ -89,7 +96,7 @@ void strlist_join_argv(struct strlist *sl, const char **argv)
 }
 
 void __strlist_join_member(struct strlist *sl, void *arr,
-			   size_t nmemb, size_t size, size_t offset)
+			   uint nmemb, uint size, uint offset)
 {
 	intptr_t addr = (intptr_t)arr;
 	size_t sum = st_umult(nmemb, size);
@@ -99,33 +106,54 @@ void __strlist_join_member(struct strlist *sl, void *arr,
 		strlist_push(sl, *(const char **)(addr + offset));
 }
 
+static char *strlist_pop_sb(struct strlist *sl)
+{
+	struct strbuf *sb = &sl->__sb[--sl->size];
+	strbuf_reset_length(sb);
+
+	return sb->str;
+}
+
+static char *strlist_pop_cs(struct strlist *sl)
+{
+	return (char *)sl->__cs[--sl->size];
+}
+
 char *strlist_pop2(struct strlist *sl, int dup)
 {
-	if (sl->nl == 0)
+	if (!sl->size)
 		return NULL;
 
-	struct strbuf *sb = &sl->list[--sl->nl];
-	char *str = sb->str;
+	char *str;
+	if (!(sl->flags & STRLIST_STORE_REF))
+		str = strlist_pop_sb(sl);
+	else
+		str = strlist_pop_cs(sl);
+
 	if (dup)
 		str = xstrdup(str);
 
-	strbuf_reset_length(sb);
 	return str;
 }
 
 char **strlist_dump2(struct strlist *sl, int copy)
 {
-	size_t i;
-	size_t nl = sl->nl;
-	char **arr = xreallocarray(NULL, sizeof((*sl->list).str), sl->nl + 1);
+	uint i;
+	char **arr = xreallocarray(NULL, sizeof(*arr), sl->size + 1);
 
-	for_each_idx(i, nl)
-		if (copy)
-			arr[i] = xstrdup(sl->list[i].str);
+	for_each_idx(i, sl->size) {
+		char *str;
+		if (!(sl->flags & STRLIST_STORE_REF))
+			str = sl->__sb[i].str;
 		else
-			arr[i] = sl->list[i].str;
+			str = (char *)sl->__cs[i];
 
-	arr[nl] = NULL;
+		if (copy)
+			str = xstrdup(str);
+		arr[i] = str;
+	}
+
+	arr[sl->size] = NULL;
 	return arr;
 }
 

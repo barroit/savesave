@@ -125,6 +125,7 @@ void strbuf_trim(struct strbuf *sb);
  * strbuf_cntchr - count occurrences of c in strbuf
  */
 size_t strbuf_cntchr(struct strbuf *sb, int c);
+// uint strbuf_occur(struct strbuf *sb, int c);
 
 /**
  * strbuf_normalize_path - unify path separator into slash

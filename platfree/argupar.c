@@ -10,6 +10,7 @@
 #include "argupar.h"
 #include "termas.h"
 #include "strlist.h"
+#include "strbuf.h"
 #include "list.h"
 #include "alloc.h"
 
@@ -423,19 +424,19 @@ static void print_command_usage(const char *const *usage, struct strlist *sl)
 		strlist_split_word(sl, mas, 80 - (preflen + namlen));
 
 		printf("%*s%.*s", preflen, pref, namlen, str);
-		puts(sl->list[0].str);
+		puts(strlist_at(sl, 0));
 
-		if (sl->nl == 1)
+		if (sl->size == 1)
 			goto next;
 
-		size_t i = 1;
+		uint i = 1;
 		int pad = preflen + namlen;
 
-		for_each_idx_from(i, sl->nl)
-			printf("%*s%s\n", pad, "", sl->list[i].str);
+		for_each_idx_from(i, sl->size)
+			printf("%*s%s\n", pad, "", strlist_at(sl, i));
 
 next:
-		strlist_reset(sl);
+		strlist_cleanup(sl);
 		usage++;
 		pref = "or: ";
 	}
@@ -507,17 +508,17 @@ print_option_usage:
 		}
 
 		strlist_split_word(sl, _(opt->usage), 80 - pad);
-		printf("%*s%s\n", pad - nr, "", sl->list[0].str);
+		printf("%*s%s\n", pad - nr, "", strlist_at(sl, 0));
 
-		if (sl->nl == 1)
+		if (sl->size == 1)
 			goto next;
 
-		size_t i = 1;
-		for_each_idx_from(i, sl->nl)
-			printf("%*s%s\n", pad, "", sl->list[i].str);
+		uint i = 1;
+		for_each_idx_from(i, sl->size)
+			printf("%*s%s\n", pad, "", strlist_at(sl, i));
 
 next:
-		strlist_reset(sl);
+		strlist_cleanup(sl);
 	}
 
 	return cnt;
