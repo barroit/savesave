@@ -12,8 +12,7 @@
 
 void strlist_init(struct strlist *sl, flag_t flags)
 {
-	BUG_ON(!(sl->flags & STRLIST_STORE_REF) &&
-	       (sl->flags & STRLIST_CALC_STRLEN));
+	BUG_ON(!(flags & STRLIST_STORE_REF) && (flags & STRLIST_CALC_STRLEN));
 
 	memset(sl, 0, sizeof(*sl));
 	sl->flags = flags;

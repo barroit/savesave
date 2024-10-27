@@ -60,12 +60,12 @@ const char *tmp_dir(void)
 int readlink_nt(const char *name, char **target)
 {
 	struct stat st;
-	int err = stat(name, &st);
+	int err = lstat(name, &st);
 
 	if (err)
 		return warn_errno(ERRMAS_STAT_FILE(name));
 
-	off_t size = st.st_size ? : PATH_MAX;
+	off_t size = st.st_size ? : fix_grow(64);
 
 	ssize_t nr;
 	char *buf = xmalloc(size);
