@@ -80,7 +80,6 @@
 #include "barroit/string.h"
 #include "barroit/time.h"
 #include "barroit/resource.h"
-#include "barroit/threads.h"
 #include "barroit/zstd.h"
 
 #ifdef __linux__
