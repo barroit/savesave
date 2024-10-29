@@ -8,6 +8,7 @@
 #include "argupar.h"
 #include "termas.h"
 #include "path.h"
+#include "proc.h"
 
 #define SAVESAVE_USAGE \
 "savesave [--dotsav=<path>] [--output=<path> | --no-output] <command> [<args>]"
@@ -20,25 +21,19 @@ int cm_has_output = 1;
 static void redirect_output(void)
 {
 	const char *name = output_path();
+	int err = proc_rd_io(name, PROC_RD_STDOUT | PROC_RD_STDERR);
 
-	int fd = flexcreat(name);
-	if (fd == -1) {
+	switch (err) {
+	case -1:
 		warn_errno(ERRMAS_OPEN_FILE(name));
-		return;
-	}
-
-	if (dup2(fd, STDOUT_FILENO) == -1) {
+		break;
+	case PERR_RD_STDOUT:
 		warn_errno(_("failed to redirect stdout to %s"), name);
-		goto err_out;
-	}
-
-	if (dup2(fd, STDERR_FILENO) == -1) {
+		break;
+	case PERR_RD_STDERR:
 		warn_errno(_("failed to redirect stderr to %s"), name);
-		goto err_out;
+		break;
 	}
-
-err_out:
-	close(fd);
 }
 
 int cmd_main(int argc, const char **argv)

@@ -119,3 +119,41 @@ void pid_erase(void)
 	const char *name = pid_path();
 	unlink(name);
 }
+
+int proc_rd_io(const char *name, flag_t flags)
+{
+	BUG_ON(!flags);
+
+	int fd = flexcreat(name);
+	if (fd == -1)
+		return -1;
+
+	int ret = 0;
+	if (flags & PROC_RD_STDIN) {
+		ret = dup2(fd, STDIN_FILENO);
+		if (ret == -1) {
+			ret = PERR_RD_STDIN;
+			goto err_out;
+		}
+	}
+
+	if (flags & PROC_RD_STDOUT) {
+		ret = dup2(fd, STDOUT_FILENO);
+		if (ret == -1) {
+			ret = PERR_RD_STDOUT;
+			goto err_out;
+		}
+	}
+
+	if (flags & PROC_RD_STDERR) {
+		ret = dup2(fd, STDERR_FILENO);
+		if (ret == -1) {
+			ret = PERR_RD_STDERR;
+			goto err_out;
+		}
+	}
+
+err_out:
+	close(fd);
+	return ret >= 0 ? 0 : ret;
+}

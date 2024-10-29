@@ -52,6 +52,8 @@ void proc_detach(void);
 #endif
 
 struct proc {
+	flag_t flags;
+
 #ifdef __unix__
 	pid_t pid;
 #elif defined(_WIN32)
@@ -59,9 +61,25 @@ struct proc {
 #endif
 };
 
-int proc_exec(struct proc **proc, const char *file, ...);
+#define PROC_INIT { 0 };
+
+#define PROC_RD_STDIN  (1 << 0)
+#define PROC_RD_STDOUT (1 << 1)
+#define PROC_RD_STDERR (1 << 2)
+
+int proc_exec(struct proc *proc, const char *file, ...);
 
 int proc_wait(struct proc *proc);
+
+#define PERR_RD_OFFSET 39
+#define PERR_RD_STDIN  (-(STDIN_FILENO + PERR_RD_OFFSET))
+#define PERR_RD_STDOUT (-(STDOUT_FILENO + PERR_RD_OFFSET))
+#define PERR_RD_STDERR (-(STDERR_FILENO + PERR_RD_OFFSET))
+
+/*
+ * Redirect stdout/stderr/stdin to specified file.
+ */
+int proc_rd_io(const char *name, flag_t flags);
 
 #ifdef __unix__
 static inline int proc_kill(struct proc *proc, int sig)
