@@ -28,6 +28,7 @@ typedef uint mode_t;
 typedef int pid_t;
 
 typedef ulong rlim_t;
+
 #endif
 
 typedef uintmax_t flag_t;

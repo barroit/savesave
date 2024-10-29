@@ -43,7 +43,7 @@ err_not_pid:
 	    name);
 }
 
-pid_t savesave_pid(void)
+pid_t pid_retrieve(void)
 {
 	size_t i;
 	pid_t pid = max_value(pid);
@@ -60,7 +60,7 @@ pid_t savesave_pid(void)
 		if (pid == max_value(pid))
 			goto next;
 
-		if (proc_is_alive(pid))
+		if (pid_is_alive(pid))
 			goto out;
 
 		/*
@@ -78,9 +78,9 @@ out:
 	return pid;
 }
 
-void assert_unic_proc(void)
+void proc_assert_unique(void)
 {
-	pid_t pid = savesave_pid();
+	pid_t pid = pid_retrieve();
 
 	if (pid == max_value(pid))
 		return;

@@ -8,7 +8,7 @@
 #include "proc.h"
 #include "termas.h"
 
-int proc_is_alive(pid_t pid)
+int pid_is_alive(pid_t pid)
 {
 	int err;
 
