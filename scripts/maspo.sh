@@ -12,10 +12,8 @@ case $1 in
 'update')
 	xgettext --from-code=UTF-8 --omit-header	\
 		 -k_ -kN_ -k -i -o locale/generated.pot	\
-		 uni/*.c	win/*.c			\
-		 platfree/*.c				\
-		 entry/*.c				\
-		 include/*.h	include/barroit/*.h
+		 platspec/**/*.c platfree/*.c		\
+		 entry/*.c include/*.h	include/barroit/*.h
 
 	for r in ${region[@]}; do
 		msgmerge -i -U locale/$r.po locale/generated.pot

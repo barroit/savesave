@@ -15,133 +15,202 @@ msgstr  "Report-Msgid-Bugs-To: barroit@linux.com\n"
         "Content-Type: text/plain; charset=UTF-8\n"
         "Content-Transfer-Encoding: 8bit\n"
 
-#: uni/backup.c:50 win/backup.c:49
-#, c-format
-msgid   "unable to copy file from `%s' to `%s'"
+#: platspec/linux/acpy.c:31
+msgid   "machine is running critically low on memory, copy stopped"
 msgstr  ""
 
-#: uni/backup.c:58
+#: platspec/linux/acpy.c:157
 #, c-format
-msgid   "unable to create file at `%s'"
+msgid   "qs is too large, clamp to %u)"
 msgstr  ""
 
-#: uni/backup.c:60 uni/backup.c:102 win/backup.c:52
+#: platspec/linux/acpy.c:162
 #, c-format
-msgid   "unable to make directory `%s'"
+msgid   "bs is too large, clamp to %zu)"
 msgstr  ""
 
-#: uni/backup.c:77
+#: platspec/linux/acpy.c:179
+msgid   "failed to setup io uring"
+msgstr  ""
+
+#: platspec/linux/acpy.c:191
+msgid   "failed to allocate submission queue"
+msgstr  ""
+
+#: platspec/linux/acpy.c:205
+msgid   "failed to allocate submission queue entries"
+msgstr  ""
+
+#: platspec/linux/acpy.c:214
+msgid   "asynchronous io is disabled"
+msgstr  ""
+
+#: platspec/linux/acpy.c:347
+#, c-format
+msgid   "failed to read fd `%d'"
+msgstr  ""
+
+#: platspec/linux/acpy.c:349
+#, c-format
+msgid   "failed to write to fd `%d'"
+msgstr  ""
+
+#: platspec/linux/version.c:51
+#, c-format
+msgid   "kenel version `%s' is malformed"
+msgstr  ""
+
+#: platspec/linux/version.c:53
+#, c-format
+msgid   "kernel version `%s' is too old (minimum 5.6)"
+msgstr  ""
+
+#: platspec/unix/baktmr.c:70
+msgid   "too many backup requests were dropped, savesave can't keep up anymore"
+msgstr  ""
+
+#: platspec/unix/baktmr.c:82
+#, c-format
+msgid   "backup request of sav `%s' was dropped"
+msgstr  ""
+
+#: platspec/unix/baktmr.c:125
+#, c-format
+msgid   "failed to create backup timer for sav `%s'"
+msgstr  ""
+
+#: platspec/unix/fcpy.c:81
 #, c-format
 msgid   "path `%s' may have been truncated"
 msgstr  ""
 
-#: uni/backup.c:96
-#, c-format
-msgid   "unable to real link `%s'"
-msgstr  ""
-
-#: uni/backup.c:99
-#, c-format
-msgid   "unable to make symbolic link `%s'"
-msgstr  ""
-
-#: uni/fileiter.c:83
+#: platspec/unix/fileiter.c:88
 #, c-format
 msgid   "can't determine file type for `%s'"
 msgstr  ""
 
-#: uni/fileiter.c:87
+#: platspec/unix/fileiter.c:92
 #, c-format
 msgid   "`%s' has unsupported file type `%d', skipped"
 msgstr  ""
 
-#: uni/mkdir.c:22 win/mkdir.c:26
-#, c-format
-msgid   "failed to remove file `%s'"
-msgstr  ""
-
-#: uni/path.c:26
+#: platspec/unix/path.c:25
 #, c-format
 msgid   "can't get home directory for sudo user `%s'"
 msgstr  ""
 
-#: uni/path.c:41
+#: platspec/unix/path.c:40
 msgid   "your $HOME corrupted"
 msgstr  ""
 
-#: uni/proc.c:21 win/proc.c:22
+#: platspec/unix/proc.c:24 platspec/win32/proc.c:22
 #, c-format
 msgid   "failed to determine existence of process `%d'"
 msgstr  ""
 
-#: win/atenter.c:16
+#: platspec/unix/proc.c:34
+msgid   "failed to detach process from controlling terminal"
+msgstr  ""
+
+#: platspec/unix/proc.c:70
+#, c-format
+msgid   "failed to execute `%s'"
+msgstr  ""
+
+#: platspec/unix/proc.c:72
+msgid   "failed to execute program"
+msgstr  ""
+
+#: platspec/unix/proc.c:99
+#, c-format
+msgid   "failed to redirect %s to null device"
+msgstr  ""
+
+#: platspec/unix/proc.c:158
+msgid   "failed to make pipe for processes"
+msgstr  ""
+
+#: platspec/unix/proc.c:166
+msgid   "failed to create new process"
+msgstr  ""
+
+#: platspec/unix/resource.c:19
+msgid   "failed to resource limit of file descriptor"
+msgstr  ""
+
+#: platspec/win32/atenter.c:17
 msgid   "unsupported windows version (at least win7)"
 msgstr  ""
 
-#: win/console.c:51
+#: platspec/win32/baktmr.c:44
+#, c-format
+msgid   "failed to create timer for sav `%s'"
+msgstr  ""
+
+#: platspec/win32/console.c:50
 msgid   "failed to get console screen information"
 msgstr  ""
 
-#: win/console.c:54
+#: platspec/win32/console.c:53
 msgid   "failed to set console screen size"
 msgstr  ""
 
-#: win/console.c:57
+#: platspec/win32/console.c:56
 msgid   "failed to update console window"
 msgstr  ""
 
-#: win/console.c:71
+#: platspec/win32/console.c:70
 msgid   "failed to set console output codepage to UTF-8"
 msgstr  ""
 
-#: win/dumpstack.c:27
+#: platspec/win32/dumpstack.c:26
 msgid   "failed to initialize symbol handler"
 msgstr  ""
 
-#: win/dumpstack.c:57
+#: platspec/win32/dumpstack.c:56
 msgid   "failed to retrieve symbol for 0x<PRIxMAX>"
 msgstr  ""
 
-#: win/fileiter.c:60
+#: platspec/win32/fileiter.c:73
 msgid   "a broken symlink?"
 msgstr  ""
 
-#: win/fileiter.c:74
+#: platspec/win32/fileiter.c:89
 #, c-format
 msgid   "`%s' has unsupported st_mode `%u', skipped"
 msgstr  ""
 
-#: win/fileiter.c:100
+#: platspec/win32/fileiter.c:115
 #, c-format
 msgid   "failed to find next file of file `%s'"
 msgstr  ""
 
-#: win/fileiter.c:107
+#: platspec/win32/fileiter.c:122
 #, c-format
 msgid   "failed to find first file from pattern `%s'"
 msgstr  ""
 
-#: win/menu.c:22
+#: platspec/win32/menu.c:22
 msgid   "failed to set menu infomation"
 msgstr  ""
 
-#: win/path.c:48
+#: platspec/win32/path.c:47
 msgid   "failed to retrieve temporary directory name"
 msgstr  ""
 
-#: win/window.c:40
+#: platspec/win32/window.c:40
 msgid   "'About' feature is not available yet"
 msgstr  ""
 
-#: win/window.c:63
+#: platspec/win32/window.c:63
 msgid   "failed to register window class"
 msgstr  ""
 
-#: win/window.c:70
+#: platspec/win32/window.c:70
 msgid   "failed to create window"
 msgstr  ""
 
-#: win/winexit.c:19
+#: platspec/win32/winexit.c:21
 msgid   "Press any key to continue..."
 msgstr  ""
 
@@ -159,271 +228,325 @@ msgstr  ""
 msgid   "failed to duplicate string"
 msgstr  ""
 
-#: platfree/argupar.c:141
+#: platfree/argupar.c:117
+#, c-format
+msgid   "unknown command `%s', see '%s -h'"
+msgstr  ""
+
+#: platfree/argupar.c:228
+#, c-format
+msgid   "options '%s' and '%s' cannot be used together"
+msgstr  ""
+
+#: platfree/argupar.c:260
 #, c-format
 msgid   "failed to parse option `%s' with value `%s'"
 msgstr  ""
 
-#: platfree/argupar.c:175
+#: platfree/argupar.c:298
 #, c-format
 msgid   "short option `%c' requires a value"
 msgstr  ""
 
-#: platfree/argupar.c:268
+#: platfree/argupar.c:396
 #, c-format
 msgid   "unknown long option `%.*s'"
 msgstr  ""
 
-#: platfree/argupar.c:271
+#: platfree/argupar.c:399
 #, c-format
 msgid   "long option `%s%s' requires a value"
 msgstr  ""
 
-#: platfree/argupar.c:274
+#: platfree/argupar.c:402
 #, c-format
 msgid   "long option `%s%s' takes no value"
 msgstr  ""
 
-#: platfree/argupar.c:277
+#: platfree/argupar.c:405
 #, c-format
 msgid   "long option `%.*s' is ambiguous (could be --%s%s or --%s%s)"
 msgstr  ""
 
-#: platfree/backup.c:77
+#: platfree/argupar.c:660
 #, c-format
-msgid   "failed to rename file `%s' to `%s'"
+msgid   "command '%s' requires an argument\n"
 msgstr  ""
 
-#: platfree/backup.c:130
+#: platfree/argupar.c:667
 #, c-format
-msgid   "unable to drop deprecated backup of configuration `%s'"
+msgid   "command '%s' takes no argument"
 msgstr  ""
 
-#: platfree/backup.c:135
+#: platfree/baktmr.c:35
 #, c-format
-msgid   "unable to sort backup `%s' of configuration `%s'"
+msgid   "can't backup sav `%s'"
 msgstr  ""
 
-#: platfree/backup.c:139
+#: platfree/baktmr.c:40
 #, c-format
-msgid   "unable to determine next backup file name of configuration `%s'"
+msgid   "failed finish backup routine for sav `%s'"
 msgstr  ""
 
-#: platfree/backup.c:195
+#: platfree/baktmr.c:44
 #, c-format
-msgid   "failed to make directory `%s'"
-msgstr  ""
-
-#: platfree/backup.c:208
-#, c-format
-msgid   "failed to backup save `%s' to `%s'"
-msgstr  ""
-
-#: platfree/backup.c:227
-#, c-format
-msgid   "next backup name\n"
-        "\t%s\n"
-        "\n"
+msgid   "backup routine of sav `%s' eixted with code `%d'"
 msgstr  ""
 
 #: platfree/compress.c:30
 msgid   "savesave requires a multithreading supported version of libzstd"
 msgstr  ""
 
-#: platfree/dotsav.c:113
+#: platfree/dotsav.c:99
 #, c-format
-msgid   "save path `%s' is not absolute"
+msgid   "cannot retrieve content for dotsav `%s'"
 msgstr  ""
 
-#: platfree/dotsav.c:126
+#: platfree/dotsav.c:109
+#, c-format
+msgid   "save `%s' must be absolute path"
+msgstr  ""
+
+#: platfree/dotsav.c:120
 #, c-format
 msgid   "unsupported save file `%s'"
 msgstr  ""
 
-#: platfree/dotsav.c:138
+#: platfree/dotsav.c:131
 msgid   "stack cannot be 0"
 msgstr  ""
 
-#: platfree/dotsav.c:147
+#: platfree/dotsav.c:140
 msgid   "period cannot be 0"
 msgstr  ""
 
-#: platfree/dotsav.c:157
+#: platfree/dotsav.c:196
+msgid   "whitespace is not allowed in savent name"
+msgstr  ""
+
+#: platfree/dotsav.c:223
+msgid   "sav entry is missing a value"
+msgstr  ""
+
+#: platfree/dotsav.c:228
 #, c-format
 msgid   "name `%s' has collisions at indexes %zu and %zu"
 msgstr  ""
 
-#: platfree/dotsav.c:203
-msgid   "whitespace is not allowed in savent name"
+#: platfree/dotsav.c:237
+msgid   "sav entry contains an unrecognized key"
 msgstr  ""
 
-#: platfree/dotsav.c:226
-msgid   "unrecognized sav entry"
-msgstr  ""
-
-#: platfree/dotsav.c:230
-msgid   "value is empty"
-msgstr  ""
-
-#: platfree/dotsav.c:243
-msgid   "encountered an unknown line"
-msgstr  ""
-
-#: platfree/dotsav.c:264
+#: platfree/dotsav.c:258
 #, c-format
 msgid   "savent `%s' missing the following fields\n"
         "\n"
         "%s"
 msgstr  ""
 
-#: platfree/dotsav.c:265
+#: platfree/dotsav.c:259
 #, c-format
 msgid   "savent `%s' missing the following field\n"
         "\n"
         "%s"
 msgstr  ""
 
-#: platfree/dotsav.c:317
+#: platfree/dotsav.c:305
 #, c-format
 msgid   "failed to parse dotsav\n"
         "%7u:%s"
 msgstr  ""
 
-#: platfree/mkdir.c:88
-#, c-format
-msgid   "unable to calculate size for directory `%s'"
-msgstr  ""
-
-#: platfree/proc.c:43
-#, c-format
-msgid   "PID found in file `%s' is malformed; ensure savesave is completely "
-        "terminated and manually remove this file."
-msgstr  ""
-
-#: platfree/proc.c:76
-#, c-format
-msgid   "there is already a running savesave (PID %d)"
-msgstr  ""
-
-#: platfree/proc.c:100
-#, c-format
-msgid   "failed to init pid file `%s', unique process detection disabled"
-msgstr  ""
-
-#: platfree/proc.c:102
-msgid   "ensure only one savesave process runs at a time, behavior otherwise "
-        "is undefined"
-msgstr  ""
-
-#: platfree/string.c:87
-#, c-format
-msgid   "signed integer `%s' is too big (range [%lld, %lld])"
-msgstr  ""
-
-#: platfree/string.c:90
-#, c-format
-msgid   "invalid character found in signed value `%s'"
-msgstr  ""
-
-#: platfree/string.c:117
-#, c-format
-msgid   "unsigned integer `%s' is too big (up to %llu)"
-msgstr  ""
-
-#: platfree/string.c:120
-#, c-format
-msgid   "invalid character found in unsigned integer `%s'"
-msgstr  ""
-
-#: platfree/string.c:166
-#, c-format
-msgid   "unknown time unit specifier `%c'"
-msgstr  ""
-
-#: platfree/string.c:183
-#, c-format
-msgid   "unknown bool value `%s'"
-msgstr  ""
-
-#: platfree/termas.c:27
-#, c-format
-msgid   "too long a prefix `%.10s...'\n"
-msgstr  ""
-
-#: platfree/termas.c:40
-#, c-format
-msgid   "fatal: unable to format message `%s'\n"
-msgstr  ""
-
-#: entry/savesave.c:26
+#: platfree/dotsav.c:368
 msgid   "no dotsav (.savesave) was provided"
 msgstr  ""
 
-#: entry/savesave.c:30
-#, c-format
-msgid   "unable to retrieve content for dotsav `%s'"
-msgstr  ""
-
-#: entry/savesave.c:37
+#: platfree/dotsav.c:375
 #, c-format
 msgid   "no configuration found in dotsav `%s'"
 msgstr  ""
 
-#: entry/savesave.c:48
-msgid   "use specified dotsav"
-msgstr  ""
-
-#: entry/savesave.c:71
-msgid   "savesave requires a command"
-msgstr  ""
-
-#: include/calc.h:32 include/calc.h:42 include/termas.h:34 include/termas.h:36
-msgid   "fatal: "
-msgstr  ""
-
-#: include/calc.h:32
+#: platfree/proc.c:41
 #, c-format
-msgid   "size overflow: %<PRIuMAX> * %<PRIuMAX>"
+msgid   "pid found in file `%s' is malformed; ensure savesave is completely "
+        "terminated and manually remove this file."
 msgstr  ""
 
-#: include/calc.h:42
+#: platfree/proc.c:88
 #, c-format
-msgid   "size overflow: %<PRIuMAX> + %<PRIuMAX>"
+msgid   "only one process allowed (running process `%d')"
 msgstr  ""
 
-#: include/command.h:29 include/command.h:30 include/command.h:31
-#: include/command.h:32
-msgid   "sss"
+#: platfree/proc.c:112
+#, c-format
+msgid   "failed to init pid file `%s', unique process detection disabled"
 msgstr  ""
 
-#: include/compiler.h:48
-msgid   "pointer type mismatch in containerof()"
+#: platfree/proc.c:114
+msgid   "ensure only one savesave process runs at a time, behavior otherwise "
+        "is undefined"
 msgstr  ""
 
-#: include/termas.h:24 include/termas.h:26
+#: platfree/string.c:85
+#, c-format
+msgid   "signed integer `%s' is too big (range [%lld, %lld])"
+msgstr  ""
+
+#: platfree/string.c:88
+#, c-format
+msgid   "invalid character found in signed value `%s'"
+msgstr  ""
+
+#: platfree/string.c:115
+#, c-format
+msgid   "unsigned integer `%s' is too big (up to %llu)"
+msgstr  ""
+
+#: platfree/string.c:118
+#, c-format
+msgid   "invalid character found in unsigned integer `%s'"
+msgstr  ""
+
+#: platfree/string.c:165
+#, c-format
+msgid   "unknown time unit specifier `%c'"
+msgstr  ""
+
+#: platfree/string.c:182
+#, c-format
+msgid   "unknown bool value `%s'"
+msgstr  ""
+
+#: platfree/termas.c:25
+#, c-format
+msgid   "too long a prefix `%.10s...'\n"
+msgstr  ""
+
+#: platfree/termas.c:38
+#, c-format
+msgid   "fatal: unable to format message `%s'\n"
+msgstr  ""
+
+#: platfree/termas.c:234
+#, c-format
+msgid   "%s:%d:overflow (%u-bit): %<PRIuMAX> * %<PRIuMAX>"
+msgstr  ""
+
+#: platfree/termas.c:236
+#, c-format
+msgid   "%s:%d:overflow (%u-bit): %<PRIuMAX> + %<PRIuMAX>"
+msgstr  ""
+
+#: entry/savesave.c:31
+#, c-format
+msgid   "failed to redirect stdout to %s"
+msgstr  ""
+
+#: entry/savesave.c:34
+#, c-format
+msgid   "failed to redirect stderr to %s"
+msgstr  ""
+
+#: entry/savesave.c:44
+msgid   "dotsav file"
+msgstr  ""
+
+#: entry/savesave.c:46
+msgid   "output file"
+msgstr  ""
+
+#: include/command.h:33
+msgid   "Start backup task in background"
+msgstr  ""
+
+#: include/command.h:34
+msgid   "Copy a file"
+msgstr  ""
+
+#: include/command.h:35
+msgid   "Display help information about Savesave"
+msgstr  ""
+
+#: include/command.h:36
+msgid   "Query default information of Savesave"
+msgstr  ""
+
+#: include/command.h:37
+msgid   "Calculate file size of given path"
+msgstr  ""
+
+#: include/command.h:38
+msgid   "Display version information about Savesave"
+msgstr  ""
+
+#: include/termas.h:28 include/termas.h:30
 msgid   "warning: "
 msgstr  ""
 
-#: include/termas.h:29 include/termas.h:31
+#: include/termas.h:33 include/termas.h:35
 msgid   "error: "
 msgstr  ""
 
-#: include/termas.h:63
+#: include/termas.h:38 include/termas.h:40
+msgid   "fatal: "
+msgstr  ""
+
+#: include/termas.h:67
 #, c-format
 msgid   "failed to retrieve information for `%s'"
 msgstr  ""
 
-#: include/termas.h:66
+#: include/termas.h:70
 #, c-format
 msgid   "failed to open `%s'"
 msgstr  ""
 
-#: include/termas.h:69
+#: include/termas.h:73
+#, c-format
+msgid   "failed to create file at `%s'"
+msgstr  ""
+
+#: include/termas.h:76
+#, c-format
+msgid   "failed to make directory `%s'"
+msgstr  ""
+
+#: include/termas.h:79
+#, c-format
+msgid   "failed to make symbolic link `%s' for target `%s'"
+msgstr  ""
+
+#: include/termas.h:82
 #, c-format
 msgid   "failed to access file `%s'"
 msgstr  ""
 
-#: include/termas.h:72
+#: include/termas.h:85
 #, c-format
 msgid   "failed to read file `%s'"
+msgstr  ""
+
+#: include/termas.h:88
+#, c-format
+msgid   "failed to write to file `%s'"
+msgstr  ""
+
+#: include/termas.h:91
+#, c-format
+msgid   "unable to read link `%s'"
+msgstr  ""
+
+#: include/termas.h:94
+#, c-format
+msgid   "unable to copy file from `%s' to `%s'"
+msgstr  ""
+
+#: include/termas.h:97
+#, c-format
+msgid   "failed to rename file `%s' to `%s'"
+msgstr  ""
+
+#: include/termas.h:100
+#, c-format
+msgid   "failed to remove file `%s'"
 msgstr  ""
