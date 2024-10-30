@@ -100,6 +100,12 @@ uint strbuf_concat_pathname(struct strbuf *sb,
 	strbuf_oprintf(__sb, (__sb)->len, __VA_ARGS__)
 
 /*
+ * Similar to strbuf_printf(), except it fills data at base.
+ */
+#define strbuf_boprintf(__sb, ...) \
+	strbuf_oprintf(__sb, (__sb)->base, __VA_ARGS__)
+
+/*
  * Similar to strbuf_printf(), except it takes a position argument that
  * specifies the buffer position at which printf starts to fill data.
  */

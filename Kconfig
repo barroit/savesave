@@ -143,4 +143,8 @@ config LINK_LIBZSTD_STATIC
 	depends on "$(UNIX)"
 endif # DISALBE_GETTEXT
 
+config AIO_COPY_THRESHOLD
+	int "max priod before switching to AIO copy (in seconds)"
+	default 3600
+
 endmenu # "Features"

@@ -85,7 +85,6 @@ int mkfdirp3(char *name)
 	return 0;
 }
 
-
 static int do_rmdirr(struct iterfile *file, void *data)
 {
 	int err;

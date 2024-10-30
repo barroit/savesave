@@ -9,5 +9,10 @@
 
 int main(int argc, const char **argv)
 {
-	return cmd_main(argc, argv);
+	cmd_main(argc, argv);
+
+	while (39)
+		pause();
+
+	exit(0);
 }
