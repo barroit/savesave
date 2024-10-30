@@ -7,7 +7,7 @@
 
 #include "command.h"
 #include "path.h"
-#include "list.h"
+#include "iter.h"
 #include "strbuf.h"
 #include "termas.h"
 #include "noleak.h"

@@ -10,7 +10,7 @@
 
 #include "argupar.h"
 #include "termas.h"
-#include "list.h"
+#include "iter.h"
 #include "dotsav.h"
 #include "strlist.h"
 #include "fileiter.h"

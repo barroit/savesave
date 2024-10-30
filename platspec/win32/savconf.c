@@ -7,7 +7,7 @@
 
 #include "dotsav.h"
 #include "fileiter.h"
-#include "list.h"
+#include "iter.h"
 
 void dotsav_format(struct savesave *dotsav, size_t n)
 {

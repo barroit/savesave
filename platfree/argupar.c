@@ -12,6 +12,7 @@
 #include "strlist.h"
 #include "strbuf.h"
 #include "list.h"
+#include "iter.h"
 #include "alloc.h"
 
 #define OPTMAS_INDENT_OPT  "    "

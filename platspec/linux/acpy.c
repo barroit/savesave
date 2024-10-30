@@ -19,7 +19,7 @@
 #include "fcpy.h"
 #include "path.h"
 #include "alloc.h"
-#include "list.h"
+#include "iter.h"
 #include "barrier.h"
 
 #define MAX_ENTRIES INT16_MAX

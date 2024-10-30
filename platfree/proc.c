@@ -9,7 +9,7 @@
 #include "strbuf.h"
 #include "robio.h"
 #include "path.h"
-#include "list.h"
+#include "iter.h"
 #include "termas.h"
 
 static pid_t read_pid(const char *name)

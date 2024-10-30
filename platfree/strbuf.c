@@ -7,7 +7,7 @@
 
 #include "strbuf.h"
 #include "alloc.h"
-#include "list.h"
+#include "iter.h"
 #include "mkdir.h"
 
 void strbuf_init2(struct strbuf *sb, const char *base, flag_t flags)

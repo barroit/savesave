@@ -14,6 +14,7 @@
 #include "dotsav.h"
 #include "noleak.h"
 #include "list.h"
+#include "iter.h"
 #include "fcpy.h"
 #include "acpy.h"
 #include "path.h"

@@ -8,7 +8,7 @@
 #include "strlist.h"
 #include "strbuf.h"
 #include "alloc.h"
-#include "list.h"
+#include "iter.h"
 
 void strlist_init(struct strlist *sl, flag_t flags)
 {

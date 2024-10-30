@@ -7,7 +7,7 @@
 
 #include "termas.h"
 #include "robio.h"
-#include "list.h"
+#include "iter.h"
 #include "alloc.h"
 
 #define UPDATE_BUF(buf, n, len)	\

@@ -6,7 +6,7 @@
  */
 
 #include "argupar.h"
-#include "list.h"
+#include "iter.h"
 #include "path.h"
 #include "termas.h"
 #include "strbuf.h"

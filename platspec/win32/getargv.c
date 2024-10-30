@@ -12,7 +12,7 @@
 
 #include "getargv.h"
 #include "strlist.h"
-#include "list.h"
+#include "iter.h"
 #include "termas.h"
 #include "alloc.h"
 

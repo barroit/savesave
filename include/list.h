@@ -87,15 +87,4 @@ static inline int list_is_empty(struct list_head *head)
 	     !list_entry_is_head(pos, head, memb); 		\
 	     pos = next, next = list_next_entry(next, memb))
 
-#define for_each_idx(i, n) for (i = 0; i < n; i++)
-
-/*
- * handle index up to max_value(i) - 1
- */
-#define for_each_idx_back(i, n) for (i = n; i != max_value(i); i--)
-
-#define for_each_idx_from(i, n) for (; i < n; i++)
-
-#define for_each_str(arr) for (; *arr != NULL; arr++)
-
 #endif /* LIST_H */
