@@ -23,6 +23,8 @@ void strbuf_init2(struct strbuf *sb, const char *base, flag_t flags)
 
 void strbuf_destroy(struct strbuf *sb)
 {
+	BUG_ON(!sb->cap);
+
 	free(sb->str);
 	sb->str = STRBUF_POISON;
 }

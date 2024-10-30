@@ -117,6 +117,7 @@ iter_done:
 
 cleanup:
 	strbuf_destroy(&ctx.sb);
-	strlist_destroy(&ctx.sl);
+	if (ctx.sl.cap)
+		strlist_destroy(&ctx.sl);
 	return ret;
 }

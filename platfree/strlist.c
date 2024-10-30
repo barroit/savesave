@@ -20,6 +20,8 @@ void strlist_init(struct strlist *sl, flag_t flags)
 
 void strlist_destroy(struct strlist *sl)
 {
+	BUG_ON(!sl->cap);
+
 	if (sl->flags & STRLIST_STORE_REF)
 		goto out;
 
