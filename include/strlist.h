@@ -90,7 +90,7 @@ static inline char *strlist_at(struct strlist *sl, uint index)
 char **strlist_dump2(struct strlist *sl, int copy);
 
 /*
- * Dump elements of strlist into array.
+ * Dump elements of strlist into array, terminate the array with NULL.
  */
 static inline char **strlist_dump(struct strlist *sl)
 {

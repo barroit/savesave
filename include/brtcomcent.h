@@ -45,6 +45,7 @@
 # include <sys/utsname.h>
 # include <sys/syscall.h>
 # include <sys/mman.h>
+# include <sys/wait.h>
 #elif defined(_WIN32)
 # include <sdkddkver.h>
 # include <io.h>
