@@ -39,6 +39,9 @@ DIR *cntopendir(const char *name);
 int cntclosedir(DIR *dirp);
 #define closedir cntclosedir
 
+int cntpipe(int pipedes[2]);
+#define pipe cntpipe
+
 #endif /* __unix__ */
 
 int cntdup(int oldfd);
