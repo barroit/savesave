@@ -20,6 +20,12 @@
 #define smp_store_release(x, val) \
 	__atomic_store_n(x, val, __ATOMIC_RELEASE)
 
+#define smp_inc_return(x) \
+	__atomic_add_fetch(x, 1, __ATOMIC_ACQ_REL)
+
+#define smp_dec_return(x) \
+	__atomic_sub_fetch(x, 1, __ATOMIC_ACQ_REL)
+
 #define smp_mb() \
 	__atomic_thread_fence(__ATOMIC_ACQ_REL)
 

@@ -6,6 +6,7 @@
  */
 
 #include "robio.h"
+#include "barrier.h"
 
 rlim_t cntio_fdcnt;
 
@@ -14,7 +15,7 @@ int cntcreat(const char *file, mode_t mode)
 	int fd = robcreat(file, mode);
 
 	if (likely(fd != -1))
-		__atomic_fetch_add(&cntio_fdcnt, 1, __ATOMIC_RELAXED);
+		smp_inc_return(&cntio_fdcnt);
 
 	return fd;
 }
@@ -29,7 +30,7 @@ int cntopen3(const char *file, int oflag, mode_t mode)
 	int fd = robopen(file, oflag, mode);
 
 	if (likely(fd != -1))
-		__atomic_fetch_add(&cntio_fdcnt, 1, __ATOMIC_RELAXED);
+		smp_inc_return(&cntio_fdcnt);
 
 	return fd;
 }
@@ -41,9 +42,8 @@ int cntclose(int fd)
 	int ret = robclose(fd);
 
 	if (likely(ret == 0)) {
-		uint prev = __atomic_fetch_sub(&cntio_fdcnt,
-					       1, __ATOMIC_RELAXED);
-		BUG_ON(prev == 0);
+		uint new = smp_dec_return(&cntio_fdcnt);
+		BUG_ON(new == -1);
 	}
 
 	return ret;
@@ -54,7 +54,7 @@ int cntdup(int oldfd)
 	int fd = robdup(oldfd);
 
 	if (likely(fd != -1))
-		__atomic_fetch_add(&cntio_fdcnt, 1, __ATOMIC_RELAXED);
+		smp_inc_return(&cntio_fdcnt);
 
 	return fd;
 }
@@ -64,7 +64,7 @@ int cntdup2(int oldfd, int newfd)
 	int fd = robdup2(oldfd, newfd);
 
 	if (likely(fd != -1))
-		__atomic_fetch_add(&cntio_fdcnt, 1, __ATOMIC_RELAXED);
+		smp_inc_return(&cntio_fdcnt);
 
 	return fd;
 }
