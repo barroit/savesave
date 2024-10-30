@@ -11,6 +11,7 @@
 #include "strbuf.h"
 #include "termas.h"
 #include "noleak.h"
+#include "alloc.h"
 
 static const char *find_data_dirname(void)
 {
@@ -147,6 +148,22 @@ const char *output_path(void)
 
 	if (!path)
 		path = __output_path();
+
+	return path;
+}
+
+const char *exec_dir(void)
+{
+	static const char *path;
+
+	if (!path) {
+		const char *file = exec_path();
+		char *buf = xstrdup(file);
+
+		path = dirname(buf);
+		if (path != buf)
+			free(buf);
+	}
 
 	return path;
 }

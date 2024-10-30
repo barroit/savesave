@@ -19,7 +19,7 @@ const char *home_dir(void)
 	return getenv("USERPROFILE");
 }
 
-const char *exec_dir(void)
+const char *exec_path(void)
 {
 	static char path[PATH_MAX + 1];
 	if (!*path) {

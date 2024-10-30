@@ -7,7 +7,7 @@
 
 #include "path.h"
 
-const char *exec_dir(void)
+const char *exec_path(void)
 {
 	static const char *path;
 

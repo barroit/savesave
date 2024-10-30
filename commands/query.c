@@ -27,7 +27,8 @@ static int cmd_query_path(int argc, const char **argv)
 		APOPT_MEMBINFO("proc-id",  N_("process id file")),
 		APOPT_MEMBINFO("data-dir", N_("program data directory")),
 		APOPT_MEMBINFO("tmp-dir",  N_("temporary data directory")),
-		APOPT_MEMBINFO("exe-dir",  N_("executable directory")),
+		APOPT_MEMBINFO("exec",     N_("executable file")),
+		APOPT_MEMBINFO("exec-dir", N_("executable directory")),
 		APOPT_MEMBINFO("locale",   N_("locale file directory")),
 		APOPT_END(),
 	};
@@ -45,7 +46,8 @@ static int cmd_query_path(int argc, const char **argv)
 		{ "proc-id",  pid_path },
 		{ "data-dir", data_dir },
 		{ "tmp-dir",  tmp_dir },
-		{ "exe-dir",  exec_dir },
+		{ "exec",     exec_path },
+		{ "exec-dir", exec_dir },
 		{ "locale",   locale_dir },
 	};
 

@@ -17,6 +17,8 @@ static inline int path_is_dir_ind(const char *name)
 
 const char *home_dir(void);
 
+const char *exec_path(void);
+
 const char *exec_dir(void);
 
 const char *tmp_dir(void);
@@ -27,7 +29,7 @@ const char *tmp_dir(void);
 #define DATA_DIR_LIST_INIT {			\
 	[0] = getenv("XDG_RUNTIME_DIR"),	\
 	[1] = tmp_dir(),			\
-	[2] = exec_dir(),		\
+	[2] = exec_path(),		\
 }
 
 const char *data_dir(void);
