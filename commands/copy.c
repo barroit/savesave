@@ -60,10 +60,9 @@ static void cleanup_cpytsk(void)
 	}
 }
 
-static void sav2argv(const char *name, int *argc, const char ***argv)
+static struct savesave *find_sav(const char *name)
 {
 	dotsav_prepare();
-
 	struct savesave *sav = dotsav_array;
 
 	for_each_sav(sav)
@@ -75,20 +74,96 @@ static void sav2argv(const char *name, int *argc, const char ***argv)
 		die(_("no matching sav `%s' found in `%s'"), name, path);
 	}
 
-	/*
-	 * -1 for removing the trailing dot
-	 */
-	size_t len = strlen(sav->backup_prefix) - 1;
-	char *dest = xmalloc(len + 1);
+	return sav;
+}
 
-	memcpy(dest, sav->backup_prefix, len);
-	dest[len] = 0;
+/*
+ * Returns the number of sorted backups. If an error is encountered, -1
+ * is returned. A return value of -EBUSY indicates that there's no room
+ * to make any backups.
+ *
+ * NB: this function uses dest as buffer to store the formatted path,
+ *     which is returned by __next.
+ */
+static int backup_messy_sort(struct strbuf *src,
+			     struct strbuf *dest,
+			     u8 stack, const char **__next)
+{
+	u8 i;
+	u8 first;
+	int next = -1;
 
+	for_each_idx(i, stack) {
+		strbuf_boprintf(src, "%u", i);
+
+		int err = access(src->str, F_OK);
+		if (!err) {
+			if (next == -1)
+				continue;
+
+			strbuf_boprintf(dest, "%u", next);
+			err = rename(src->str, dest->str);
+			if (!err) {
+				next += 1;
+				continue;
+			}
+
+			return warn_errno(ERRMAS_RENAME_FILE(src->str,
+							     dest->str));
+		} else if (errno != ENOENT) {
+			return warn_errno(ERRMAS_ACCESS_FILE(src->str));
+		} else if (next == -1) {
+			first = i;
+			next = i;
+		}
+	}
+
+	if (next == -1)
+		return -EBUSY;
+
+	if (!__next)
+		goto out;
+
+	strbuf_boprintf(dest, "%u", next);
+	*__next = dest->str;
+
+out:
+	return next - first;
+}
+
+static void sav2argv(const char *name, int *argc, const char ***argv)
+{
+	struct savesave *sav = find_sav(name);
+	struct strbuf src;
+	struct strbuf dest;
+
+	strbuf_init2(&src, sav->backup_prefix, 0);
+	strbuf_init2(&dest, sav->backup_prefix, 0);
+
+	const char *next;
+	int ret;
+
+retry:
+	ret = backup_messy_sort(&src, &dest, sav->stack, &next);
+
+	if (ret == -1) {
+		die(_("unable to sort backup %s for sav `%s'"),
+		    dest.str, sav->name);
+	} else if (ret == -EBUSY) {
+		strbuf_boprintf(&dest, "%u", 0);
+		ret = flexremove(dest.str);
+		if (ret)
+			die(_("unable to drop deprecated backup for `%s'"),
+			    sav->name);
+		goto retry;
+	}
+
+	strbuf_destroy(&src);
 	*argc = 2;
 	*argv = xcalloc(sizeof(*argv), 3);
 
 	(*argv)[0] = sav->save_prefix;
-	(*argv)[1] = dest;
+	(*argv)[1] = next;
 	(*argv)[2] = NULL;
 
 	NOLEAK(*argv);
