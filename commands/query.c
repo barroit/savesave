@@ -21,7 +21,7 @@ static int cmd_query_path(int argc, const char **argv)
 {
 	struct arguopt option[] = {
 		APOPT_GROUP(N_("List of query names")),
-		APOPT_MEMBINFO("log",      N_("log file")),
+		APOPT_MEMBINFO("output",   N_("log file")),
 		APOPT_MEMBINFO("home",     N_("home directory")),
 		APOPT_MEMBINFO("dotsav",   N_("dotsav configuration")),
 		APOPT_MEMBINFO("proc-id",  N_("process id file")),

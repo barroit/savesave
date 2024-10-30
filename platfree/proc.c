@@ -124,7 +124,7 @@ int proc_rd_io(const char *name, flag_t flags)
 {
 	BUG_ON(!flags);
 
-	int fd = flexcreat(name);
+	int fd = flexcreat_nt(name);
 	if (fd == -1)
 		return -1;
 
