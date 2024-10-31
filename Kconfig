@@ -16,6 +16,7 @@ menu "Sanitizers"
 
 config USE_ASAN
 	bool "address - memory-related bugs"
+	select NO_REPORT_HOOK if "$(WIN32)"
 
 config USE_UBSAN
 	bool "undefined - various kinds of undefined behavior"
@@ -49,6 +50,9 @@ config DEBUG_INTLDLL
 config MAX_DUMP_STACK
 	int "max dump stack (up to USHRT_MAX)"
 	default 64
+
+config NO_REPORT_HOOK
+	bool "disable crt report hook"
 endif # "$(WIN32)"
 
 endmenu # "Debugging"

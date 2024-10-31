@@ -59,7 +59,7 @@
 # include <direct.h>
 # include <basetsd.h>
 # include <shlwapi.h>
-# ifndef NDEBUG
+# ifdef HAVE_RPHK
 #  include <dbghelp.h>
 #  include <crtdbg.h>
 # endif

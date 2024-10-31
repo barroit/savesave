@@ -209,8 +209,9 @@ target_link_libraries(savesave platfree platspec)
 # ------------------------------------ Dll ------------------------------------
 if(WIN32)
   target_link_libraries(savesave comctl32 shlwapi)
-  if(CONFIG_ENABLE_DEBUGGING)
+  if(CONFIG_ENABLE_DEBUGGING AND NOT CONFIG_NO_REPORT_HOOK)
     target_link_libraries(savesave dbghelp)
+    add_compile_definitions(HAVE_RPHK)
   endif()
 endif()
 
