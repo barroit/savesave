@@ -9,8 +9,10 @@
 
 int setenv(const char *name, const char *value, int overwrite)
 {
-	if (!name || *name == 0 || strchr(name, '='))
-		goto err_nul_name;
+	if (!name || *name == 0 || strchr(name, '=')) {
+		errno = EINVAL;
+		return -1;
+	}
 
 	char *prev = getenv(name);
 	if (prev && !overwrite)
@@ -21,8 +23,10 @@ int setenv(const char *name, const char *value, int overwrite)
 	size_t stlen = nalen + 1 + valen;
 
 	char *str = malloc(stlen + 1);
-	if (!str)
-		goto err_no_mem;
+	if (!str) {
+		errno = ENOMEM;
+		return -1;
+	}
 
 	memcpy(str, name, nalen);
 	str[nalen] = '=';
@@ -30,19 +34,11 @@ int setenv(const char *name, const char *value, int overwrite)
 	str[stlen] = 0;
 
 	int err = putenv(str);
-	if (err)
-		goto err_put_env;
+	if (err) {
+		free(str);
+		return -1;
+	}
 
 	NOLEAK(str);
 	return 0;
-
-err_put_env:
-	free(str);
-	return -1;
-err_nul_name:
-	errno = EINVAL;
-	return -1;
-err_no_mem:
-	errno = ENOMEM;
-	return -1;
 }

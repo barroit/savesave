@@ -70,6 +70,8 @@ extern const char *cm_output_path;
 
 extern int cm_has_output;
 
+#define cm_io_need_update (!cm_has_output || cm_output_path)
+
 #define APOPT_MAINCOMMAND(v) \\
 EOF
 

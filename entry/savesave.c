@@ -59,7 +59,7 @@ int cmd_main(int argc, const char **argv)
 	else if (cm_output_path == NULL)
 		cm_has_output = 0;
 
-	if (!cm_has_output || cm_output_path)
+	if (cm_io_need_update)
 		redirect_output();
 
 	return runcmd(argc, argv);

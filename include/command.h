@@ -29,6 +29,8 @@ extern const char *cm_output_path;
 
 extern int cm_has_output;
 
+#define cm_io_need_update (!cm_has_output || cm_output_path)
+
 #define APOPT_MAINCOMMAND(v) \
 	APOPT_SUBCMD("backup", (v), N_("Start backup task in background"), cmd_backup, 0), \
 	APOPT_SUBCMD("copy", (v), N_("Copy a file"), cmd_copy, 0), \
