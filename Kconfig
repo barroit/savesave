@@ -13,7 +13,6 @@ config ENABLE_DEBUGGING
 	default y if "$(UNIX)"
 
 menu "Sanitizers"
-	depends on "$(UNIX)"
 
 config USE_ASAN
 	bool "address - memory-related bugs"
@@ -21,11 +20,16 @@ config USE_ASAN
 config USE_UBSAN
 	bool "undefined - various kinds of undefined behavior"
 
+if "$(UNIX)"
+
 config USE_TSAN
 	bool "thread - data races and thread-related bugs"
 
 config USE_MSAN
 	bool "memory - uninitialized memory reads"
+	depends on CC_IS_CLANG
+
+endif # "$(UNIX)"
 
 endmenu # "Sanitizers"
 

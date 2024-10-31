@@ -54,6 +54,11 @@ endif()
 test_add_compile_options(CONFIG_USE_ASAN -fsanitize=address)
 test_add_link_options(CONFIG_USE_ASAN -fsanitize=address)
 
+if(WIN32 AND CONFIG_USE_ASAN)
+  # ASAN library lacks certain C library functions.
+  add_compile_options(-U_DLL)
+endif()
+
 test_add_compile_options(CONFIG_USE_UBSAN -fsanitize=undefined)
 test_add_link_options(CONFIG_USE_UBSAN -fsanitize=undefined)
 
@@ -108,6 +113,7 @@ set(SAVESAVE_VERSION $ENV{SAVESAVE_VERSION})
 string(REPLACE -rc . SAVESAVE_VERSION_CMAKE ${SAVESAVE_VERSION})
 
 project(${SAVESAVE_NAME} VERSION ${SAVESAVE_VERSION_CMAKE} LANGUAGES C)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # ---------------------------------- Include ----------------------------------
 # By specifying a SHELL and quoting our options, we can disable Option
@@ -202,7 +208,7 @@ target_link_libraries(savesave platfree platspec)
 
 # ------------------------------------ Dll ------------------------------------
 if(WIN32)
-  target_link_libraries(savesave ws2_32 comctl32 shlwapi)
+  target_link_libraries(savesave comctl32 shlwapi)
   if(CONFIG_ENABLE_DEBUGGING)
     target_link_libraries(savesave dbghelp)
   endif()
