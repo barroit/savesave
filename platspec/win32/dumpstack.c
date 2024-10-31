@@ -10,6 +10,7 @@
 #include "iter.h"
 #include "constructor.h"
 
+#ifndef NDEBUG
 static void assert_failure_routine(void)
 {
 	BUG_ON(CONFIG_MAX_DUMP_STACK > USHRT_MAX);
@@ -78,8 +79,12 @@ static int savesave_report_hook(int type, char *message, int *_)
 	strlist_destroy(&sl);
 	return 0;
 }
+#endif
 
 CONSTRUCTOR(setup_crt_report_hook)
 {
+#ifndef NDEBUG
 	_CrtSetReportHook(savesave_report_hook);
+#endif
 }
+
