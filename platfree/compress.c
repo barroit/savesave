@@ -21,13 +21,9 @@ CONSTRUCTOR(check_libzstd_compat)
 
 	ret = ZSTD_CCtx_setParameter(ctx, ZSTD_c_nbWorkers, 400);
 	if (ZSTD_isError(ret))
-		goto err_no_mt;
+		die(_("savesave requires a multithreading supported version of libzstd"));
 
 	ZSTD_freeCCtx(ctx);
-	return;
-
-err_no_mt:
-	die(_("savesave requires a multithreading supported version of libzstd"));
 }
 
 int make_zip(const char *dest, const char *src, int is_dir)

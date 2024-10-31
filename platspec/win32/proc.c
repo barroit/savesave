@@ -7,6 +7,7 @@
 
 #include "proc.h"
 #include "termas.h"
+#include "command.h"
 
 int pid_is_alive(pid_t pid)
 {

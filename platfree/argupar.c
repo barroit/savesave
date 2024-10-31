@@ -443,6 +443,7 @@ static size_t print_option_usage(struct arguopt *option, struct strlist *sl)
 		const char *fmt;
 		int nr;
 		int is_subcmd = opt->type == ARGUOPT_SUBCOMMAND;
+		int pad;
 
 		if (is_subcmd) {
 			nr = strlen(OPTMAS_INDENT_CMD);
@@ -479,7 +480,7 @@ static size_t print_option_usage(struct arguopt *option, struct strlist *sl)
 		nr += printf(fmt, opt->argh);
 
 print_option_usage:
-		int pad = is_subcmd ? OPTMAS_PADCMD : OPTMAS_PADOPT;
+		pad = is_subcmd ? OPTMAS_PADCMD : OPTMAS_PADOPT;
 
 		if (nr >= pad) {
 			putchar('\n');

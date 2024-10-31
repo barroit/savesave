@@ -163,6 +163,7 @@ static void append_savesave(struct dotsav *ctx)
 static int apply_savent(struct savent *ent,
 			struct savesave *sav, const char *val)
 {
+	char *cp;
 	int ret = 0;
 	intptr_t addr = (intptr_t)sav + ent->offset;
 
@@ -172,7 +173,7 @@ static int apply_savent(struct savent *ent,
 		if (strnxtws(val))
 			goto err_inv_name;
 	case SAVENT_STRING:
-		char *cp = xstrdup(val);
+		cp = xstrdup(val);
 		memcpy((void *)addr, &cp, sizeof(cp));
 		break;
 	case SAVENT_TIMESPAN:
