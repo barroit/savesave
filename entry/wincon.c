@@ -7,14 +7,14 @@
 
 #include "command.h"
 #include "i18n.h"
-#include "atenter.h"
+#include "prog.h"
 #include "proc.h"
 #include "termas.h"
 
 int main(int argc, const char **argv)
 {
-	setup_program();
-	post_setup_program();
+	prog_init();
+	prog_init_ob();
 
 	setup_message_translation();
 

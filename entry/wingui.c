@@ -7,7 +7,7 @@
 
 #include "command.h"
 #include "i18n.h"
-#include "atenter.h"
+#include "prog.h"
 #include "console.h"
 #include "getargv.h"
 #include "window.h"
@@ -17,9 +17,9 @@
 
 int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int __)
 {
-	setup_program();
+	prog_init();
 	setup_console();
-	post_setup_program();
+	prog_init_ob();
 
 	const char *defargv[] = { "savesave", "backup" };
 	int argc = sizeof_array(defargv);

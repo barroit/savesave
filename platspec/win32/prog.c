@@ -5,12 +5,12 @@
  * Contact: barroit@linux.com
  */
 
-#include "atenter.h"
+#include "prog.h"
 #include "termas.h"
 #include "constructor.h"
 #include "iter.h"
 
-void setup_program(void)
+void prog_init(void)
 {
 	uint i;
 	constructor_t constructors[] = CONSTRUCTOR_LIST_INIT;
@@ -19,7 +19,7 @@ void setup_program(void)
 		constructors[i]();
 }
 
-void post_setup_program(void)
+void prog_init_ob(void)
 {
 	uint i;
 	constructor_t constructors[] = CONSTRUCTOR_LIST_INIT_USESTDIO;
