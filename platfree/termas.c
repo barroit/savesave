@@ -9,6 +9,7 @@
 #include "robio.h"
 #include "iter.h"
 #include "alloc.h"
+#include "proc.h"
 
 #define UPDATE_BUF(buf, n, len)	\
 do {				\
@@ -236,4 +237,18 @@ void __cold ___die_ucalc_overflow(const char *file, int line,
 		mas = N_("%s:%d:overflow (%u-bit): %" PRIuMAX " + %" PRIuMAX);
 
 	die(_(mas), file, line, size, a, b);
+}
+
+int redirect_output(const char *name)
+{
+	int ret = proc_rd_io(name, PROC_RD_STDOUT | PROC_RD_STDERR);
+
+	if (ret == -1)
+		return warn_errno(ERRMAS_OPEN_FILE(name));
+	else if (ret == PERR_RD_STDOUT)
+		return warn_errno(_("failed to redirect stdout to %s"), name);
+	else if (ret == PERR_RD_STDERR)
+		return warn_errno(_("failed to redirect stderr to %s"), name);
+
+	return 0;
 }

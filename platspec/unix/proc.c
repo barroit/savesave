@@ -10,6 +10,7 @@
 #include "alloc.h"
 #include "robio.h"
 #include "strlist.h"
+#include "command.h"
 
 int pid_is_alive(pid_t pid)
 {
@@ -27,7 +28,7 @@ int pid_is_alive(pid_t pid)
 #ifndef proc_detach
 void proc_detach(void)
 {
-	int err = daemon(1, 1);
+	int err = daemon(1, cm_io_need_update);
 	if (!err)
 		return;
 

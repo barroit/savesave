@@ -115,7 +115,7 @@ endmenu # "Compiler"
 
 menu "Features"
 
-config IS_CONSOLE_APP
+config NO_GUI
 	bool "build console version of savesave"
 	depends on "$(WIN32)"
 
