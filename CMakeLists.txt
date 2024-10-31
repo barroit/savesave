@@ -120,6 +120,13 @@ include_directories(${ROOT}/include ${ROOT}/include/arch/${ARCH})
 
 # --------------------------------- Manifest ----------------------------------
 if(WIN32)
+  set(SAVESAVE_VERSION_RC ${SAVESAVE_VERSION_CMAKE})
+  string(REPLACE "." ";" rcv_seg ${SAVESAVE_VERSION_CMAKE})
+
+  list(LENGTH rcv_seg rcv_rep)
+  string(REPEAT "0." ${rcv_rep} rcv_pad)
+
+  string(PREPEND SAVESAVE_VERSION_RC ${rcv_pad})
   configure_file(${ROOT}/savesave.manifest.in ${ROOT}/savesave.manifest)
 endif()
 
