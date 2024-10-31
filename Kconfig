@@ -17,9 +17,11 @@ menu "Sanitizers"
 config USE_ASAN
 	bool "address - memory-related bugs"
 	select NO_REPORT_HOOK if "$(WIN32)"
+	select NO_WIN_GUI if "$(WIN32)"
 
 config USE_UBSAN
 	bool "undefined - various kinds of undefined behavior"
+	select NO_WIN_GUI if "$(WIN32)"
 
 if "$(UNIX)"
 
@@ -123,7 +125,7 @@ endmenu # "Compiler"
 
 menu "Features"
 
-config NO_GUI
+config NO_WIN_GUI
 	bool "build console version of savesave"
 	depends on "$(WIN32)"
 

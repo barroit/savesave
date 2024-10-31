@@ -15,7 +15,7 @@ void winexit(int code)
 {
 	BUG_ON(code == STILL_ACTIVE);
 
-#ifndef CONFIG_NO_GUI
+#ifndef CONFIG_NO_WIN_GUI
 	if (code && !cm_io_need_update) {
 		show_console();
 

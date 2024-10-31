@@ -31,7 +31,7 @@ int pid_kill(pid_t pid, int sig)
 #ifndef proc_detach
 void proc_detach(void)
 {
-# ifdef CONFIG_NO_GUI
+# ifdef CONFIG_NO_WIN_GUI
 	if (!cm_io_need_update) {
 		int err = redirect_output(NULL_DEVICE);
 		if (err)
