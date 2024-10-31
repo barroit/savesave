@@ -8,42 +8,50 @@
 #include "baktmr.h"
 #include "dotsav.h"
 #include "alloc.h"
-#include "list.h"
+#include "iter.h"
 #include "termas.h"
 
-void PLATSPECOF(baktimer_init)(struct baktimer *ctx, struct baksched *bs)
+struct baktmr {
+	HANDLE que;	/* timer queue */
+	HANDLE *id;	/* timer ids */
+	char *rtm;	/* running task map, using char
+			   due to __atomic builtins */
+};
+
+static struct baktmr tmr;
+
+static void tmr_callback(void *data,
+			 BOOLEAN fuck_this_BOOLEAN_type_fuck_windows)
 {
-	ctx->tmrque = CreateTimerQueue();
-	ctx->bs = bs;
+	uint i = (uintptr_t)data;
+	FEATSPEC(baktmr_callback)(i, &tmr.rtm[i]);
 }
 
-static void tmr_callback(void *data, BOOLEAN fuck_this_BOOLEAN_type_fuck_microsoft)
+void baktmr_arm(void)
 {
-	struct savesave *sav = ((void **)data)[0];
-	baksched_t bs = ((void **)data)[1];
+	FEATSPEC(bakolc_init)();
 
-	baksched_post(bs, sav);
-}
+	tmr.que = CreateTimerQueue();
+	tmr.id = xcalloc(sizeof(*tmr.id), dotsav_size);
+	tmr.rtm = xcalloc(sizeof(*tmr.rtm), dotsav_size);
 
-void baktimer_arm(struct baktimer *ctx)
-{
 	size_t i;
-	for_each_idx(i, ctx->nl) {
-		struct savesave *sav = &ctx->sav[i];
-		void **data = xcalloc(sizeof(void *), 2);
+	for_each_idx(i, dotsav_size) {
+		struct savesave *sav = &dotsav_array[i];
 		DWORD cd = sav->period * 1000;
 
-		data[0] = &ctx->sav[i];
-		data[1] = ctx->bs;
-
-		int err = !CreateTimerQueueTimer(&ctx->tmr[i], ctx->tmrque,
-						 tmr_callback, data, cd, cd,
-						 WT_EXECUTELONGFUNCTION);
-
+		int err = !CreateTimerQueueTimer(&tmr.id[i], tmr.que,
+						 tmr_callback, (void *)i, cd,
+						 cd, WT_EXECUTELONGFUNCTION);
 		if (err)
 			die_winerr(_("failed to create timer for sav `%s'"),
 				   sav->name);
 	}
+}
+
+void baktmr_disarm(void)
+{
+	FEATSPEC(bakolc_destroy)();
 }
 
 // void baktimer_disarm(struct baktimer *ctx)

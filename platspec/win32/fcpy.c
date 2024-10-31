@@ -28,8 +28,3 @@ int copy_symlink(const char *srcname, const char *destname)
 
 	return 0;
 }
-
-int copy_regfile_async(const char *srcname, const char *destname)
-{
-	return 0;
-}

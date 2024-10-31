@@ -60,7 +60,7 @@ static int dispatch_file(struct __fileiter *ctx, WIN32_FIND_DATA *ent)
 		file.st.st_mode = S_IFLNK;
 		return ctx->func(&file, ctx->data);
 	} else if (ent->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-		strlist_push2(&ctx->sl, absname, 32);
+		strlist_push(&ctx->sl, absname);
 		return 0;
 	}
 

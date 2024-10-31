@@ -21,19 +21,14 @@ int cm_has_output = 1;
 static void redirect_output(void)
 {
 	const char *name = output_path();
-	int err = proc_rd_io(name, PROC_RD_STDOUT | PROC_RD_STDERR);
+	int ret = proc_rd_io(name, PROC_RD_STDOUT | PROC_RD_STDERR);
 
-	switch (err) {
-	case -1:
+	if (ret == -1)
 		warn_errno(ERRMAS_OPEN_FILE(name));
-		break;
-	case PERR_RD_STDOUT:
+	else if (ret == PERR_RD_STDOUT)
 		warn_errno(_("failed to redirect stdout to %s"), name);
-		break;
-	case PERR_RD_STDERR:
+	else if (ret == PERR_RD_STDERR)
 		warn_errno(_("failed to redirect stderr to %s"), name);
-		break;
-	}
 }
 
 int cmd_main(int argc, const char **argv)

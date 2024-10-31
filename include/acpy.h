@@ -5,10 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef __linux__
-# error "acpy.h is linux-specific"
-#endif
-
 #ifndef ACPY_H
 #define ACPY_H
 

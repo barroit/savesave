@@ -15,8 +15,6 @@
 #include "fileiter.h"
 #include "mkdir.h"
 
-#pragma GCC diagnostic ignored "-Wswitch"
-
 enum savtype {
 	SAVENT_END,
 
@@ -186,6 +184,8 @@ static int apply_savent(struct savent *ent,
 	case SAVENT_FLAG:
 		ret = str2bool(val, (int *)addr);
 		break;
+	case SAVENT_END:
+		bug("??");
 	}
 
 	if (!ret && ent->cb)

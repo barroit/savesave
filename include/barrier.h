@@ -32,6 +32,12 @@
 #define smp_sub_return(x, val) \
 	__atomic_sub_fetch(x, val, __ATOMIC_ACQ_REL)
 
+#define smp_test_and_set(x) \
+	__atomic_test_and_set(x, __ATOMIC_ACQ_REL)
+
+#define smp_clear(x) \
+	__atomic_clear(x, __ATOMIC_RELEASE);
+
 #define smp_mb() \
 	__atomic_thread_fence(__ATOMIC_ACQ_REL)
 

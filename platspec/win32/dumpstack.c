@@ -5,8 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#pragma GCC diagnostic ignored "-Wreturn-type"
-
 #include "termas.h"
 #include "strlist.h"
 #include "iter.h"
@@ -45,16 +43,14 @@ static void assert_failure_routine(void)
 		DWORD64 addr = (DWORD64)(stack[i]);
 
 		err = !SymFromAddr(proc, addr, 0, symbol);
-		if (err)
-			goto err_get_sym;
+		if (err) {
+			warn_winerr(_("failed to retrieve symbol for 0x" PRIxMAX),
+				    addr);
+			continue;
+		}
 
 		printf("%5d: 0x%" PRIxMAX " - %s\n",
 		       frames - i - 1, symbol->Address, symbol->Name);
-		continue;
-
-err_get_sym:
-		warn_winerr(_("failed to retrieve symbol for 0x" PRIxMAX),
-			    addr);
 	}
 
 	exit(128);
@@ -62,7 +58,6 @@ err_get_sym:
 
 static int savesave_report_hook(int type, char *message, int *_)
 {
-	size_t i;
 	struct strlist sl;
 
 	strlist_init(&sl, STRLIST_STORE_REF);
@@ -72,7 +67,6 @@ static int savesave_report_hook(int type, char *message, int *_)
 		const char *str = strlist_pop(&sl);
 		if (!str)
 			break;
-
 		puts(str);
 	}
 

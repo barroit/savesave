@@ -10,13 +10,6 @@
 #include "constructor.h"
 #include "iter.h"
 
-USESTDIO
-CONSTRUCTOR(check_os_version)
-{
-	if (!IsWindows7OrGreater())
-		die(_("unsupported windows version (at least win7)"));
-}
-
 void setup_program(void)
 {
 	uint i;

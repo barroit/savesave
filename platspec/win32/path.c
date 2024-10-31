@@ -37,12 +37,9 @@ const char *tmp_dir(void)
 		/* THIS GODDAMN MOTHERFUCKING PIECE OF SHIT WINDOWS */
 		DWORD nr = GetTempPath(sizeof(path), path);
 		if (!nr)
-			goto err_get_path;
+			die_winerr(_("failed to retrieve temporary directory name"));
 		path[nr - 1] = 0;
 	}
 
 	return path;
-
-err_get_path:
-	die_winerr(_("failed to retrieve temporary directory name"));
 }

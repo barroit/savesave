@@ -149,6 +149,7 @@ void __noreturn winexit(int code);
 #define S_ISLNK(m) (((m) & S_IFMT) == S_IFLNK)
 #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 
+#define STDIN_FILENO ({ fileno(stdin); })
 #define STDOUT_FILENO ({ fileno(stdout); })
 #define STDERR_FILENO ({ fileno(stderr); })
 

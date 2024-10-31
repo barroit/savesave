@@ -13,7 +13,11 @@
 
 void baktmr_arm(void);
 
-int FEATSPEC(baktmr_callback)(uint idx);
+void FEATSPEC(bakolc_init)(void);
+
+void FEATSPEC(bakolc_destroy)(void);
+
+void FEATSPEC(baktmr_callback)(uint idx, char *rtm);
 
 void baktmr_disarm(void);
 

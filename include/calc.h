@@ -8,6 +8,10 @@
 #ifndef CALC_H
 #define CALC_H
 
+#ifdef CONFIG_CC_IS_CLANG
+# pragma GCC diagnostic ignored "-Wtautological-constant-out-of-range-compare"
+#endif
+
 #define fix_grow(x) (((x) + 16) * 3 / 2)
 
 #define bit_sizeof(x) (CHAR_BIT * sizeof(x))
@@ -47,8 +51,12 @@ void __noreturn ___die_ucalc_overflow(const char *file, int line,
 /*
  * Do not perform operations that produce side effects
  */
-#define max(a, b) ((a) > (b) ? (a) : (b))
-#define min(a, b) ((a) < (b) ? (a) : (b))
+#ifndef max
+# define max(a, b) ((a) > (b) ? (a) : (b))
+#endif
+#ifndef min
+# define min(a, b) ((a) < (b) ? (a) : (b))
+#endif
 
 #define sec_to_millisec(x) st_umult(x, 1000)
 #define sec_to_microsec(x) st_umult(sec_to_millisec(x), 1000)

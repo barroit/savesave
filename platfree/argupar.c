@@ -5,8 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#pragma GCC diagnostic ignored "-Wunused-function"
-
 #include "argupar.h"
 #include "termas.h"
 #include "strlist.h"
@@ -141,16 +139,6 @@ out:
 	return sb.str;
 }
 
-static OPTARG_APPLICATOR(subcommand)
-{
-	BUG_ON("not implemented");
-}
-
-static OPTARG_APPLICATOR(callback)
-{
-	BUG_ON("not implemented");
-}
-
 static OPTARG_APPLICATOR(switch)
 {
 	int *p = opt->value;
@@ -232,20 +220,12 @@ static int check_cmdmode_collision(struct arguopt *opt,
 	return -1;
 }
 
-static int __apply_optarg(struct arguopt *opt, const char *arg, int unset);
-
 static int dispatch_optarg(struct arguopt *opt, const char *arg,
 			   flag_t flags, struct list_head *cml)
 {
 	BUG_ON(flags & OPT_USET && arg);
 
-	static typeof(__apply_optarg) *map[ARGUOPT_TYPEMAX] = {
-		[ARGUOPT_END]        = CALLBACK_MAP_POISON1,
-		[ARGUOPT_GROUP]      = CALLBACK_MAP_POISON2,
-
-		[ARGUOPT_SUBCOMMAND] = apply_subcommand_optarg,
-		[ARGUOPT_CALLBACK]   = apply_callback_optarg,
-
+	static typeof(apply_switch_optarg) *map[ARGUOPT_TYPEMAX] = {
 		[ARGUOPT_SWITCH]     = apply_switch_optarg,
 		[ARGUOPT_COUNTUP]    = apply_countup_optarg,
 		[ARGUOPT_UINT]       = apply_uint_optarg,
@@ -605,9 +585,9 @@ static void cleanup_cmdmode_list(struct argupar *ctx)
 void argupar_parse(int *argc, const char ***argv,
 		   struct arguopt *option, const char **usage, flag_t flags)
 {
-	int __argc = *argc - 1;
+	int narg = *argc - 1;
 	struct argupar ctx = {
-		.argc = __argc,
+		.argc = narg,
 		.argv = *argv + 1,
 		.outv = ctx.argv,
 
@@ -656,7 +636,7 @@ parse_done:
 		/*
 		 * We do have some options, but no argument found
 		 */
-		if (__argc)
+		if (narg)
 			error(_("command '%s' requires an argument\n"),
 			      cmdpath(NULL));
 help_no_arg:

@@ -9,7 +9,7 @@
 
 int acpy_disabled;
 
-void acpy_deploy(uint qs, size_t bs);
+void acpy_deploy(uint qs, size_t bs)
 {
 	acpy_disabled = 1;
 }

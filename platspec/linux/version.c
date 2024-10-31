@@ -8,10 +8,7 @@
 #include "constructor.h"
 #include "termas.h"
 
-#define MIN_VERSION    5
-#define MIN_PATCHLEVEL 19
-
-CONSTRUCTOR(check_kernel_version)
+__CONSTRUCTOR(check_kernel_version)
 {
 	struct utsname un;
 	uname(&un);
@@ -26,13 +23,13 @@ CONSTRUCTOR(check_kernel_version)
 	err = str2ullong(str, sep - str, &version, -1);
 	if (err)
 		goto err_malformed;
-	if (version < MIN_VERSION)
+	if (version < CONFIG_MIN_KVERSION)
 		goto err_too_old;
-	else if (version > MIN_VERSION)
+	else if (version > CONFIG_MIN_KVERSION)
 		return;
 
 	/*
-	 * Check patch level for version equal to MIN_VERSION.
+	 * Check patch level for version equal to CONFIG_MIN_KVERSION.
 	 */
 	str = sep + 1;
 	sep = strchr(str, '.');
@@ -42,7 +39,7 @@ CONSTRUCTOR(check_kernel_version)
 	err = str2ullong(str, sep - str, &patchlevel, -1);
 	if (err)
 		goto err_malformed;
-	if (patchlevel < MIN_PATCHLEVEL)
+	if (patchlevel < CONFIG_MIN_KPATCHLEVEL)
 		goto err_too_old;
 
 	return;
@@ -50,5 +47,6 @@ CONSTRUCTOR(check_kernel_version)
 err_malformed:
 	die(_("kenel version `%s' is malformed"), un.release);
 err_too_old:
-	die(_("kernel version `%s' is too old (minimum 5.6)"), un.release);
+	die(_("kernel version `%s' is too old (minimum %d.%d)"),
+	    un.release, CONFIG_MIN_KVERSION, CONFIG_MIN_KPATCHLEVEL);
 }

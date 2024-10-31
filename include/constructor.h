@@ -13,6 +13,7 @@
 #define USESTDIO
 
 #if defined(__unix__)
+# define __CONSTRUCTOR CONSTRUCTOR
 # define CONSTRUCTOR(name) static void __attribute__((constructor)) name(void)
 #elif defined(_WIN32)
 /*
@@ -23,13 +24,11 @@
 
 CONSTRUCTOR(setup_atexit);
 CONSTRUCTOR(check_libzstd_compat);
-CONSTRUCTOR(check_kernel_version);
-CONSTRUCTOR(check_os_version);
 CONSTRUCTOR(setup_crt_report_hook);
+CONSTRUCTOR(check_os_version);
 
 #define CONSTRUCTOR_LIST_INIT { \
 	setup_atexit, \
-	check_kernel_version, \
 	setup_crt_report_hook, \
 }
 

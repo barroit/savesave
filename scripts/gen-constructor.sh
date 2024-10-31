@@ -45,6 +45,7 @@ cat <<EOF > $dest
 #define USESTDIO
 
 #if defined(__unix__)
+# define __CONSTRUCTOR CONSTRUCTOR
 # define CONSTRUCTOR(name) static void __attribute__((constructor)) name(void)
 #elif defined(_WIN32)
 /*

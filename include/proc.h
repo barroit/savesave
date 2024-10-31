@@ -89,16 +89,4 @@ int proc_wait(struct proc *proc, int *ret);
  */
 int proc_rd_io(const char *name, flag_t flags);
 
-/*
- * Kill a process by proc.
- */
-#ifdef __unix__
-static inline int proc_kill(struct proc *proc, int sig)
-{
-	return kill(proc->pid, sig);
-}
-#else
-int proc_kill(struct proc *proc, int sig);
-#endif
-
 #endif /* PROC_H */

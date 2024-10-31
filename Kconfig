@@ -144,7 +144,18 @@ config LINK_LIBZSTD_STATIC
 endif # DISALBE_GETTEXT
 
 config AIO_COPY_THRESHOLD
-	int "max priod before switching to AIO copy (in seconds)"
+	int "maximum period before switching to AIO copy (in seconds)"
 	default 3600
+
+config MIN_KVERSION
+	int "minimum required version of kernel"
+	default 5 if "$(LINUX)"
+	default 7 if "$(WIN32)"
+	default 0
+
+config MIN_KPATCHLEVEL
+	int "minimum required patch level of kernel"
+	default 19 if "$(LINUX)"
+	default 0
 
 endmenu # "Features"

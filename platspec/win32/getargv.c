@@ -5,11 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-/*
- * dumb clang
- */
-#pragma GCC diagnostic ignored "-Wreturn-type"
-
 #include "getargv.h"
 #include "strlist.h"
 #include "iter.h"
@@ -28,13 +23,13 @@ int getargv(const char ***argv)
 	size_t i;
 	struct strlist sl;
 
-	strlist_init(&sl, STRLIST_USEREF);
+	strlist_init(&sl, STRLIST_STORE_REF);
 	for_each_idx(i, argc) {
 		const wchar_t *arg = wargv[i];
 		size_t size = wcsrtombs(NULL, &arg, 0, NULL);
 
 		if (size == SIZE_MAX)
-			goto err_wstr2mstr;
+			die_errno(_("failed to convert wide character string to multibyte string"));
 		size += 1;
 
 		char *buf = xmalloc(size);
@@ -46,12 +41,9 @@ int getargv(const char ***argv)
 		strlist_push(&sl, buf);
 	}
 
-	*argv = (const char **)strlist_dump(&sl);
+	*argv = (const char **)strlist_dump2(&sl, 0);
 
 	LocalFree(wargv);
 	strlist_destroy(&sl);
 	return argc;
-
-err_wstr2mstr:
-	die_errno("failed to convert wide character string to multibyte string");
 }

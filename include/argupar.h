@@ -11,23 +11,22 @@
 #define ARGUPAR_H
 
 enum arguopt_type {
-	ARGUOPT_END,		/* end of arguopt */
-	ARGUOPT_GROUP,		/* start a new group (visual) */
-
-	ARGUOPT_SUBCOMMAND,	/* subcmd */
-	ARGUOPT_CALLBACK,	/* callback */
-
 	ARGUOPT_SWITCH,		/* switch */
 	ARGUOPT_COUNTUP,	/* count up */
 	ARGUOPT_UINT,		/* unsigned integer */
 
 	ARGUOPT_STRING,		/* string */
 
-	ARGUOPT_MEMBINFO,	/* member information (print usage) */
-
 	ARGUOPT_CMDMODE,	/* command mode */
 
 	ARGUOPT_TYPEMAX,
+
+	ARGUOPT_END,		/* end of arguopt */
+	ARGUOPT_GROUP,		/* start a new group (visual) */
+
+	ARGUOPT_SUBCOMMAND,	/* subcmd */
+
+	ARGUOPT_MEMBINFO,	/* member information (print usage) */
 };
 
 #define ARGUOPT_NOARG   (1 << 0) /* no argument */

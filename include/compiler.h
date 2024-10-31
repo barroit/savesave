@@ -14,11 +14,13 @@
 # define BUG_ON(cond) assert(!(cond))
 #endif
 
-#define __format(start, first) \
-	__attribute__((format(printf, start, first)))
+#define __format(start, first) __attribute__((format(printf, start, first)))
 
-#define __noreturn \
-	__attribute__((noreturn))
+#ifdef CONFIG_CC_IS_GCC
+# define __noreturn __attribute__((noreturn))
+#else
+# define __noreturn _Noreturn
+#endif
 
 /*
  * I'm fucking using __, no matter what!

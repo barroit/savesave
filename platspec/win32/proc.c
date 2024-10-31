@@ -21,3 +21,23 @@ int pid_is_alive(pid_t pid)
 
 	die_winerr(_("failed to determine existence of process `%d'"), pid);
 }
+
+int pid_kill(pid_t pid, int sig)
+{
+	return 0;
+}
+
+void proc_detach(void)
+{
+	//
+}
+
+int proc_exec(struct proc *proc, const char *file, ...)
+{
+	return 0;
+}
+
+int proc_wait(struct proc *proc, int *ret)
+{
+	return 0;
+}
