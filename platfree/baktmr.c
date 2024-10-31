@@ -35,11 +35,6 @@ void FEATSPEC(bakolc_init)(void)
 	mtx_init(&olc.lock, mtx_plain);
 }
 
-void FEATSPEC(bakolc_destroy)(void)
-{
-	mtx_destroy(&olc.lock);
-}
-
 static void baktmr_callback_busy(uint idx)
 {
 	timestamp_t new = timestamp();

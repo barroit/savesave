@@ -69,6 +69,4 @@ void baktmr_disarm(void)
 
 	for_each_idx(i, dotsav_size)
 		timer_settime(tmr.id[i], 0, &ts, NULL);
-
-	FEATSPEC(bakolc_destroy)();
 }
