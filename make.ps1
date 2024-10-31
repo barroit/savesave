@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 param (
-	[ValidateSet('build', 'distclean', 'menuconfig', `
-		     'install', 'uninstall', 'mcheck')]
+	[ValidateSet('build', 'clean', 'distclean', `
+		     'menuconfig', 'install', 'uninstall', 'mcheck')]
 	[string]$command = 'build'
 )
 
@@ -35,7 +35,10 @@ $env:BUILD = 'windows'
 $env:ARCH  = $env:PROCESSOR_ARCHITECTURE
 $env:SAVESAVE_VERSION = cat version
 
-if ($command -eq 'distclean') {
+if ($command -eq 'clean') {
+	cmake --build "$abs_build" --target clean
+	exit 0
+} elseif ($command -eq 'distclean') {
 	rm -Force -ErrorAction SilentlyContinue "$abs_root/include/generated/*"
 	git ls-files --directory -o 'build' | rm -Recurse -Force
 	rm -Force -ErrorAction SilentlyContinue "$abs_root/.config*"
