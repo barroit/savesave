@@ -120,7 +120,7 @@ void pid_erase(void)
 	unlink(name);
 }
 
-int proc_rd_io(const char *name, flag_t flags)
+int __proc_rd_io(const char *name, flag_t flags)
 {
 	BUG_ON(!flags);
 

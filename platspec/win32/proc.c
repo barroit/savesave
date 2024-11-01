@@ -44,6 +44,21 @@ int pid_kill(pid_t pid, int sig)
 	return ret;
 }
 
+int proc_rd_io(const char *name, flag_t flags)
+{
+	int ret = __proc_rd_io(name, flags);
+	if (!ret) {
+		if (flags & PROC_RD_STDIN)
+			setvbuf(stdin, NULL, _IONBF, 0);
+		if (flags & PROC_RD_STDOUT)
+			setvbuf(stdout, NULL, _IONBF, 0);
+		if (flags & PROC_RD_STDERR)
+			setvbuf(stderr, NULL, _IONBF, 0);
+	}
+
+	return ret;
+}
+
 #ifndef proc_detach
 void proc_detach(void)
 {

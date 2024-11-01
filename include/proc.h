@@ -43,7 +43,7 @@ int pid_kill(pid_t pid, int sig);
 void proc_assert_unique(void);
 
 /*
- * Detach self from terminal.
+ * Detach self from terminal, as well as redirect outputs.
  */
 #ifdef CONFIG_NO_LONGRUNNING_DAEMON
 # define proc_detach() do {} while (0)
@@ -87,6 +87,11 @@ int proc_wait(struct proc *proc, int *ret);
 /*
  * Redirect stdout/stderr/stdin to specified file.
  */
+int __proc_rd_io(const char *name, flag_t flags);
+#ifdef __unix__
+# define proc_rd_io __proc_rd_io
+#else
 int proc_rd_io(const char *name, flag_t flags);
+#endif
 
 #endif /* PROC_H */
