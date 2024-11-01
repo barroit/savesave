@@ -12,6 +12,8 @@
 #include "strbuf.h"
 #include "noleak.h"
 
+#define is_dot_ph(name) ((name)[0] == '.' && (name)[1] == 0)
+
 struct pathinfo {
 	const char *name;
 	const char *(*func)(void);
@@ -21,15 +23,16 @@ static int cmd_query_path(int argc, const char **argv)
 {
 	struct arguopt option[] = {
 		APOPT_GROUP(N_("List of query names")),
-		APOPT_MEMBINFO("output",   N_("log file")),
-		APOPT_MEMBINFO("home",     N_("home directory")),
-		APOPT_MEMBINFO("dotsav",   N_("dotsav configuration")),
-		APOPT_MEMBINFO("proc-id",  N_("process id file")),
-		APOPT_MEMBINFO("data-dir", N_("program data directory")),
-		APOPT_MEMBINFO("tmp-dir",  N_("temporary data directory")),
-		APOPT_MEMBINFO("exec",     N_("executable file")),
-		APOPT_MEMBINFO("exec-dir", N_("executable directory")),
-		APOPT_MEMBINFO("locale",   N_("locale file directory")),
+		APOPT_MEMBINFO(".",      N_("list all paths")),
+		APOPT_MEMBINFO("output", N_("log file")),
+		APOPT_MEMBINFO("home",   N_("home directory")),
+		APOPT_MEMBINFO("dotsav", N_("dotsav configuration")),
+		APOPT_MEMBINFO("pid",    N_("process id file")),
+		APOPT_MEMBINFO("data",   N_("program data directory")),
+		APOPT_MEMBINFO("tmp",    N_("temporary data directory")),
+		APOPT_MEMBINFO("exec",   N_("executable file")),
+		APOPT_MEMBINFO("ws",     N_("executable working directory")),
+		APOPT_MEMBINFO("locale", N_("locale file directory")),
 		APOPT_END(),
 	};
 	const char *usage[] = {
@@ -37,25 +40,30 @@ static int cmd_query_path(int argc, const char **argv)
 		NULL,
 	};
 
+	argupar_opt_mas_pad = 16;
 	argupar_parse(&argc, &argv, option, usage, AP_NEED_ARGUMENT);
 
 	struct pathinfo info[] = {
-		{ "output",   __output_path },
-		{ "home",     home_dir },
-		{ "dotsav",   __dotsav_path },
-		{ "proc-id",  pid_path },
-		{ "data-dir", data_dir },
-		{ "tmp-dir",  tmp_dir },
-		{ "exec",     exec_path },
-		{ "exec-dir", exec_dir },
-		{ "locale",   locale_dir },
+		{ "output", __output_path },
+		{ "home",   home_dir },
+		{ "dotsav", __dotsav_path },
+		{ "pid",    pid_path },
+		{ "data",   data_dir },
+		{ "tmp",    tmp_dir },
+		{ "exec",   exec_path },
+		{ "ws",     exec_dir },
+		{ "locale", locale_dir },
 	};
 
 	int i;
-	struct strbuf sb = STRBUF_INIT;
+	int has_dot_ph = 0;
+	for_each_idx(i, argc)
+		if (is_dot_ph(argv[i]))
+			has_dot_ph = 1;
 
+	struct strbuf sb = STRBUF_INIT;
 	for_each_idx(i, argc) {
-		size_t j;
+		uint j;
 		const char *name = argv[i];
 
 		for_each_idx(j, sizeof_array(info)) {
@@ -63,18 +71,32 @@ static int cmd_query_path(int argc, const char **argv)
 
 			if (strcmp(name, q->name))
 				continue;
+			else if (has_dot_ph)
+				goto next;
 
 			const char *path = q->func();
 
 			strbuf_boconcat(&sb, path);
 			strbuf_normalize_path(&sb);
-			printf("%-10s %s\n", name, sb.str);
 
+			printf("%-10s %s\n", name, sb.str);
 			goto next;
 		}
 
-		warn("unknown query name `%s'", name);
+		if (!is_dot_ph(name))
+			warn("unknown query name `%s'", name);
 next:;
+	}
+
+	if (has_dot_ph) {
+		for_each_idx(i, sizeof_array(info)) {
+			struct pathinfo *q = &info[i];
+			const char *path = q->func();
+
+			strbuf_boconcat(&sb, path);
+			strbuf_normalize_path(&sb);
+			printf("%-10s %s\n", q->name, sb.str);
+		}
 	}
 
 	exit(0);
