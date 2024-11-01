@@ -421,6 +421,8 @@ next:
 	}
 }
 
+int argupar_opt_mas_pad;
+
 static size_t print_option_usage(struct arguopt *option, struct strlist *sl)
 {
 	struct arguopt *opt = option;
@@ -480,7 +482,10 @@ static size_t print_option_usage(struct arguopt *option, struct strlist *sl)
 		nr += printf(fmt, opt->argh);
 
 print_option_usage:
-		pad = is_subcmd ? OPTMAS_PADCMD : OPTMAS_PADOPT;
+		if (argupar_opt_mas_pad)
+			pad = argupar_opt_mas_pad;
+		else
+			pad = is_subcmd ? OPTMAS_PADCMD : OPTMAS_PADOPT;
 
 		if (nr >= pad) {
 			putchar('\n');

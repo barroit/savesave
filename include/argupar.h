@@ -68,6 +68,8 @@ typedef typeof(((struct arguopt *)0)->subcmd) subcmd_t;
 
 #define for_each_option(opt) for (; opt->type != ARGUOPT_END; opt++)
 
+extern int argupar_opt_mas_pad;
+
 void __noreturn prompt_shrt_help(const char **usage, struct arguopt *option);
 
 void argupar_parse(int *argc, const char ***argv,
