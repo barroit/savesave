@@ -12,7 +12,7 @@
 int cmd_version(int argc, const char **argv)
 CMDDESCRIP("Display version information about Savesave")
 {
-	puts(SAVESAVE_NAME "/" SAVESAVE_HOST "-"
+	puts(SAVESAVE_NAME "/" SAVESAVE_BUILD "-"
 	     SAVESAVE_ARCH " " SAVESAVE_VERSION);
 
 	printf("   libzstd-%s\n", ZSTD_versionString());

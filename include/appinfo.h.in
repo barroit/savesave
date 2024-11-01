@@ -14,11 +14,11 @@
 #endif
 
 #ifndef SAVESAVE_ARCH
-# define SAVESAVE_ARCH "@ARCH@"
+# define SAVESAVE_ARCH "@SAVESAVE_ARCH@"
 #endif
 
-#ifndef SAVESAVE_HOST
-# define SAVESAVE_HOST "@HOST@"
+#ifndef SAVESAVE_BUILD
+# define SAVESAVE_BUILD "@SAVESAVE_BUILD@"
 #endif
 
 #if !defined(CONFIG_DISABLE_GETTEXT) && !defined(GETTEXT_VERSION)

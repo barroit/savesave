@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.21)
 set(ROOT ${CMAKE_SOURCE_DIR})
 set(GENERATED ${ROOT}/include/generated)
 
-include(${ROOT}/scripts/helper.cmake)
+include(${ROOT}/scripts/func.cmake)
 file(MAKE_DIRECTORY ${GENERATED})
 
 # ------------------------------- Architecture --------------------------------
@@ -109,6 +109,8 @@ add_compile_options(-fshort-wchar
 
 # ---------------------------------- Profile ----------------------------------
 set(SAVESAVE_NAME savesave)
+set(SAVESAVE_ARCH $ENV{ARCH})
+set(SAVESAVE_BUILD $ENV{BUILD})
 set(SAVESAVE_VERSION $ENV{SAVESAVE_VERSION})
 string(REPLACE -rc . SAVESAVE_VERSION_CMAKE ${SAVESAVE_VERSION})
 
@@ -130,6 +132,7 @@ if(WIN32)
   string(REPLACE "." ";" rcv_seg ${SAVESAVE_VERSION_CMAKE})
 
   list(LENGTH rcv_seg rcv_rep)
+  math(EXPR rcv_rep "4 - ${rcv_rep}")
   string(REPEAT "0." ${rcv_rep} rcv_pad)
 
   string(PREPEND SAVESAVE_VERSION_RC ${rcv_pad})

@@ -20,7 +20,7 @@ NOTIFYICONDATA notifyicon_init(HINSTANCE app, HWND window)
 
 	};
 
-	const char *str = SAVESAVE_NAME "/" SAVESAVE_HOST "-"
+	const char *str = SAVESAVE_NAME "/" SAVESAVE_BUILD "-"
 			  SAVESAVE_ARCH " " SAVESAVE_VERSION;
 	strncpy(icon.szTip, str, sizeof_array(icon.szTip));
 
