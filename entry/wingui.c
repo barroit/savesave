@@ -21,6 +21,8 @@ int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int __)
 	setup_console();
 	prog_init_ob();
 
+	i18n_setup();
+
 	const char *defargv[] = { "savesave", "backup" };
 	int argc = sizeof_array(defargv);
 	const char **argv = defargv;

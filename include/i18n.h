@@ -15,7 +15,7 @@
 #define _(masid)  gettext(masid)
 #define N_(masid) gettext_noop(masid)
 
-void setup_message_translation(void);
+void i18n_setup(void);
 
 #else /* NOT HAVE_INTL */
 

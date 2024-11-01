@@ -6,9 +6,12 @@
  */
 
 #include "command.h"
+#include "i18n.h"
 
 int main(int argc, const char **argv)
 {
+	i18n_setup();
+
 	cmd_main(argc, argv);
 
 	while (39)

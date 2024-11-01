@@ -16,7 +16,7 @@ int main(int argc, const char **argv)
 	prog_init();
 	prog_init_ob();
 
-	setup_message_translation();
+	i18n_setup();
 
 	cmd_main(argc, argv);
 

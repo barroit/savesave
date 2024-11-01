@@ -47,7 +47,7 @@ static const char *detect_locale(void)
 	return lang;
 }
 
-void setup_message_translation(void)
+void i18n_setup(void)
 {
 	const char *dir = locale_dir();
 	const char *locale = detect_locale();
