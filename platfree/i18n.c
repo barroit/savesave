@@ -14,57 +14,47 @@
 
 #define TEXTDOMAIN SAVESAVE_NAME
 
-static void setup_gettext(void)
-{
-	const char *name = locale_dir();
-
-	textdomain(TEXTDOMAIN);
-	bindtextdomain(TEXTDOMAIN, name);
-	bind_textdomain_codeset(TEXTDOMAIN, "UTF-8");
-}
-
 /*
  * CONFIG_TARGET_LOCALE > LANGUAGE > LANG
  */
-static char *get_preferred_locale(void)
+static const char *detect_locale(void)
 {
-	const char *language = getenv("LANGUAGE");
+	static const char *lang;
 
-	if (*CONFIG_TARGET_LOCALE == 0) {
-		if (language && *language)
-			return xstrdup(language);
+	if (!lang) {
+		if (*CONFIG_TARGET_LOCALE == 0) {
+			lang = getenv("LANGUAGE");
+			if (lang)
+				return lang;
 
-		language = getenv("LANG");
-		if (language && *language)
-			return xstrdup(language);
+			lang = getenv("LANG");
+			if (lang)
+				return lang;
+
+			lang = "";
+		} else {
+			struct strbuf sb;
+			strbuf_init2(&sb, CONFIG_TARGET_LOCALE, 0);
+
+			const char *sep = strchr(sb.str, '.');
+			if (!sep)
+				strbuf_concat(&sb, ".UTF-8");
+
+			lang = sb.str;
+		}
 	}
 
-	struct strbuf locale;
-
-	strbuf_init2(&locale, CONFIG_TARGET_LOCALE, 0);
-	if (*locale.str == 0)
-		return locale.str;
-
-	const char *sep = strchr(locale.str, '.');
-	if (sep && sep[1] != 0)
-		return locale.str;
-
-	strbuf_concat(&locale, ".UTF-8");
-	return locale.str;
-}
-
-static void setup_locale(const char *locale)
-{
-	setlocale(LC_TIME, locale);
-	setlocale(LC_MONETARY, locale);
-	setlocale(LC_MESSAGES, locale);
+	return lang;
 }
 
 void setup_message_translation(void)
 {
-	char *locale = get_preferred_locale();
+	const char *dir = locale_dir();
+	const char *locale = detect_locale();
 
-	setup_gettext();
+	textdomain(TEXTDOMAIN);
+	bindtextdomain(TEXTDOMAIN, dir);
+	bind_textdomain_codeset(TEXTDOMAIN, "UTF-8");
 
 	/*
 	 * gettext-runtime/intl/dcigettext.c:guess_category_value
@@ -78,8 +68,9 @@ void setup_message_translation(void)
 	 */
 	setenv("LANGUAGE", locale, 1);
 
-	setup_locale(locale);
-	free(locale);
+	setlocale(LC_TIME, locale);
+	setlocale(LC_MONETARY, locale);
+	setlocale(LC_MESSAGES, locale);
 }
 
 #endif

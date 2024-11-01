@@ -3,6 +3,10 @@
  * Copyright 2024 Jiamu Sun
  *
  * Contact: barroit@linux.com
+ *
+ * NB:	Passing NULL or an empty string to strbuf_*() functions is
+ *	meaningless. These functions do not handle such cases, and thus
+ *	the behavior is undefined.
  */
 
 #include "strbuf.h"
