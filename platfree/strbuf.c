@@ -4,9 +4,8 @@
  *
  * Contact: barroit@linux.com
  *
- * NB:	Passing NULL or an empty string to strbuf_*() functions is
- *	meaningless. These functions do not handle such cases, and thus
- *	the behavior is undefined.
+ * NB:	The behavior is undefined if NULL or an empty string is passed
+ *	to strbuf_*concat() or strbuf_*printf().
  */
 
 #include "strbuf.h"
@@ -63,6 +62,22 @@ uint strbuf_oconcat(struct strbuf *sb, uint offset, const char *str)
 		sb->len -= overlap - len;
 
 	return len;
+}
+
+uint strbuf_oconcat_char(struct strbuf *sb, uint offset, int c)
+{
+	uint overlap = sb->len - offset;
+	if (!overlap)
+		strbuf_nalloc(sb, 1);
+
+	sb->str[offset] = c;
+	if (!overlap)
+		sb->len += 1;
+	else if (overlap > 1)
+		sb->len -= overlap - 1;
+
+	sb->str[sb->len] = 0;
+	return 1;
 }
 
 uint strbuf_oprintf(struct strbuf *sb,

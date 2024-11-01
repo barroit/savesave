@@ -60,9 +60,11 @@ static inline uint strbuf_avail(struct strbuf *sb)
 }
 
 /*
- * Similar to strbuf_concat(), except it includes a position argument that
- * specifies the buffer position where string is appended.
- * NB: Don't pass offset that exceeds the length of strbuf.
+ * Similar to strbuf_concat(), except it includes a position argument
+ * that specifies the buffer position where string is appended.
+ *
+ * NB:	The behavior is undefined if the offset exceeds the length of
+ *	strbuf.
  */
 uint strbuf_oconcat(struct strbuf *sb, uint offset, const char *str);
 
@@ -80,6 +82,18 @@ static inline uint strbuf_concat(struct strbuf *sb, const char *str)
 static inline uint strbuf_boconcat(struct strbuf *sb, const char *str)
 {
 	return strbuf_oconcat(sb, sb->base, str);
+}
+
+uint strbuf_oconcat_char(struct strbuf *sb, uint offset, int c);
+
+static inline uint strbuf_concat_char(struct strbuf *sb, int c)
+{
+	return strbuf_oconcat_char(sb, sb->len, c);
+}
+
+static inline uint strbuf_boconcat_char(struct strbuf *sb, int c)
+{
+	return strbuf_oconcat_char(sb, sb->base, c);
 }
 
 /*
@@ -112,9 +126,6 @@ uint strbuf_concat_pathname(struct strbuf *sb,
 uint strbuf_oprintf(struct strbuf *sb,
 		    uint offset, const char *format, ...) __nonnull(3);
 
-/*
- * Truncate the length of strbuf.
- */
 static inline void strbuf_trunc(struct strbuf *sb, uint size)
 {
 	sb->len -= size;
