@@ -239,7 +239,7 @@ void __cold ___die_ucalc_overflow(const char *file, int line,
 	die(_(mas), file, line, size, a, b);
 }
 
-int redirect_output(const char *name)
+int termas_rd_output(const char *name)
 {
 	int ret = proc_rd_io(name, PROC_RD_STDOUT | PROC_RD_STDERR);
 

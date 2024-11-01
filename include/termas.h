@@ -59,7 +59,7 @@ const char *strwinerror(void);
 
 #endif /* _WIN32 */
 
-int redirect_output(const char *name);
+int termas_rd_output(const char *name);
 
 /*
  * file-related error messages

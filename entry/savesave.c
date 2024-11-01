@@ -18,6 +18,7 @@ const char *cm_dotsav_path;
 const char *cm_output_path = CM_OUTPUT_UNSET;
 
 int cm_has_output = 1;
+int cm_no_detach;
 
 int cmd_main(int argc, const char **argv)
 {
@@ -49,7 +50,7 @@ int cmd_main(int argc, const char **argv)
 
 	if (cm_io_need_update) {
 		const char *name = output_path();
-		redirect_output(name);
+		cm_no_detach = termas_rd_output(name);
 	}
 
 	return runcmd(argc, argv);

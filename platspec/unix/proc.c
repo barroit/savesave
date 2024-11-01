@@ -28,11 +28,17 @@ int pid_is_alive(pid_t pid)
 #ifndef proc_detach
 void proc_detach(void)
 {
-	int err = daemon(1, cm_io_need_update);
-	if (!err)
+	if (!cm_io_need_update) {
+		const char *output = output_path();
+		cm_no_detach = termas_rd_output(output);
+	}
+
+	if (cm_no_detach)
 		return;
 
-	warn_errno(_("failed to detach process from controlling terminal"));
+	int err = daemon(1, cm_io_need_update);
+	if (err)
+		warn_errno(_("failed to detach process from controlling terminal"));
 }
 #endif
 

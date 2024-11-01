@@ -28,6 +28,7 @@ extern const char *cm_dotsav_path;
 extern const char *cm_output_path;
 
 extern int cm_has_output;
+extern int cm_no_detach;
 
 #define cm_io_need_update (!cm_has_output || cm_output_path)
 

@@ -8,6 +8,7 @@
 #include "proc.h"
 #include "termas.h"
 #include "command.h"
+#include "path.h"
 
 int pid_is_alive(pid_t pid)
 {
@@ -64,12 +65,12 @@ void proc_detach(void)
 {
 # ifdef CONFIG_NO_WIN_GUI
 	if (!cm_io_need_update) {
-		int err = redirect_output(NULL_DEVICE);
-		if (err)
-			return;
+		const char *output = output_path();
+		cm_no_detach = termas_rd_output(output);
 	}
 
-	FreeConsole();
+	if (!cm_no_detach)
+		FreeConsole();
 # endif
 }
 #endif
