@@ -9,11 +9,13 @@
 #include "termas.h"
 #include "path.h"
 
+#define CM_OUTPUT_UNSET (void *)-39
+
 #define SAVESAVE_USAGE \
 "savesave [--dotsav=<path>] [--output=<path> | --no-output] <command> [<args>]"
 
 const char *cm_dotsav_path;
-const char *cm_output_path = (void *)-39;
+const char *cm_output_path = CM_OUTPUT_UNSET;
 
 int cm_has_output = 1;
 
@@ -40,7 +42,7 @@ int cmd_main(int argc, const char **argv)
 	argupar_parse(&argc, &argv, option, usage,
 		      AP_COMMAND_MODE | AP_NEED_ARGUMENT);
 
-	if (cm_output_path == (void *)-39)
+	if (cm_output_path == CM_OUTPUT_UNSET)
 		cm_output_path = NULL;
 	else if (cm_output_path == NULL)
 		cm_has_output = 0;

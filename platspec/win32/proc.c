@@ -25,7 +25,23 @@ int pid_is_alive(pid_t pid)
 
 int pid_kill(pid_t pid, int sig)
 {
-	return 0;
+	int ret = 0;
+	HANDLE p = OpenProcess(PROCESS_TERMINATE, 0, pid);
+	if (!p)
+		goto err_out;
+
+	int err = !TerminateProcess(p, 0);
+	if (err)
+		goto err_out;
+
+	if (0) {
+	err_out:
+		errno = EPERM;
+		ret = -1;
+	}
+
+	CloseHandle(p);
+	return ret;
 }
 
 #ifndef proc_detach
