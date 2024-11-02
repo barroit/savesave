@@ -11,7 +11,7 @@
 #include "termas.h"
 #include "command.h"
 
-void winexit(int code)
+void __exit(int code)
 {
 	BUG_ON(code == STILL_ACTIVE);
 

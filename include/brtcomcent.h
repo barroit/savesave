@@ -112,7 +112,9 @@ char *basename(char *path);
 
 int setenv(const char *name, const char *value, int overwrite);
 
-void __noreturn winexit(int code);
+void __noreturn __exit(int code);
+
+int __unlink(const char *name);
 
 #define read   _read
 #define write  _write
@@ -121,11 +123,11 @@ void __noreturn winexit(int code);
 #define fileno _fileno
 #define mkdir  _mkdir
 #define putenv _putenv
-#define unlink _unlink
+#define unlink __unlink
 #define rmdir  _rmdir
 #define getpid _getpid
 
-#define exit winexit
+#define exit __exit
 
 #define MKDIR mkdir
 
