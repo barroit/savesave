@@ -54,12 +54,19 @@ void proc_detach(void);
 struct proc {
 	flag_t flags;
 
-#ifdef __unix__
+#if defined(__unix__)
 	pid_t pid;
 #elif defined(_WIN32)
-	HANDLE handle;
+	PROCESS_INFORMATION info;
 #endif
 };
+
+#ifdef _WIN32
+# define pc_proc info.hProcess
+# define pc_pid  info.dwProcessId
+# define pc_thrd info.hThread
+# define pc_tid  info.dwThreadId
+#endif
 
 #define PROC_INIT { 0 };
 
@@ -83,6 +90,13 @@ int proc_wait(struct proc *proc, int *ret);
 #define PERR_RD_STDIN  PERR_RD_ERR(STDIN_FILENO)
 #define PERR_RD_STDOUT PERR_RD_ERR(STDOUT_FILENO)
 #define PERR_RD_STDERR PERR_RD_ERR(STDERR_FILENO)
+
+static inline int proc_use_io_rd(flag_t flags)
+{
+	return flags & PROC_RD_STDIN ||
+	       (flags & PROC_RD_STDOUT) ||
+	       (flags & PROC_RD_STDERR);
+}
 
 /*
  * Redirect stdout/stderr/stdin to specified file.

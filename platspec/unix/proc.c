@@ -56,13 +56,6 @@ struct cerr {
 	char info[];
 };
 
-static inline int proc_use_io_rd(flag_t flags)
-{
-	return flags & PROC_RD_STDIN ||
-	       (flags & PROC_RD_STDOUT) ||
-	       (flags & PROC_RD_STDERR);
-}
-
 static void warn_cerr_exec(int fd, struct cerr *err)
 {
 	char *buf = xmalloc(err->size);
@@ -217,18 +210,13 @@ retry:
 	pid = waitpid(proc->pid, &ws, 0);
 	if (pid == -1) {
 		if (errno != EINTR)
-			return -1;
+			return warn_errno(ERRMAS_WAIT_PROC(pid));
 		goto retry;
 	}
-
-	if (!ret)
-		goto out;
 
 	if (WIFEXITED(ws))
 		*ret = WEXITSTATUS(ws);
 	else if (WIFSIGNALED(ws))
 		*ret = WTERMSIG(ws);
-
-out:
 	return 0;
 }

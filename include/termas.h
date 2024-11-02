@@ -103,4 +103,7 @@ int termas_rd_output(const char *name);
 #define ERRMAS_REMOVE_FILE(name) \
 	_("failed to remove file `%s'"), name
 
+#define ERRMAS_WAIT_PROC(id) \
+	_("failed to wait for process `%d' to terminate"), id
+
 #endif /* TERMAS_H */

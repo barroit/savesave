@@ -24,8 +24,7 @@ static void tmr_callback(void *data,
 			 BOOLEAN fuck_this_BOOLEAN_type_fuck_windows)
 {
 	uint i = (uintptr_t)data;
-	puts("111");
-	// FEATSPEC(baktmr_callback)(i, &tmr.rtm[i]);
+	FEATSPEC(baktmr_callback)(i, &tmr.rtm[i]);
 }
 
 void baktmr_arm(void)

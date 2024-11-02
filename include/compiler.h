@@ -111,7 +111,7 @@
 
 #define __cold __attribute__((__cold__))
 
-#ifdef __unix__
+#if defined(__unix__)
 # define __FEATSPEC_NAME uni
 #elif defined(_WIN32)
 # define __FEATSPEC_NAME win
