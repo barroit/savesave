@@ -38,6 +38,7 @@ endmenu # "Sanitizers"
 
 config NO_LONGRUNNING_DAEMON
 	bool "disable daemonized longrunning"
+	select NO_WIN_GUI if "$(WIN32)"
 
 config SUPPRESS_ANNOTATED_LEAKS
 	bool "suppress annotated leaks"
