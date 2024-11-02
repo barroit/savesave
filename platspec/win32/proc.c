@@ -122,15 +122,7 @@ err_out:
 #ifndef proc_detach
 void proc_detach(void)
 {
-# ifdef CONFIG_NO_WIN_GUI
-	if (!cm_io_need_update) {
-		const char *output = output_path();
-		cm_no_detach = termas_rd_output(output);
-	}
-
-	if (!cm_no_detach)
-		FreeConsole();
-# endif
+	/* DO NOTHING ON WIN32 */
 }
 #endif
 

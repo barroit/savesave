@@ -10,7 +10,6 @@
 #include "alloc.h"
 #include "robio.h"
 #include "strlist.h"
-#include "command.h"
 
 int pid_is_alive(pid_t pid)
 {
