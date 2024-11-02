@@ -20,12 +20,8 @@ int cntcreat(const char *file, mode_t mode);
  * good job, microsoft filesystem permission strategy
  */
 # define flexcreat(file) creat(file, S_IREAD | S_IWRITE)
-# define flexcreat_nt(file) \
-	open(file, O_CREAT | O_WRONLY | O_APPEND, S_IREAD | S_IWRITE)
 #else
 # define flexcreat(file) creat(file, 0664)
-# define flexcreat_nt(file) \
-	open(file, O_CREAT | O_WRONLY | O_APPEND, 0664)
 #endif
 
 int cntopen2(const char *file, int oflag);

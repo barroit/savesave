@@ -95,7 +95,9 @@ void FEATSPEC(baktmr_callback)(uint idx, char *rtm)
 	struct savesave *sav = &dotsav_array[idx];
 	const char *exec = exec_path();
 	const char *output = output_path();
-	struct proc ps = PROC_INIT;
+	struct proc ps = {
+		.flags = PROC_RD_STDIN | PROC_RD_STDOUT | PROC_RD_STDERR,
+	};
 
 	int err;
 	if (sav->period > CONFIG_AIO_COPY_THRESHOLD)

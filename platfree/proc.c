@@ -124,7 +124,13 @@ int __proc_rd_io(const char *name, flag_t flags)
 {
 	BUG_ON(!flags);
 
-	int fd = flexcreat_nt(name);
+	int mode = 0;
+	if (flags & PROC_RD_STDIN)
+		mode |= O_RDONLY;
+	if (flags & (PROC_RD_STDOUT | PROC_RD_STDERR))
+		mode |= O_WRONLY | O_APPEND;
+
+	int fd = open(name, O_CREAT | mode, 0664);
 	if (fd == -1)
 		return -1;
 

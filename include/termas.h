@@ -48,6 +48,8 @@ void __noreturn bug_routine(const char *file,
 
 const char *strwinerror(void);
 
+int last_errno_error(void);
+
 #define warn_winerr(...) \
 	__warn_routine("warning: ", strwinerror(), __VA_ARGS__)
 
