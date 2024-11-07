@@ -5,11 +5,13 @@
  * Contact: barroit@linux.com
  */
 
-#undef exit
-
-#include "console.h"
+#include "cnsl.h"
 #include "termas.h"
 #include "command.h"
+
+#ifdef exit
+# undef exit
+#endif
 
 void __exit(int code)
 {
@@ -17,7 +19,7 @@ void __exit(int code)
 
 #ifndef CONFIG_NO_WIN_GUI
 	if (code && !cm_io_need_update) {
-		show_console();
+		cnsl_show();
 
 		puts(_("Press any key to continue..."));
 		_getch();
