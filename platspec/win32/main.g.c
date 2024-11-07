@@ -15,17 +15,23 @@
 #include "termas.h"
 #include "proc.h"
 
+int cm_do_mr;
+
 int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int __)
 {
-	prog_init();
-	cnsl_attach();
-	prog_init_ob();
+	const char *mr = getenv(PROC_DO_MINIMAL);
+	cm_do_mr = mr && strcmp(mr, "y") == 0;
 
+	prog_init();
+	if (!cm_do_mr)
+		cnsl_attach();
+
+	prog_init_ob();
 	i18n_setup();
 
-	const char *defargv[] = { "savesave", "backup" };
-	int argc = sizeof_array(defargv);
-	const char **argv = defargv;
+	const char *defv[] = { "savesave", "backup" };
+	int argc = sizeof_array(defv);
+	const char **argv = defv;
 
 	if (*cmdline)
 		argc = getargv(&argv);

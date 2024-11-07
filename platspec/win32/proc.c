@@ -122,7 +122,9 @@ err_out:
 #ifndef proc_detach
 void proc_detach(void)
 {
-	/* DO NOTHING ON WIN32 */
+# ifndef CONFIG_NO_WIN_GUI
+	setenv(PROC_DO_MINIMAL, "y", 1);
+# endif
 }
 #endif
 

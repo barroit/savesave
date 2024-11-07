@@ -42,6 +42,9 @@ int pid_kill(pid_t pid, int sig);
  */
 void proc_assert_unique(void);
 
+#if defined(_WIN32) && !defined(CONFIG_NO_WIN_GUI)
+# define PROC_DO_MINIMAL "SAVESAVE_DO_MINIMAL"
+#endif
 /*
  * Detach self from terminal, as well as redirect outputs.
  */

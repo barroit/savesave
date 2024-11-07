@@ -18,7 +18,12 @@ void __exit(int code)
 	BUG_ON(code == STILL_ACTIVE);
 
 #ifndef CONFIG_NO_WIN_GUI
-	if (code && !cm_io_need_update) {
+	/*
+	 * Run this only if
+	 *	process is not running on PROC_DO_MINIMAL.
+	 *	output is not redirected to a new file.
+	 */
+	if (code && !cm_do_mr && !cm_io_need_update) {
 		cnsl_show();
 
 		puts(_("Press any key to continue..."));

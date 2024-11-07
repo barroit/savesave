@@ -74,6 +74,10 @@ extern int cm_no_detach;
 #define CM_OUTPUT_UNSET (void *)-39
 #define cm_io_need_update (!cm_has_output || cm_output_path != CM_OUTPUT_UNSET)
 
+#if defined(_WIN32) && !defined(CONFIG_NO_WIN_GUI)
+extern int cm_do_mr;
+#endif
+
 #define APOPT_MAINCOMMAND(v) \\
 EOF
 
