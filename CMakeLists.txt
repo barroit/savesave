@@ -160,7 +160,7 @@ if(NOT CONFIG_DISALBE_GETTEXT AND Intl_FOUND)
     if(GETTEXT_FOUND)
       set(GETTEXT_VERSION ${GETTEXT_VERSION_STRING})
     else()
-      set(GETTEXT_VERSION "unknown")
+      set(GETTEXT_VERSION unknown)
     endif()
   else()
     set(GETTEXT_VERSION ${Intl_VERSION})
@@ -187,7 +187,9 @@ if(LINUX)
 endif()
 
 list(TRANSFORM pathspec PREPEND platspec/)
+
 file(GLOB source LIST_DIRECTORIES false ${pathspec})
+list(FILTER source EXCLUDE REGEX main\.)
 
 add_library(platspec OBJECT ${source})
 
@@ -196,26 +198,27 @@ file(GLOB source LIST_DIRECTORIES false platfree/*.c commands/*.c)
 add_library(platfree OBJECT ${source})
 
 # --------------------------------- Savesave ----------------------------------
-list(APPEND mainsrc savesave.c)
 if(UNIX)
-  list(APPEND mainsrc uni.c)
+  set(source unix/main.c)
 elseif(WIN32)
   if(CONFIG_NO_WIN_GUI)
-    list(APPEND mainsrc wincon.c)
+    set(source win32/main.c.c)
   else()
-    list(APPEND mainsrc wingui.c)
+    set(source win32/main.g.c)
   endif()
 endif()
-list(TRANSFORM mainsrc PREPEND ${ROOT}/entry/)
+
+list(TRANSFORM source PREPEND ${ROOT}/platspec/)
 
 if(WIN32)
-  list(APPEND mainsrc ${ROOT}/savesave.rc)
+  set_source_files_properties(${source} PROPERTIES LANGUAGE C)
+  list(APPEND source ${ROOT}/savesave.rc)
   if(NOT CONFIG_NO_WIN_GUI)
-    list(PREPEND mainsrc WIN32)
+    list(PREPEND source WIN32)
   endif()
 endif()
 
-add_executable(savesave ${mainsrc})
+add_executable(savesave ${source})
 
 target_link_libraries(savesave platfree platspec)
 
