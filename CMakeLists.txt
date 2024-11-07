@@ -126,6 +126,16 @@ add_compile_options("SHELL:-include ${ROOT}/include/brtcomcent.h")
 
 include_directories(${ROOT}/include ${ROOT}/include/arch/${ARCH})
 
+if(UNIX)
+  include_directories(${ROOT}/platspec/unix)
+elseif(WIN32)
+  include_directories(${ROOT}/platspec/win32)
+endif()
+
+if(LINUX)
+  include_directories(${ROOT}/platspec/linux)
+endif()
+
 # --------------------------------- Manifest ----------------------------------
 if(WIN32)
   set(SAVESAVE_VERSION_RC ${SAVESAVE_VERSION_CMAKE})

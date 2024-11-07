@@ -5,10 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef _WIN32
-# error "menu.h is win-spec"
-#endif
-
 #ifndef MENU_H
 #define MENU_H
 

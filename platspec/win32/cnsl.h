@@ -5,10 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef _WIN32
-# error "cnsl.h is win-spec"
-#endif
-
 #ifndef CNSL_H
 #define CNSL_H
 

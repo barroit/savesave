@@ -5,10 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef _WIN32
-# error "resid.h is win-spec"
-#endif
-
 #ifndef RESID_H
 #define RESID_H
 

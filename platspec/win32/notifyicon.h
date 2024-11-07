@@ -5,10 +5,6 @@
  * Contact: barroit@linux.com
  */
 
-#ifndef _WIN32
-# error "notifyicon.h is win-spec"
-#endif
-
 #ifndef NOTIFYICON_H
 #define NOTIFYICON_H
 

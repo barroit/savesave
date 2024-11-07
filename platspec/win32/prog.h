@@ -7,10 +7,6 @@
  * Do not be confused with proc_*
  */
 
-#ifndef _WIN32
-# error "prog.h is win-spec"
-#endif
-
 #ifndef PROG_H
 #define PROG_H
 
