@@ -8,7 +8,7 @@
 #include "command.h"
 #include "i18n.h"
 #include "prog.h"
-#include "console.h"
+#include "cnsl.h"
 #include "getargv.h"
 #include "window.h"
 #include "notifyicon.h"
@@ -18,7 +18,7 @@
 int WinMain(HINSTANCE app, HINSTANCE _, char *cmdline, int __)
 {
 	prog_init();
-	setup_console();
+	cnsl_attach();
 	prog_init_ob();
 
 	i18n_setup();
