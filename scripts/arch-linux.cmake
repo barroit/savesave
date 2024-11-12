@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 # We use the first item in the list as real architecture name
 # Also include/arch
 set(ARCH_X86 "x86 x86_64 amd64 x64")

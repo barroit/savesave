@@ -1,8 +1,6 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
- * Copyright 2024 Jiamu Sun
- *
- * Contact: barroit@linux.com
+ * Copyright 2024 Jiamu Sun <barroit@linux.com>
  *
  * Implementation based on the example provided by liburing and
  * https://man7.org/linux/man-pages/man7/io_uring.7.html

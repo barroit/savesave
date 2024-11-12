@@ -1,8 +1,6 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
- * Copyright 2024 Jiamu Sun
- *
- * Contact: barroit@linux.com
+ * Copyright 2024 Jiamu Sun <barroit@linux.com>
  *
  * NB:	The behavior is undefined if NULL or an empty string is passed
  *	to strbuf_*concat() or strbuf_*printf().

@@ -1,8 +1,6 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
- * Copyright 2024 Jiamu Sun
- *
- * Contact: barroit@linux.com
+ * Copyright 2024 Jiamu Sun <barroit@linux.com>
  *
  * we tried cpp17's file system, but the api is sucked, especially when coming
  * with temporary object and value_type. So, use win32 api.

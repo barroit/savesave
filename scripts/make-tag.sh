@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-# SPDX-License-Identifier: GPL-3.0-only
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 if [[ ! -f .savesave.example ]]; then
 	>&2 echo 'error: not in source tree'
